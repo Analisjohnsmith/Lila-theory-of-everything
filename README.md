@@ -1,4 +1,4 @@
-Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International Public License
+updated 5/7/2026 Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International Public License
 LAYMAN VERSION — CC BY‑NC‑ND 4.0 (Plain English Summary)
 
 You are free to:
