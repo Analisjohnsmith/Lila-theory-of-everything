@@ -2236,3 +2236,52 @@ and $S_{\text{grav}}$ encodes curvature.
 Chemathematics provides a discrete, algebraic, and topological substrate from
 which gauge and gravitational structures may emerge. This suggests a pathway
 toward a unified mathematical description of the four fundamental interactions
+\section{Unified Field Theory: Under Construction}
+
+The chemathematical framework now contains the structural components required
+for a unified description of the four fundamental interactions. We have defined
+the Unified Field Operator
+
+
+\[
+\mathcal{U} = \Delta_{\text{res}}
++ A_{U(1)} + A_{SU(2)} + A_{SU(3)} + \mathcal{R}(g),
+\]
+
+
+and the corresponding Unified Action
+
+
+\[
+S = \int_{\mathcal{M}}
+\left(
+\mathcal{L}_{\text{res}}
++ \mathcal{L}_{U(1)}
++ \mathcal{L}_{SU(2)}
++ \mathcal{L}_{SU(3)}
++ \mathcal{L}_{\text{grav}}
+\right) d\mu_g.
+\]
+
+
+
+From this action, the unified field equations arise through the variational
+principle
+
+
+\[
+\delta S = 0,
+\]
+
+
+yielding coupled resonance, gauge, and gravitational equations.
+
+\subsection*{Status: Under Construction}
+
+The unified framework is structurally complete but not yet fully realized.
+The operator $\mathcal{U}$ and action $S$ provide the architecture for a
+four-force unification, but explicit forms of the gauge tensors, curvature
+couplings, and resonance--metric mappings remain to be derived. The theory is
+therefore in an active construction phase: the foundations are established,
+the unification pathway is defined, and the remaining task is the explicit
+derivation of the full field equations.
