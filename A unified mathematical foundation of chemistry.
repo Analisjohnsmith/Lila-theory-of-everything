@@ -1876,3 +1876,177 @@ structure, aromaticity, resonance, and reactivity.
 
 \end{document}
 
+% ============================================================
+% Ω–COSMOLOGY: GENERATIVE, STRUCTURAL, OBSERVATIONAL, PRE-HISTORY
+% ============================================================
+
+% 1. GENERATIVE LAYER — Ω REWRITE DYNAMICS
+
+
+\[
+\Omega : C_t \;\longrightarrow\; C_{t+1}
+\]
+
+
+
+
+
+\[
+\rho_\Omega(t) \;=\; \frac{dN_{\text{rewrites}}}{dt}
+\]
+
+
+
+
+
+\[
+H_\Omega(t) \;\propto\; \frac{dN_{\text{links}}}{dt}
+\]
+
+
+
+% 2. GEOMETRY FROM CONNECTIVITY (GRAVITY)
+
+
+\[
+\mathcal{K}(x) \;=\; f\!\left(\rho_\Omega(x)\right)
+\]
+
+
+
+
+
+\[
+R_{\mu\nu} \;\sim\; \partial^2 \rho_\Omega
+\]
+
+
+
+% 3. Ω → PARTICLE FIXED-POINTS
+
+
+\[
+\Omega(p) = p \quad\Rightarrow\quad p \text{ is a particle state}
+\]
+
+
+
+
+
+\[
+\text{Mass}(p) \;\propto\; \lambda_{\text{min}}(p)
+\]
+
+
+
+
+
+\[
+\text{Charge}(p) \;\propto\; \Delta\phi_\Omega(p)
+\]
+
+
+
+% 4. Ω → FORCE SYMMETRIES
+
+
+\[
+U(1) \;\equiv\; \text{phase symmetry of }\Omega
+\]
+
+
+
+
+
+\[
+SU(2) \;\equiv\; \text{chiral asymmetry of }\Omega
+\]
+
+
+
+
+
+\[
+SU(3) \;\equiv\; \text{resonance-cycle symmetry of }\Omega
+\]
+
+
+
+
+
+\[
+\text{Gravity} \;\equiv\; \text{connectivity curvature of }\Omega
+\]
+
+
+
+% 5. Ω → ΛCDM CORRESPONDENCE
+
+
+\[
+\lim_{\Delta t \to 0} \Omega(C_t) \;\longrightarrow\; 
+H^2(a) = H_0^2 \left( \Omega_m a^{-3} + \Omega_r a^{-4} + \Omega_\Lambda + \Omega_k a^{-2} \right)
+\]
+
+
+
+% 6. EARLY UNIVERSE (Ω INFLATION REGIME)
+
+
+\[
+\rho_\Omega(t) \;\approx\; \rho_{\max}
+\]
+
+
+
+
+
+\[
+a(t) \;\sim\; \exp\!\left( \alpha\, t \right)
+\]
+
+
+
+% 7. TRANSITION TO RADIATION ERA
+
+
+\[
+\rho_\Omega(t) \;\downarrow\; \Rightarrow\; a(t) \sim t^{1/2}
+\]
+
+
+
+% 8. MATTER EMERGENCE FROM FIXED-POINT FORMATION
+
+
+\[
+\frac{d}{dt} N_{\text{fixed}}(t) \;>\; 0
+\]
+
+
+
+% 9. LATE-TIME ACCELERATION (Ω RECURSION)
+
+
+\[
+\frac{d\rho_\Omega}{dt} > 0 \quad\Rightarrow\quad a(t) \sim \exp(\beta t)
+\]
+
+
+
+% 10. FULL Ω COSMOLOGY STACK
+
+
+\[
+\text{Universe} \;=\;
+\Big(
+\underbrace{\Omega}_{\text{generative}},
+\underbrace{\mathcal{S}_\Omega}_{\text{structural}},
+\underbrace{\Lambda\text{CDM}}_{\text{observational}},
+\underbrace{\mathcal{B}}_{\text{pre-history (optional)}}
+\Big)
+\]
+
+
+
+% ============================================================
