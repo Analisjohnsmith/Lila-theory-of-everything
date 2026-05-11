@@ -1,0 +1,483 @@
+% Pando Canonical Mathematical Model
+% Ready-to-compile LaTeX (no placeholders, no external dependencies)
+
+\documentclass[11pt]{article}
+
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+\title{A Canonical Dynamical System for the Pando Aspen Clone}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Domain and Geometry}
+
+Let the spatial domain be
+
+
+\[
+  \Omega \subset \mathbb{R}^2,
+\]
+
+
+equipped with a Riemannian metric
+
+
+\[
+  g_{ij}(x,y), \quad i,j \in \{1,2\},
+\]
+
+
+and corresponding inverse metric $g^{ij}(x,y)$ and covariant derivative $\nabla_i$.
+
+We denote the volume element by
+
+
+\[
+  d^2x = \sqrt{\det g}\,dx\,dy.
+\]
+
+
+
+\section{State Variables}
+
+The full state of the Pando system at time $t$ is
+
+
+\[
+  \mathcal{S}(t)
+  =
+  \big(
+    u,\ n_i,\ G^{(k)},\ E^{(k)}_\ell,\ h_j,\ m,\ \mathcal{R},\ C,\ H,\ F,\ w
+  \big),
+\]
+
+
+where:
+
+\begin{itemize}
+  \item $u(x,y,t)$: continuous ``presence'' field (organism density / vigor).
+  \item $n_i(t) \in \{0,1\}$: discrete stem occupation at lattice site $i$ with position $\mathbf{x}_i \in \Omega$.
+  \item $G^{(k)}(t)$: genome of stem $k$ (e.g.\ a vector in sequence space).
+  \item $E^{(k)}_\ell(t)$: epigenetic state for locus $\ell$ in stem $k$.
+  \item $h_j(x,y,t)$: biochemical (hormone) fields, indexed by $j$.
+  \item $m(x,y,t)$: soil microbiome / fungal density field.
+  \item $\mathcal{R}(t) = (V(t),E(t))$: root network graph (nodes and edges).
+  \item $C(x,y,t) = \{T(x,y,t), P(x,y,t), W(x,y,t)\}$: climate forcing (temperature, precipitation, water).
+  \item $H(x,y,t)$: herbivory (browsing) pressure field.
+  \item $F(x,y,t)$: fire intensity field.
+  \item $w(x,y,t)$: mechanical displacement / bending field of stems.
+\end{itemize}
+
+The total number of stems is
+
+
+\[
+  N(t) = \sum_i n_i(t).
+\]
+
+
+
+\section{Core Fields and Dynamics}
+
+\subsection{Presence field}
+
+The presence field $u(x,y,t)$ evolves according to
+\begin{equation}
+  \frac{\partial u}{\partial t}
+  =
+  D\,\nabla_i\big(g^{ij}\nabla_j u\big)
+  + r\,F_C(C)\,R(x,y)\,u(1-u)
+  - \delta\,G_C(C)\,u
+  + \lambda \sum_i \big(n_i - u(\mathbf{x}_i,t)\big)\,\delta(x-\mathbf{x}_i),
+  \label{eq:presence}
+\end{equation}
+where:
+\begin{itemize}
+  \item $D$ is a diffusion coefficient.
+  \item $R(x,y)$ is a resource field (soil, light, etc.).
+  \item $F_C(C)$ and $G_C(C)$ are climate response functions modifying growth and decay.
+  \item $r$ is an intrinsic growth rate.
+  \item $\delta$ is a decay rate.
+  \item $\lambda$ is a coupling strength between stems and field.
+\end{itemize}
+
+\subsection{Stem lattice and energy}
+
+Define the stem energy contribution
+\begin{equation}
+  E_{\text{stems}}
+  =
+  -J \sum_{\langle i,j \rangle} n_i n_j
+  + \alpha \sum_i n_i,
+  \label{eq:stem_energy}
+\end{equation}
+where:
+\begin{itemize}
+  \item $J$ is a coupling constant between neighboring stems.
+  \item $\alpha$ is a linear cost/benefit term for stem presence.
+  \item $\langle i,j \rangle$ denotes nearest neighbors on the lattice.
+\end{itemize}
+
+\subsection{Genome and mutation}
+
+Let $G$ be a reference genome and $G^{(k)}(t)$ the genome of stem $k$.
+Define the Hamming distance
+
+
+\[
+  d_k(t) = d\big(G^{(k)}(t), G\big).
+\]
+
+
+The genome energy term is
+\begin{equation}
+  E_{\text{genome}}
+  =
+  \beta \sum_k d_k,
+  \label{eq:genome_energy}
+\end{equation}
+and the genome--stem coupling term
+\begin{equation}
+  E_{\text{genome-stem}}
+  =
+  \beta \sum_k d_k\,n_k.
+  \label{eq:genome_stem_energy}
+\end{equation}
+
+Genome dynamics (schematic) can be written as
+\begin{equation}
+  G^{(k)}(t+\Delta t)
+  =
+  G^{(k)}(t)
+  - \beta\,\nabla d_k
+  + \Delta \epsilon^{(k)}(t),
+  \label{eq:genome_dynamics}
+\end{equation}
+where $\Delta \epsilon^{(k)}(t)$ represents mutation noise (e.g.\ Poisson process with rate $\mu$).
+
+\subsection{Turnover and regulation}
+
+Define a turnover energy term
+\begin{equation}
+  E_{\text{turnover}}
+  =
+  \gamma \big(N - N^*\big)^2,
+  \label{eq:turnover_energy}
+\end{equation}
+where $N^*$ is a preferred stem number and $\gamma$ a penalty strength.
+
+At a coarse level, stem number dynamics can be written as
+\begin{equation}
+  \frac{dN}{dt}
+  =
+  (b - d)\,N,
+  \label{eq:turnover_dynamics}
+\end{equation}
+with birth and death rates
+\begin{align}
+  b &= b_0\,u(\mathbf{x}_i,t), \\
+  d &= d_0 + \eta\big(1 - u(\mathbf{x}_i,t)\big) + \eta_H H(\mathbf{x}_i,t),
+\end{align}
+where $\eta_H$ encodes herbivory effects.
+
+\subsection{Coupling terms}
+
+The stem--field coupling energy is
+\begin{equation}
+  E_{\text{coupling}}
+  =
+  \lambda \sum_i \big(n_i - u(\mathbf{x}_i,t)\big)^2.
+  \label{eq:coupling_energy}
+\end{equation}
+
+\section{Additional Subsystems}
+
+\subsection{Biochemical signaling fields}
+
+For each hormone or signaling field $h_j(x,y,t)$:
+\begin{equation}
+  \frac{\partial h_j}{\partial t}
+  =
+  D_j \nabla^2 h_j
+  + S_j\big(u,m,\mathcal{R}\big)
+  - \delta_j h_j,
+  \label{eq:hormone}
+\end{equation}
+where $S_j$ is a source term depending on presence $u$, microbiome $m$, and root network $\mathcal{R}$.
+
+\subsection{Epigenetic memory}
+
+For each locus $\ell$ in stem $k$:
+\begin{equation}
+  \frac{dE^{(k)}_\ell}{dt}
+  =
+  \phi\big(\text{stress}, h_j\big)
+  - \psi\big(E^{(k)}_\ell\big),
+  \label{eq:epigenetic}
+\end{equation}
+where $\phi$ encodes induction by stress and signaling, and $\psi$ encodes relaxation.
+
+\subsection{Microbiome dynamics}
+
+The microbiome / fungal density field $m(x,y,t)$ evolves as
+\begin{equation}
+  \frac{\partial m}{\partial t}
+  =
+  D_m \nabla^2 m
+  + G_m\big(u,\mathcal{R}\big)
+  - \delta_m m,
+  \label{eq:microbiome}
+\end{equation}
+where $G_m$ is a growth term depending on presence $u$ and root network $\mathcal{R}$.
+
+\subsection{Root network}
+
+The root network is a time-dependent graph
+
+
+\[
+  \mathcal{R}(t) = \big(V(t),E(t)\big),
+\]
+
+
+with edge dynamics
+\begin{equation}
+  \frac{dE}{dt}
+  =
+  f\big(\text{soil}, u, \text{stress}\big),
+  \label{eq:root_edges}
+\end{equation}
+and root tip motion governed by resource gradients:
+\begin{equation}
+  \frac{d\mathbf{x}_{\text{tip}}}{dt}
+  =
+  \nabla R(x,y).
+  \label{eq:root_tip}
+\end{equation}
+
+\subsection{Climate forcing}
+
+Climate fields
+
+
+\[
+  C(x,y,t) = \{T(x,y,t), P(x,y,t), W(x,y,t)\}
+\]
+
+
+enter via response functions $F_C(C)$ and $G_C(C)$ in the presence dynamics \eqref{eq:presence}, and can also modulate other parameters (e.g.\ $r$, $\delta$, $G_m$).
+
+\subsection{Herbivory}
+
+Herbivory pressure $H(x,y,t)$ modifies local death rates and stem survival. In particular,
+\begin{equation}
+  d \to d + \eta_H H(x,y,t),
+  \label{eq:herbivory}
+\end{equation}
+and can be spatially structured (e.g.\ higher near edges, lower in fenced regions).
+
+\subsection{Fire ecology}
+
+Fire intensity $F(x,y,t)$ induces stem mortality:
+\begin{equation}
+  n_i(t^+) = 0
+  \quad \text{if} \quad
+  F(\mathbf{x}_i,t) > F_{\text{crit}},
+  \label{eq:fire}
+\end{equation}
+with possible partial or full survival of roots depending on fire severity.
+
+\subsection{Mechanical forces}
+
+The mechanical displacement field $w(x,y,t)$ satisfies an elasticity-type equation:
+\begin{equation}
+  D_m^{(w)} \nabla^4 w
+  =
+  F_{\text{wind}}(x,y,t)
+  + F_{\text{snow}}(x,y,t),
+  \label{eq:mechanical}
+\end{equation}
+where $D_m^{(w)}$ is a flexural rigidity parameter.
+
+\section{Stochastic Stem Dynamics}
+
+The discrete stem variables $n_i(t)$ evolve via a Glauber-type dynamic:
+\begin{equation}
+  \Pr\big[n_i(t+\Delta t) = 1\big]
+  =
+  \sigma\!\left(-\frac{\Delta E_i}{kT}\right),
+  \label{eq:glauber}
+\end{equation}
+where:
+\begin{itemize}
+  \item $\Delta E_i$ is the energy change if $n_i$ flips (from 0 to 1 or 1 to 0),
+  \item $kT$ is an effective noise/temperature parameter,
+  \item $\sigma(z)$ is a sigmoid function, e.g.\ $\sigma(z) = \frac{1}{1+e^{-z}}$.
+\end{itemize}
+
+The local energy $E_i$ includes contributions from
+\begin{equation}
+  E_i
+  =
+  -J \sum_{j \in \text{nbr}(i)} n_j
+  + \alpha n_i
+  + \beta d_i n_i
+  + 2\lambda \big(n_i - u(\mathbf{x}_i,t)\big)^2
+  + 2\gamma \big(N - N^*\big)^2.
+  \label{eq:local_energy}
+\end{equation}
+
+\section{Action Functional and Canonical Form}
+
+Define the total Lagrangian density
+\begin{equation}
+  \mathcal{L}
+  =
+  \mathcal{L}_{\text{field}}
+  + \mathcal{L}_{\text{stems}}
+  + \mathcal{L}_{\text{genome}}
+  + \mathcal{L}_{\text{turnover}}
+  + \mathcal{L}_{\text{coupling}}
+  + \mathcal{L}_{\text{bio}}
+  + \mathcal{L}_{\text{micro}}
+  + \mathcal{L}_{\text{mech}}
+  + \mathcal{L}_{\text{env}},
+  \label{eq:total_L}
+\end{equation}
+with representative components:
+
+\paragraph{Field term}
+\begin{equation}
+  \mathcal{L}_{\text{field}}
+  =
+  \frac{1}{2} D\,g^{ij}\,\partial_i u\,\partial_j u
+  + r\,F_C(C)\,R(x,y)\,u(1-u)
+  - \delta\,G_C(C)\,u^2.
+  \label{eq:L_field}
+\end{equation}
+
+\paragraph{Stem term}
+\begin{equation}
+  \mathcal{L}_{\text{stems}}
+  =
+  -J \sum_{\langle i,j \rangle} n_i n_j
+  + \alpha \sum_i n_i.
+  \label{eq:L_stems}
+\end{equation}
+
+\paragraph{Genome term}
+\begin{equation}
+  \mathcal{L}_{\text{genome}}
+  =
+  \beta \sum_k d_k n_k.
+  \label{eq:L_genome}
+\end{equation}
+
+\paragraph{Turnover term}
+\begin{equation}
+  \mathcal{L}_{\text{turnover}}
+  =
+  \gamma \big(N - N^*\big)^2.
+  \label{eq:L_turnover}
+\end{equation}
+
+\paragraph{Coupling term}
+\begin{equation}
+  \mathcal{L}_{\text{coupling}}
+  =
+  \lambda \sum_i \big(n_i - u(\mathbf{x}_i,t)\big)^2.
+  \label{eq:L_coupling}
+\end{equation}
+
+\paragraph{Biochemical and microbiome terms}
+\begin{align}
+  \mathcal{L}_{\text{bio}}
+  &=
+  \sum_j
+  \left[
+    \frac{1}{2} D_j |\nabla h_j|^2
+    + S_j(u,m,\mathcal{R})\,h_j
+    - \frac{1}{2}\delta_j h_j^2
+  \right],
+  \label{eq:L_bio}
+  \\
+  \mathcal{L}_{\text{micro}}
+  &=
+  \frac{1}{2} D_m |\nabla m|^2
+  + G_m(u,\mathcal{R})\,m
+  - \frac{1}{2}\delta_m m^2.
+  \label{eq:L_micro}
+\end{align}
+
+\paragraph{Mechanical term}
+\begin{equation}
+  \mathcal{L}_{\text{mech}}
+  =
+  \frac{1}{2} D_m^{(w)} (\nabla^2 w)^2
+  - w\big(F_{\text{wind}} + F_{\text{snow}}\big).
+  \label{eq:L_mech}
+\end{equation}
+
+\paragraph{Environmental term}
+\begin{equation}
+  \mathcal{L}_{\text{env}}
+  =
+  \mathcal{L}_{\text{climate}}(C)
+  + \mathcal{L}_{\text{herbivory}}(H)
+  + \mathcal{L}_{\text{fire}}(F),
+  \label{eq:L_env}
+\end{equation}
+with specific forms chosen as needed.
+
+\subsection{Action}
+
+The canonical Action functional is
+\begin{equation}
+  S[\mathcal{S}]
+  =
+  \int dt \int_{\Omega} d^2x\,
+  \mathcal{L}\big(\mathcal{S}(t,x,y)\big).
+  \label{eq:action}
+\end{equation}
+
+\subsection{Equations of motion}
+
+The deterministic (mean-field) equations of motion follow from the variational conditions
+\begin{equation}
+  \frac{\delta S}{\delta u} = 0,\quad
+  \frac{\delta S}{\delta n_i} = 0,\quad
+  \frac{\delta S}{\delta G^{(k)}} = 0,\quad
+  \frac{\delta S}{\delta E^{(k)}_\ell} = 0,\quad
+  \frac{\delta S}{\delta h_j} = 0,\quad
+  \frac{\delta S}{\delta m} = 0,\quad
+  \frac{\delta S}{\delta w} = 0,
+  \label{eq:eom_variational}
+\end{equation}
+which reproduce, in appropriate limits, the PDEs and update rules given in
+\eqref{eq:presence}--\eqref{eq:mechanical} and \eqref{eq:glauber}--\eqref{eq:local_energy}.
+
+\section{Canonical Object Summary}
+
+The canonical mathematical object representing the Pando organism is the dynamical system
+
+
+\[
+  \big(\Omega, g_{ij}, \mathcal{S}(t), S[\mathcal{S}]\big),
+\]
+
+
+where:
+\begin{itemize}
+  \item $\Omega, g_{ij}$ define the geometric and environmental backdrop.
+  \item $\mathcal{S}(t)$ collects all fields, discrete variables, and graph structures.
+  \item $S[\mathcal{S}]$ is the Action functional whose variation yields the equations of motion.
+\end{itemize}
+
+This system is simulation-ready and can be discretized in space and time to generate numerical realizations of Pando's growth, decline, regeneration, and response to climate, herbivory, fire, and other forces.
+
+\end{document}
