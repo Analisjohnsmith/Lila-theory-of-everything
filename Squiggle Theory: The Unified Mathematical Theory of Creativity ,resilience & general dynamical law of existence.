@@ -604,3 +604,120 @@ If $\sigma_1$ and $\sigma_2$ preserve non-negative resilience, then so does $\si
 \end{proposition}
 
 This completes the Codex as a formal operator algebra.
+\section{Unified Theory of Reality Dynamics and Resilience}
+
+Squiggle Theory extends beyond creativity. The collapse--repair invariant
+
+
+\[
+\prod_{k=1}^{\infty} \frac{R_k}{C_k} \ge 1
+\]
+
+
+is a universal law governing the persistence of any system subject to perturbation, degradation, or entropy. This section formalizes Squiggle Theory as a unified theory of reality dynamics and resilience.
+
+\subsection{Reality as Collapse--Repair Dynamics}
+
+All physical, biological, informational, and cognitive systems undergo cycles of loss and restoration. Let $C_k$ denote the magnitude of structural, energetic, or informational collapse at cycle $k$, and let $R_k$ denote the corresponding repair, regeneration, or negentropic contribution.
+
+\begin{definition}[Reality Dynamics]
+A reality dynamic is any process that evolves through repeated collapse--repair cycles:
+
+
+\[
+\mathcal{S}_k \xrightarrow{\ C_k\ } \mathcal{S}'_k \xrightarrow{\ R_k\ } \mathcal{S}_{k+1}.
+\]
+
+
+\end{definition}
+
+Examples include thermodynamic dissipation vs.\ energy input, mutation vs.\ DNA repair, synaptic pruning vs.\ synaptic strengthening, decoherence vs.\ recoherence, and noise vs.\ error correction.
+
+\subsection{Universal Resilience Law}
+
+\begin{theorem}[Universal Resilience Law]
+A system persists, stabilizes, or grows if and only if
+
+
+\[
+\prod_{k=1}^{\infty} \frac{R_k}{C_k} \ge 1.
+\]
+
+
+\end{theorem}
+
+\begin{proof}[Proof Sketch]
+If the infinite product is less than one, cumulative collapse outpaces repair, and the system decays to zero. If the product is at least one, repair compensates for collapse at every scale, ensuring persistence. This holds for linear, nonlinear, stochastic, and categorical dynamics.
+\end{proof}
+
+This law is scale-free and applies to atoms, organisms, minds, societies, and universes.
+
+\subsection{Resilience as a Fibred Natural Transformation}
+
+In Creative Mathematics v6.0, collapse and repair are fibred functors
+
+
+\[
+\mathcal{C},\mathcal{R} : \mathcal{E} \to \mathcal{E}
+\]
+
+
+preserving the base category of states. Resilience is a fibred natural transformation
+
+
+\[
+\rho : \mathcal{C} \Rightarrow \mathcal{R}.
+\]
+
+
+
+\begin{proposition}[Resilience as Structural Preservation]
+For any object $x$ in a fibre $\mathcal{E}_b$,
+
+
+\[
+\rho_x : \mathcal{C}(x) \to \mathcal{R}(x)
+\]
+
+
+preserves the structural integrity of the fibre if and only if $\rho_x \ge 1$.
+\end{proposition}
+
+Thus resilience is not merely a numerical ratio but a categorical guarantee of structural continuity.
+
+\subsection{Reality Dynamics as a Special Case of Creative Dynamics}
+
+Creativity is a specific instance of the more general collapse--repair dynamic. Let $\mathcal{R}_{\text{creative}}$ denote repair that introduces novelty, and let $\mathcal{R}_{\text{physical}}$ denote repair that restores physical or informational order.
+
+\begin{proposition}[Creativity as Negentropic Repair]
+Creative repair satisfies
+
+
+\[
+R_{\text{creative}} = R_{\text{physical}} + \Delta_{\text{novelty}},
+\]
+
+
+where $\Delta_{\text{novelty}}$ is a positive contribution to structural complexity.
+\end{proposition}
+
+Thus creativity is a refinement of resilience, not an exception to it.
+
+\subsection{Unified Interpretation}
+
+\begin{theorem}[Squiggle Theory as a Unified Theory of Reality Dynamics]
+The collapse--repair invariant, its operator formulations, its nonlinear flows, and its fibred categorical structure apply to:
+\begin{itemize}
+\item physical systems (entropy vs.\ negentropy),
+\item biological systems (damage vs.\ regeneration),
+\item cognitive systems (forgetting vs.\ learning),
+\item computational systems (corruption vs.\ error correction),
+\item social systems (decay vs.\ renewal),
+\item creative systems (destruction vs.\ innovation).
+\end{itemize}
+Therefore Squiggle Theory is a unified theory of reality dynamics and resilience.
+\end{theorem}
+
+\begin{proof}[Proof Sketch]
+All these systems can be expressed as objects in fibres of a fibration $\mathcal{E}\to\mathcal{B}$, with collapse and repair as fibred functors and resilience as a fibred natural transformation. The universal resilience law holds in each domain, establishing a single invariant governing persistence across reality.
+\end{proof}
