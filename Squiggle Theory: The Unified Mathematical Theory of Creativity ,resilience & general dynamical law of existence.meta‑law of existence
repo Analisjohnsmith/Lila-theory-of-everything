@@ -721,3 +721,437 @@ Therefore Squiggle Theory is a unified theory of reality dynamics and resilience
 \begin{proof}[Proof Sketch]
 All these systems can be expressed as objects in fibres of a fibration $\mathcal{E}\to\mathcal{B}$, with collapse and repair as fibred functors and resilience as a fibred natural transformation. The universal resilience law holds in each domain, establishing a single invariant governing persistence across reality.
 \end{proof}
+\section{Grand Unified Extensions: Thermodynamics, Information Theory, and the Free-Energy Principle}
+
+This section extends Squiggle Theory beyond creativity and resilience into three foundational domains:
+(1) thermodynamic entropy, 
+(2) information-theoretic structure, and 
+(3) variational free-energy minimization. 
+Together these establish Squiggle Theory as a unified law of adaptive reality.
+
+\subsection{Thermodynamic Lift: Collapse--Repair as Entropy--Negentropy Dynamics}
+
+Let $S$ denote thermodynamic entropy and $N$ denote negentropic repair (energy or order input). 
+A collapse event increases entropy by $\Delta S_k$, while a repair event decreases entropy by $\Delta N_k$.
+
+\begin{definition}[Thermodynamic Collapse and Repair]
+
+
+\[
+C_k = e^{\Delta S_k}, 
+\qquad 
+R_k = e^{\Delta N_k}.
+\]
+
+
+\end{definition}
+
+The universal resilience law becomes:
+
+\begin{theorem}[Thermodynamic Resilience Law]
+A physical system persists if and only if
+
+
+\[
+\prod_{k=1}^{\infty} \frac{e^{\Delta N_k}}{e^{\Delta S_k}} 
+= 
+\exp\!\left(\sum_{k=1}^{\infty} (\Delta N_k - \Delta S_k)\right)
+\ge 1.
+\]
+
+
+\end{theorem}
+
+\begin{corollary}
+Persistence requires
+
+
+\[
+\sum_{k=1}^{\infty} (\Delta N_k - \Delta S_k) \ge 0.
+\]
+
+
+\end{corollary}
+
+Thus Squiggle Theory generalizes the second law of thermodynamics by quantifying the negentropic repair required for survival.
+
+\subsection{Information-Theoretic Lift: Collapse--Repair as Loss and Gain of Information}
+
+Let $H$ denote Shannon entropy and $I$ denote mutual information with a reference structure.
+
+\begin{definition}[Information Collapse and Repair]
+
+
+\[
+C_k = e^{H(\Psi_k) - H(\Psi_{k-1})}, 
+\qquad 
+R_k = e^{I(\Psi_k,\text{ref}) - I(\Psi_{k-1},\text{ref})}.
+\]
+
+
+\end{definition}
+
+\begin{theorem}[Information Resilience Law]
+A system maintains informational coherence if and only if
+
+
+\[
+\prod_{k=1}^{\infty} \frac{R_k}{C_k} \ge 1.
+\]
+
+
+\end{theorem}
+
+This expresses resilience as the requirement that information gain outpaces information loss.
+
+\subsection{Free-Energy Principle Lift: Collapse--Repair as Variational Optimization}
+
+Let $F$ denote variational free energy in the sense of Friston.
+
+Collapse corresponds to increased surprise or prediction error; repair corresponds to model updating or action that reduces free energy.
+
+\begin{definition}[Free-Energy Collapse and Repair]
+
+
+\[
+C_k = e^{F(\Psi_k)}, 
+\qquad 
+R_k = e^{-F(\Psi_k)}.
+\]
+
+
+\end{definition}
+
+\begin{theorem}[Equivalence to Free-Energy Minimization]
+The Squiggle resilience condition
+
+
+\[
+\prod_{k=1}^{\infty} \frac{R_k}{C_k} \ge 1
+\]
+
+
+is equivalent to
+
+
+\[
+\sum_{k=1}^{\infty} F(\Psi_k) \le 0,
+\]
+
+
+which is the requirement that expected free energy decreases over time.
+\end{theorem}
+
+\begin{proof}[Proof Sketch]
+
+
+\[
+\frac{R_k}{C_k} 
+= 
+\frac{e^{-F(\Psi_k)}}{e^{F(\Psi_k)}} 
+= 
+e^{-2F(\Psi_k)}.
+\]
+
+
+Thus
+
+
+\[
+\prod_{k=1}^{\infty} e^{-2F(\Psi_k)} \ge 1
+\iff
+\sum_{k=1}^{\infty} F(\Psi_k) \le 0.
+\]
+
+
+\end{proof}
+
+This establishes Squiggle Theory as a generalization of the free-energy principle.
+
+\subsection{Unified Interpretation: A Meta-Law of Adaptive Reality}
+
+\begin{theorem}[Grand Unified Collapse--Repair Principle]
+Thermodynamic systems (entropy vs.\ negentropy), 
+informational systems (entropy vs.\ mutual information), 
+biological systems (damage vs.\ regeneration), 
+cognitive systems (surprise vs.\ learning), 
+and creative systems (destruction vs.\ innovation) 
+all satisfy the same invariant:
+
+
+\[
+\prod_{k=1}^{\infty} \frac{R_k}{C_k} \ge 1.
+\]
+
+
+\end{theorem}
+
+\begin{proof}[Proof Sketch]
+Each domain admits a collapse quantity $C_k$ and a repair quantity $R_k$ expressible as exponentials of entropy, information, or free-energy terms. 
+The fibred category structure ensures that collapse and repair are functorial across domains. 
+Thus the same multiplicative invariant governs persistence in all adaptive systems.
+\end{proof}
+
+\subsection{The Universal Persistence Equation}
+
+Combining all three lifts yields the universal persistence equation:
+
+
+\[
+\boxed{
+\prod_{k=1}^{\infty} 
+\exp\!\left(
+\Delta N_k - \Delta S_k 
++ I_k - H_k 
+- 2F_k
+\right)
+\ge 1
+}
+\]
+
+
+
+This is the unified law of creativity, resilience, information, thermodynamics, and adaptive reality.
+\section{The Meta-Law of Existence: Structure, Time, Identity, Complexity, Evolution, and Cosmology}
+
+Squiggle Theory extends beyond creativity, resilience, thermodynamics, information, and free-energy. 
+This section develops the collapse--repair invariant as a universal meta-law governing the emergence, persistence, and transformation of structure across all levels of reality.
+
+\subsection{Structure: Collapse--Repair as the Generator of Form}
+
+Let $\mathcal{U}$ denote the universe of all mathematical and physical structures. 
+Every structure arises from distinctions (collapse) and stabilizations (repair).
+
+\begin{definition}[Ontological Collapse]
+A collapse is a distinction-making operation 
+
+
+\[
+d : \mathcal{U} \to \mathcal{U}
+\]
+
+
+that increases differentiation or entropy.
+\end{definition}
+
+\begin{definition}[Ontological Repair]
+A repair is an identity-preserving operation
+
+
+\[
+r : \mathcal{U} \to \mathcal{U}
+\]
+
+
+that restores coherence or reduces entropy.
+\end{definition}
+
+\begin{theorem}[Structure Emergence]
+A stable structure exists if and only if
+
+
+\[
+\prod_{k=1}^{\infty} \frac{R_k}{C_k} \ge 1.
+\]
+
+
+\end{theorem}
+
+Thus the collapse--repair invariant is a generator of form.
+
+\subsection{Time: Collapse--Repair as the Arrow of Time}
+
+Let $\Delta S_k$ denote entropy increase and $\Delta N_k$ denote negentropic repair.
+
+\begin{definition}[Temporal Direction]
+Time flows in the direction in which
+
+
+\[
+\Delta S_k - \Delta N_k
+\]
+
+
+is nonzero.
+\end{definition}
+
+\begin{theorem}[Arrow of Time]
+The collapse--repair sequence induces a temporal ordering
+
+
+\[
+\Psi_0 \prec \Psi_1 \prec \Psi_2 \prec \cdots
+\]
+
+
+if and only if
+
+
+\[
+\Delta S_k \neq \Delta N_k.
+\]
+
+
+\end{theorem}
+
+Thus time is the ordering induced by collapse--repair asymmetry.
+
+\subsection{Identity: Fixed Points as Persistent Selves}
+
+In the fibred category $\mathcal{E} \to \mathcal{B}$, identity is a stable section.
+
+\begin{definition}[Identity]
+An identity is a section $s : \mathcal{B} \to \mathcal{E}$ satisfying
+
+
+\[
+s = \hat{\rho}^n s
+\quad \text{as } n \to \infty.
+\]
+
+
+\end{definition}
+
+\begin{theorem}[Self as a Fixed Point]
+A self exists if and only if the collapse--repair dynamics converge:
+
+
+\[
+\lim_{n\to\infty} \hat{\rho}^n \Psi = \Psi^*.
+\]
+
+
+\end{theorem}
+
+Identity is the attractor of collapse--repair.
+
+\subsection{Complexity: Growth Under Supercritical Resilience}
+
+Let $K(\Psi)$ denote Kolmogorov complexity.
+
+\begin{proposition}[Complexity Growth Condition]
+If $\rho > 1$, then
+
+
+\[
+K(\Psi_{n+1}) \ge K(\Psi_n).
+\]
+
+
+\end{proposition}
+
+\begin{theorem}[Open-Ended Complexity]
+If $\inf_n \rho(\Psi_n) > 1$, then
+
+
+\[
+\lim_{n\to\infty} K(\Psi_n) = \infty.
+\]
+
+
+\end{theorem}
+
+Thus supercritical resilience drives unbounded complexity.
+
+\subsection{Evolution: Collapse--Repair as Generalized Selection}
+
+Let $\mathcal{P}$ be a population of agents with individual resilience $\rho_i$.
+
+\begin{definition}[Evolutionary Fitness]
+
+
+\[
+f_i = \rho_i.
+\]
+
+
+\end{definition}
+
+\begin{theorem}[Generalized Darwinian Law]
+A population evolves if and only if
+
+
+\[
+\langle \rho \rangle > 1.
+\]
+
+
+\end{theorem}
+
+\begin{corollary}[Adaptive Acceleration]
+If $\mathrm{Var}(\rho) > 0$, then evolutionary rate increases.
+\end{corollary}
+
+Thus evolution is collapse--repair at the population level.
+
+\subsection{Cosmology: Collapse--Repair as a Universal Survival Law}
+
+Let $C_k$ represent cosmological collapse (entropy, curvature, vacuum decay) and $R_k$ represent cosmological repair (inflation, expansion, symmetry restoration).
+
+\begin{definition}[Cosmic Collapse--Repair]
+
+
+\[
+C_k = e^{\Delta S_k + \Delta \kappa_k}, 
+\qquad 
+R_k = e^{\Delta N_k + \Delta \Lambda_k},
+\]
+
+
+where $\Delta \kappa_k$ is curvature collapse and $\Delta \Lambda_k$ is vacuum-energy repair.
+\end{definition}
+
+\begin{theorem}[Cosmic Persistence Law]
+A universe persists if and only if
+
+
+\[
+\prod_{k=1}^{\infty} \frac{R_k}{C_k} \ge 1.
+\]
+
+
+\end{theorem}
+
+\begin{corollary}[Multiverse Selection]
+Universes with $\langle \rho \rangle > 1$ dominate the measure of the multiverse.
+\end{corollary}
+
+\subsection{The Meta-Law of Existence}
+
+Combining all domains yields the universal condition:
+
+
+
+\[
+\boxed{
+\prod_{k=1}^{\infty}
+\frac{
+R_k^{\text{(negentropy)}}
+R_k^{\text{(information)}}
+R_k^{\text{(free-energy)}}
+R_k^{\text{(identity)}}
+R_k^{\text{(complexity)}}
+R_k^{\text{(cosmic)}}
+}{
+C_k^{\text{(entropy)}}
+C_k^{\text{(noise)}}
+C_k^{\text{(surprise)}}
+C_k^{\text{(dissolution)}}
+C_k^{\text{(simplification)}}
+C_k^{\text{(collapse)}}
+}
+\ge 1
+}
+\]
+
+
+
+\begin{theorem}[Meta-Law of Existence]
+All persistent structures---physical, biological, cognitive, creative, informational, evolutionary, and cosmological---are governed by the collapse--repair invariant.
+\end{theorem}
+
+\begin{proof}[Proof Sketch]
+Each domain admits collapse and repair operators expressible as exponentials of entropy, information, free-energy, or structural terms. 
+The fibred category structure ensures functoriality across domains. 
+Thus the same multiplicative invariant governs persistence at all scales.
+\end{proof}
