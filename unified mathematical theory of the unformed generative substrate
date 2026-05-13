@@ -3365,4 +3365,25 @@ For the 3-node chain,
 \]
 
 
-\end{example}    h                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+\end{example}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+             ┌──────────────┐
+             │  Substrate    │
+             │  (∞-Topos)    │
+             └──────┬───────┘
+                    │
+     ┌──────────────┼──────────────┐
+     │              │              │
+  Λ (phys)       Φ (sem)        Ξ (coupling)
+     │              │              │
+     └──────────────┼──────────────┘
+                    │
+                dΩ (cohesion)
+                    │
+                 VOID (collapse)
+                    │
+             ┌──────┴──────┐
+             │   Global     │
+             │   Update U   │
+             └──────────────┘
+          
+            paradoxically  the unformed is formed 
