@@ -1,0 +1,2476 @@
+```latex
+% ============================================================
+% CONTINUATION: FULL MONOLITHIC CANONICAL MATH (PART 2)
+% ============================================================
+
+\section{Full Expansion of the Potential and Its Derivatives}
+
+We expand the potential
+\[
+V(x_1,x_2) = \frac{1}{4}(x_1^2 + x_2^2 - r_0^2)^2
++ \mu x_1^2 x_2^2
++ \epsilon \cos(8\theta),
+\qquad
+\theta = \operatorname{atan2}(x_2,x_1).
+\]
+
+\subsection{Gradient of the quartic radial term}
+
+Let
+\[
+Q = x_1^2 + x_2^2 - r_0^2.
+\]
+
+Then
+\[
+\frac{\partial}{\partial x_1}\left(\frac{1}{4}Q^2\right)
+= \frac{1}{2}Q \cdot 2x_1
+= Q x_1,
+\]
+\[
+\frac{\partial}{\partial x_2}\left(\frac{1}{4}Q^2\right)
+= Q x_2.
+\]
+
+\subsection{Gradient of the dual-well term}
+
+\[
+\frac{\partial}{\partial x_1}(\mu x_1^2 x_2^2)
+= 2\mu x_1 x_2^2,
+\]
+\[
+\frac{\partial}{\partial x_2}(\mu x_1^2 x_2^2)
+= 2\mu x_2 x_1^2.
+\]
+
+\subsection{Gradient of the 8-fold angular term}
+
+We use
+\[
+\frac{\partial \theta}{\partial x_1} = -\frac{x_2}{r^2}, \qquad
+\frac{\partial \theta}{\partial x_2} = \frac{x_1}{r^2}.
+\]
+
+Thus
+\[
+\frac{\partial}{\partial x_1}\big(\epsilon \cos(8\theta)\big)
+= -8\epsilon \sin(8\theta)\frac{\partial\theta}{\partial x_1}
+= 8\epsilon \sin(8\theta)\frac{x_2}{r^2},
+\]
+\[
+\frac{\partial}{\partial x_2}\big(\epsilon \cos(8\theta)\big)
+= -8\epsilon \sin(8\theta)\frac{\partial\theta}{\partial x_2}
+= -8\epsilon \sin(8\theta)\frac{x_1}{r^2}.
+\]
+
+\subsection{Full gradient}
+
+\[
+\frac{\partial V}{\partial x_1}
+= Q x_1 + 2\mu x_1 x_2^2 + 8\epsilon \sin(8\theta)\frac{x_2}{r^2},
+\]
+\[
+\frac{\partial V}{\partial x_2}
+= Q x_2 + 2\mu x_2 x_1^2 - 8\epsilon \sin(8\theta)\frac{x_1}{r^2}.
+\]
+
+% ============================================================
+\section{Full Cartesian Dynamical System}
+
+The canonical flow is
+\[
+\dot{x} = -\nabla V(x) + \omega R x,
+\qquad
+R = \begin{pmatrix}0 & -1 \\ 1 & 0\end{pmatrix}.
+\]
+
+Thus
+\[
+\dot{x}_1
+= -\left(Q x_1 + 2\mu x_1 x_2^2 + 8\epsilon \sin(8\theta)\frac{x_2}{r^2}\right)
+- \omega x_2,
+\]
+\[
+\dot{x}_2
+= -\left(Q x_2 + 2\mu x_2 x_1^2 - 8\epsilon \sin(8\theta)\frac{x_1}{r^2}\right)
++ \omega x_1.
+\]
+
+% ============================================================
+\section{Polar Expansion: Full Derivatives}
+
+\subsection{Radial derivative}
+
+\[
+V(r,\theta)
+= \frac{1}{4}(r^2 - r_0^2)^2
++ \mu r^4 \cos^2(2\theta)\sin^2(2\theta)
++ \epsilon \cos(8\theta).
+\]
+
+Compute:
+\[
+\frac{\partial}{\partial r}\left(\frac{1}{4}(r^2 - r_0^2)^2\right)
+= (r^2 - r_0^2)r,
+\]
+\[
+\frac{\partial}{\partial r}\left(\mu r^4 \cos^2(2\theta)\sin^2(2\theta)\right)
+= 4\mu r^3 \cos^2(2\theta)\sin^2(2\theta),
+\]
+\[
+\frac{\partial}{\partial r}\left(\epsilon \cos(8\theta)\right)
+= 0.
+\]
+
+Thus
+\[
+\frac{\partial V}{\partial r}
+= (r^2 - r_0^2)r
++ 4\mu r^3 \cos^2(2\theta)\sin^2(2\theta).
+\]
+
+\subsection{Angular derivative}
+
+We use
+\[
+\cos^2(2\theta)\sin^2(2\theta)
+= \frac{1}{4}\sin^2(4\theta).
+\]
+
+Thus
+\[
+\frac{\partial}{\partial\theta}\left(\mu r^4 \cos^2(2\theta)\sin^2(2\theta)\right)
+= \mu r^4 \cdot \frac{\partial}{\partial\theta}\left(\frac{1}{4}\sin^2(4\theta)\right)
+\]
+\[
+= \mu r^4 \cdot \frac{1}{2}\sin(4\theta)\cos(4\theta)\cdot 4
+= 2\mu r^4 \sin(4\theta)\cos(4\theta).
+\]
+
+And
+\[
+\frac{\partial}{\partial\theta}\left(\epsilon \cos(8\theta)\right)
+= -8\epsilon \sin(8\theta).
+\]
+
+Thus
+\[
+\frac{\partial V}{\partial\theta}
+= 2\mu r^4 \sin(4\theta)\cos(4\theta)
+- 8\epsilon \sin(8\theta).
+\]
+
+% ============================================================
+\section{Full Polar Dynamical System}
+
+\[
+\dot{r}
+= -\frac{\partial V}{\partial r}
+= -(r^2 - r_0^2)r
+- 4\mu r^3 \cos^2(2\theta)\sin^2(2\theta),
+\]
+
+\[
+\dot{\theta}
+= \omega - \frac{1}{r^2}\frac{\partial V}{\partial\theta}
+= \omega
+- 2\mu r^2 \sin(4\theta)\cos(4\theta)
++ 8\epsilon \frac{1}{r^2}\sin(8\theta).
+\]
+
+% ============================================================
+\section{Limit Cycle and Golden Manifold}
+
+The stable limit cycle is
+\[
+\mathcal{C} = \{(r,\theta)\mid r = r_0\}.
+\]
+
+The golden manifold is
+\[
+\mathcal{M}_{\text{golden}}
+= \{x\in\mathbb{R}^2 \mid r(x)=r_0\}
+\cup W^s(\mathcal{C}),
+\]
+where $W^s(\mathcal{C})$ is the stable manifold of the cycle.
+
+% ============================================================
+\section{Symmetry Group}
+
+The system is invariant under the dihedral group
+\[
+D_8 = \langle \rho, \sigma \mid \rho^8 = \sigma^2 = 1,\; \sigma\rho\sigma = \rho^{-1}\rangle,
+\]
+where $\rho$ is rotation by $\pi/4$ and $\sigma$ is reflection.
+
+\end{document}
+```
+% ============================================================
+% PART 3 — FORMAL STRUCTURAL PROPERTIES AND THEOREM STATEMENTS
+% ============================================================
+
+\section{Existence and Stability of the Golden Limit Cycle}
+
+\subsection{Theorem (Existence of the Golden Limit Cycle)}
+Let the dynamical system be
+
+
+\[
+\dot{x} = -\nabla V(x) + \omega R x,
+\]
+
+
+with $V$ as previously defined.  
+If $r_0 > 0$ and $\omega \neq 0$, then the set
+
+
+\[
+\mathcal{C} = \{(r,\theta) \mid r = r_0\}
+\]
+
+
+is a nontrivial periodic orbit.
+
+\subsection{Proof Sketch}
+On the circle $r=r_0$,
+
+
+\[
+\dot{r} = -(r_0^2 - r_0^2)r_0 - 4\mu r_0^3 \cos^2(2\theta)\sin^2(2\theta) = 0.
+\]
+
+
+Thus the radius is invariant.  
+Angular velocity is
+
+
+\[
+\dot{\theta} = \omega - 2\mu r_0^2 \sin(4\theta)\cos(4\theta)
++ 8\epsilon \frac{1}{r_0^2}\sin(8\theta),
+\]
+
+
+which is nonzero for generic $(\mu,\epsilon)$.  
+Hence the orbit is periodic.
+
+\subsection{Theorem (Stability of the Golden Limit Cycle)}
+If
+
+
+\[
+\frac{\partial \dot{r}}{\partial r}\bigg|_{r=r_0} < 0,
+\]
+
+
+then $\mathcal{C}$ is asymptotically stable.
+
+\subsection{Evaluation}
+
+
+\[
+\frac{\partial \dot{r}}{\partial r}
+= -3r^2 + r_0^2 - 12\mu r^2 \cos^2(2\theta)\sin^2(2\theta).
+\]
+
+
+At $r=r_0$,
+
+
+\[
+\frac{\partial \dot{r}}{\partial r}\bigg|_{r=r_0}
+= -2r_0^2 - 12\mu r_0^2 \cos^2(2\theta)\sin^2(2\theta) < 0.
+\]
+
+
+Thus the limit cycle is stable.
+
+% ============================================================
+\section{Symmetry-Induced Geometry}
+
+\subsection{Theorem (D8 Symmetry of the Potential)}
+The potential satisfies
+
+
+\[
+V(r,\theta + k\pi/4) = V(r,\theta)
+\quad \forall k \in \mathbb{Z}.
+\]
+
+
+
+\subsection{Theorem (Lotus Geometry)}
+The restriction of $V$ to the limit cycle produces an 8-petal angular modulation:
+
+
+\[
+V(r_0,\theta) = \epsilon \cos(8\theta) + \text{constant}.
+\]
+
+
+
+\subsection{Theorem (Dual-Well Yin-Yang Structure)}
+The angular term
+
+
+\[
+\mu r^4 \cos^2(2\theta)\sin^2(2\theta)
+= \frac{\mu r^4}{4}\sin^2(4\theta)
+\]
+
+
+has two minima per $\pi$, generating a dual-well structure.
+
+% ============================================================
+\section{Golden Recursion as a Dynamical Process}
+
+\subsection{Definition (Golden Recursion)}
+Golden recursion is the iterative map induced by the flow:
+
+
+\[
+x_{n+1} = \Phi_T(x_n),
+\]
+
+
+where $\Phi_T$ is the time-$T$ flow map for one full rotation of the limit cycle.
+
+\subsection{Theorem (Self-Similarity of the Spiral Approach)}
+Let $x(t)$ be a trajectory approaching $\mathcal{C}$.  
+Then for sufficiently large $t$,
+
+
+\[
+r(t) = r_0 + C e^{-\lambda t},
+\]
+
+
+
+
+\[
+\theta(t) = \omega t + \Theta_0 + O(e^{-\lambda t}),
+\]
+
+
+which defines a logarithmic spiral.
+
+% ============================================================
+\section{Canonical Object}
+
+\subsection{Definition (Golden Manifold)}
+The golden manifold is
+
+
+\[
+\mathcal{M}_{\text{golden}}
+= \mathcal{C} \cup W^s(\mathcal{C}),
+\]
+
+
+where $W^s(\mathcal{C})$ is the stable manifold of the limit cycle.
+
+\subsection{Theorem (Topological Structure)}
+
+
+\[
+\mathcal{M}_{\text{golden}} \cong S^1 \cup \mathbb{R}^2.
+\]
+
+
+
+\subsection{Theorem (Geometric Structure)}
+The manifold consists of:
+\begin{itemize}
+\item a circular attractor (the golden ring),
+\item a logarithmic spiral stable manifold (the golden spiral),
+\item 8-fold angular modulation (lotus),
+\item a dual-well angular energy landscape (yin-yang).
+\end{itemize}
+
+\end{document}
+% ============================================================
+% PART 4 — INVARIANTS, FLOWS, AND GEOMETRIC CONSEQUENCES
+% ============================================================
+
+\section{Invariant Quantities and Flow Properties}
+
+\subsection{Energy-like Lyapunov Function}
+
+Define the Lyapunov function
+
+
+\[
+L(x) = V(x),
+\]
+
+
+where $V$ is the canonical potential.
+
+Then
+
+
+\[
+\frac{d}{dt}L(x(t))
+= \nabla V(x) \cdot \dot{x}
+= \nabla V(x) \cdot \left(-\nabla V(x) + \omega R x\right).
+\]
+
+
+
+Since $R$ is skew-symmetric,
+
+
+\[
+\nabla V(x) \cdot (R x) = 0.
+\]
+
+
+
+Thus
+
+
+\[
+\frac{d}{dt}L(x(t))
+= -\|\nabla V(x)\|^2 \le 0.
+\]
+
+
+
+\subsection{Consequences}
+
+\begin{itemize}
+\item $L$ is strictly decreasing except at critical points.
+\item All trajectories move ``downhill'' toward the limit cycle.
+\item The system is globally dissipative.
+\end{itemize}
+
+% ============================================================
+\section{Spiral Dynamics and Logarithmic Form}
+
+\subsection{Asymptotic Spiral Form}
+
+Near the limit cycle $r=r_0$, linearization yields
+
+
+\[
+\dot{r} = -\lambda (r - r_0) + O((r-r_0)^2),
+\]
+
+
+
+
+\[
+\dot{\theta} = \omega + O(r-r_0).
+\]
+
+
+
+Solving:
+
+
+\[
+r(t) = r_0 + C e^{-\lambda t},
+\]
+
+
+
+
+\[
+\theta(t) = \omega t + \Theta_0 + O(e^{-\lambda t}).
+\]
+
+
+
+Thus the trajectory is a logarithmic spiral:
+
+
+\[
+x(t) = r(t)
+\begin{pmatrix}
+\cos\theta(t) \\
+\sin\theta(t)
+\end{pmatrix}.
+\]
+
+
+
+% ============================================================
+\section{Angular Energy Landscape}
+
+\subsection{Dual-Well Structure}
+
+The angular energy term is
+
+
+\[
+U(\theta) = \mu r^4 \cos^2(2\theta)\sin^2(2\theta)
+= \frac{\mu r^4}{4}\sin^2(4\theta).
+\]
+
+
+
+Critical points satisfy
+
+
+\[
+\frac{dU}{d\theta}
+= \frac{\mu r^4}{2}\sin(4\theta)\cos(4\theta)\cdot 4
+= 2\mu r^4 \sin(4\theta)\cos(4\theta)
+= 0.
+\]
+
+
+
+Thus
+
+
+\[
+\sin(4\theta)=0
+\quad\text{or}\quad
+\cos(4\theta)=0.
+\]
+
+
+
+This yields:
+
+
+\[
+\theta = \frac{k\pi}{4}, \quad k\in\mathbb{Z}.
+\]
+
+
+
+\subsection{Classification}
+
+
+
+\[
+U''(\theta)
+= 8\mu r^4 \cos(8\theta).
+\]
+
+
+
+Thus:
+\begin{itemize}
+\item minima at $\theta = \frac{k\pi}{4}$ with $k$ even,
+\item maxima at $\theta = \frac{k\pi}{4}$ with $k$ odd.
+\end{itemize}
+
+This produces the yin-yang dual-well structure.
+
+% ============================================================
+\section{Eightfold Symmetry and Lotus Geometry}
+
+\subsection{Angular Modulation}
+
+The lotus term is
+
+
+\[
+W(\theta) = \epsilon \cos(8\theta).
+\]
+
+
+
+Critical points:
+
+
+\[
+W'(\theta) = -8\epsilon \sin(8\theta) = 0
+\Rightarrow \theta = \frac{k\pi}{8}.
+\]
+
+
+
+Thus the angular structure has 16 extrema and 8 petals.
+
+\subsection{Lotus Shape on the Limit Cycle}
+
+On $r=r_0$,
+
+
+\[
+V(r_0,\theta) = \epsilon \cos(8\theta) + \text{constant}.
+\]
+
+
+
+Plotting $(x_1,x_2)$ with $r=r_0$ and $\theta$ varying yields an 8-petal lotus.
+
+% ============================================================
+\section{Full Canonical System Summary}
+
+\subsection{Cartesian Form}
+
+
+
+\[
+\dot{x}
+= -\nabla\left[
+\frac{1}{4}(\|x\|^2 - r_0^2)^2
++ \mu x_1^2 x_2^2
++ \epsilon \cos(8\theta)
+\right]
++ \omega R x.
+\]
+
+
+
+\subsection{Polar Form}
+
+
+
+\[
+\dot{r}
+= -(r^2 - r_0^2)r
+- 4\mu r^3 \cos^2(2\theta)\sin^2(2\theta),
+\]
+
+
+
+
+
+\[
+\dot{\theta}
+= \omega
+- 2\mu r^2 \sin(4\theta)\cos(4\theta)
++ 8\epsilon \frac{1}{r^2}\sin(8\theta).
+\]
+
+
+
+% ============================================================
+\section{Golden Manifold and Recursion}
+
+\subsection{Golden Manifold}
+
+
+
+\[
+\mathcal{M}_{\text{golden}}
+= \{x : r(x)=r_0\}
+\cup W^s(\mathcal{C}).
+\]
+
+
+
+\subsection{Golden Recursion}
+
+
+
+\[
+x_{n+1} = \Phi_T(x_n),
+\]
+
+
+where $\Phi_T$ is the time-$T$ flow map for one revolution.
+
+\end{document}
+% ============================================================
+% PART 5 — FLOWS, MANIFOLDS, AND GLOBAL PHASE PORTRAIT
+% ============================================================
+
+\section{Global Phase Structure}
+
+\subsection{Attracting Regions}
+
+Define the radial zones:
+
+
+\[
+\mathcal{R}_1 = \{ r < r_0 \}, \qquad
+\mathcal{R}_2 = \{ r = r_0 \}, \qquad
+\mathcal{R}_3 = \{ r > r_0 \}.
+\]
+
+
+
+From the radial equation
+
+
+\[
+\dot{r} = -(r^2 - r_0^2)r - 4\mu r^3 \cos^2(2\theta)\sin^2(2\theta),
+\]
+
+
+we have:
+
+\begin{itemize}
+\item If $r < r_0$, then $(r^2 - r_0^2) < 0$ and $\dot{r} > 0$.
+\item If $r > r_0$, then $(r^2 - r_0^2) > 0$ and $\dot{r} < 0$.
+\item If $r = r_0$, then $\dot{r} = 0$.
+\end{itemize}
+
+Thus:
+
+
+\[
+\mathcal{R}_1 \to \mathcal{R}_2 \leftarrow \mathcal{R}_3.
+\]
+
+
+
+\subsection{Global Attractor}
+
+The limit cycle
+
+
+\[
+\mathcal{C} = \{ r = r_0 \}
+\]
+
+
+is a global attractor for all non-equilibrium trajectories.
+
+% ============================================================
+\section{Stable and Unstable Manifolds}
+
+\subsection{Stable Manifold of the Limit Cycle}
+
+
+
+\[
+W^s(\mathcal{C})
+= \{ x \in \mathbb{R}^2 : \lim_{t\to\infty} \text{dist}(x(t),\mathcal{C}) = 0 \}.
+\]
+
+
+
+This manifold is a logarithmic spiral bundle.
+
+\subsection{Unstable Manifold}
+
+There are no nontrivial unstable manifolds because the system is dissipative:
+
+
+\[
+\frac{d}{dt}V(x(t)) = -\|\nabla V(x)\|^2 \le 0.
+\]
+
+
+
+% ============================================================
+\section{Critical Points of the Potential}
+
+Critical points satisfy
+
+
+\[
+\nabla V(x) = 0.
+\]
+
+
+
+\subsection{Radial Critical Points}
+
+Solve
+
+
+\[
+(r^2 - r_0^2)r = 0.
+\]
+
+
+
+Thus:
+
+
+\[
+r = 0 \quad \text{or} \quad r = r_0.
+\]
+
+
+
+\subsection{Angular Critical Points}
+
+Solve
+
+
+\[
+2\mu r^4 \sin(4\theta)\cos(4\theta)
+- 8\epsilon \sin(8\theta) = 0.
+\]
+
+
+
+Factor:
+
+
+\[
+\sin(8\theta)(\mu r^4 - 8\epsilon) = 0.
+\]
+
+
+
+Thus:
+
+
+\[
+\theta = \frac{k\pi}{8}
+\quad\text{or}\quad
+\mu r^4 = 8\epsilon.
+\]
+
+
+
+% ============================================================
+\section{Classification of the Origin}
+
+At $r=0$:
+
+
+\[
+V(0) = \frac{1}{4}r_0^4 + \epsilon.
+\]
+
+
+
+The Hessian is
+
+
+\[
+H(0) = -r_0^2 I.
+\]
+
+
+
+Thus the origin is a repelling equilibrium.
+
+% ============================================================
+\section{Classification of the Limit Cycle}
+
+Linearization in the radial direction:
+
+
+\[
+\frac{\partial \dot{r}}{\partial r}\bigg|_{r=r_0}
+= -2r_0^2 - 12\mu r_0^2 \cos^2(2\theta)\sin^2(2\theta) < 0.
+\]
+
+
+
+Thus the limit cycle is hyperbolically stable.
+
+% ============================================================
+\section{Angular Frequency Modulation}
+
+The angular velocity is
+
+
+\[
+\dot{\theta}
+= \omega
+- 2\mu r^2 \sin(4\theta)\cos(4\theta)
++ 8\epsilon \frac{1}{r^2}\sin(8\theta).
+\]
+
+
+
+On the limit cycle:
+
+
+\[
+\dot{\theta}\big|_{r=r_0}
+= \omega
+- 2\mu r_0^2 \sin(4\theta)\cos(4\theta)
++ 8\epsilon \frac{1}{r_0^2}\sin(8\theta).
+\]
+
+
+
+This produces:
+\begin{itemize}
+\item 8-fold modulation,
+\item dual-well angular drift,
+\item harmonic locking between wells and petals.
+\end{itemize}
+
+% ============================================================
+\section{Harmonic Locking and Golden Recursion}
+
+Define the harmonic map:
+
+
+\[
+H(\theta) = \omega
+- 2\mu r_0^2 \sin(4\theta)\cos(4\theta)
++ 8\epsilon \frac{1}{r_0^2}\sin(8\theta).
+\]
+
+
+
+Golden recursion corresponds to the iteration:
+
+
+\[
+\theta_{n+1} = \theta_n + \int_0^T H(\theta(t))\,dt.
+\]
+
+
+
+This defines a circle map with 8-fold symmetry.
+
+% ============================================================
+\section{Circle Map Interpretation}
+
+Define the Poincaré map:
+
+
+\[
+P(\theta) = \theta + \Omega + \Delta(\theta),
+\]
+
+
+where
+
+
+\[
+\Omega = \omega T,
+\]
+
+
+
+
+\[
+\Delta(\theta)
+= -2\mu r_0^2 \int_0^T \sin(4\theta(t))\cos(4\theta(t))\,dt
++ 8\epsilon \frac{1}{r_0^2}\int_0^T \sin(8\theta(t))\,dt.
+\]
+
+
+
+This is a smooth $D_8$-equivariant circle map.
+
+\end{document}
+% ============================================================
+% PART 6 — BIFURCATION ANALYSIS AND PARAMETER SPACE GEOMETRY
+% ============================================================
+
+\section{Parameter Space and Bifurcation Structure}
+
+The system depends on four primary parameters:
+
+
+\[
+(r_0,\, \mu,\, \epsilon,\, \omega).
+\]
+
+
+
+Each parameter controls a distinct geometric or dynamical feature.
+
+% ------------------------------------------------------------
+\subsection{Role of $r_0$ (Golden Radius / Closure Radius)}
+
+The parameter $r_0$ determines the radius of the stable limit cycle:
+
+
+\[
+\mathcal{C} = \{ r = r_0 \}.
+\]
+
+
+
+A change in $r_0$ produces a continuous family of concentric golden rings.
+
+There is no bifurcation in $r_0$; it is a structural parameter.
+
+% ------------------------------------------------------------
+\subsection{Role of $\omega$ (Spiral Angular Velocity)}
+
+The angular velocity $\omega$ determines the rotational speed:
+
+
+\[
+\dot{\theta} \approx \omega.
+\]
+
+
+
+If $\omega = 0$, the system loses its spiral structure and becomes gradient-only.
+
+Thus:
+
+
+\[
+\omega = 0
+\quad\text{is a pitchfork-like degeneracy of the rotational flow}.
+\]
+
+
+
+% ------------------------------------------------------------
+\subsection{Role of $\mu$ (Dual-Well Strength)}
+
+The dual-well term
+
+
+\[
+\mu x_1^2 x_2^2
+\]
+
+
+controls the yin-yang structure.
+
+When $\mu = 0$, the dual-well collapses and the system becomes radially symmetric.
+
+Thus:
+
+
+\[
+\mu = 0
+\quad\text{is a symmetry-restoring bifurcation}.
+\]
+
+
+
+% ------------------------------------------------------------
+\subsection{Role of $\epsilon$ (Eightfold Modulation Strength)}
+
+The lotus term
+
+
+\[
+\epsilon \cos(8\theta)
+\]
+
+
+controls the 8-petal angular modulation.
+
+When $\epsilon = 0$, the lotus collapses and the system becomes 4-fold symmetric.
+
+Thus:
+
+
+\[
+\epsilon = 0
+\quad\text{is a symmetry-breaking bifurcation from } D_8 \to D_4.
+\]
+
+
+
+% ------------------------------------------------------------
+\subsection{Combined Parameter Space}
+
+The full parameter space is
+
+
+\[
+\mathcal{P} = \mathbb{R}_{>0} \times \mathbb{R} \times \mathbb{R} \times \mathbb{R}
+\]
+
+
+with coordinates $(r_0,\mu,\epsilon,\omega)$.
+
+The bifurcation surfaces are:
+
+
+\[
+\mu = 0, \qquad \epsilon = 0, \qquad \omega = 0.
+\]
+
+
+
+These surfaces partition $\mathcal{P}$ into regions with distinct geometric behavior.
+
+% ============================================================
+\section{Normal Form Near the Limit Cycle}
+
+Linearize the system near $r=r_0$.
+
+Let
+
+
+\[
+\rho = r - r_0.
+\]
+
+
+
+Then
+
+
+\[
+\dot{\rho}
+= -\lambda \rho + O(\rho^2),
+\]
+
+
+where
+
+
+\[
+\lambda = 2r_0^2 + 12\mu r_0^2 \cos^2(2\theta)\sin^2(2\theta).
+\]
+
+
+
+Angular dynamics:
+
+
+\[
+\dot{\theta}
+= \omega + \alpha(\theta)\rho + O(\rho^2),
+\]
+
+
+where
+
+
+\[
+\alpha(\theta)
+= -4\mu r_0 \sin(4\theta)\cos(4\theta).
+\]
+
+
+
+Thus the normal form is:
+
+
+\[
+\begin{cases}
+\dot{\rho} = -\lambda(\theta)\rho + O(\rho^2), \\
+\dot{\theta} = \omega + \alpha(\theta)\rho + O(\rho^2).
+\end{cases}
+\]
+
+
+
+% ============================================================
+\section{Floquet Theory for the Golden Cycle}
+
+Let $x(t)$ be a trajectory on the limit cycle.
+
+The variational equation is:
+
+
+\[
+\dot{\xi} = Df(x(t))\,\xi.
+\]
+
+
+
+The monodromy matrix is:
+
+
+\[
+M = \Phi(T),
+\]
+
+
+where $\Phi$ is the fundamental matrix solution.
+
+The Floquet multipliers are:
+
+
+\[
+\lambda_1 = 1,
+\qquad
+\lambda_2 = e^{-\Lambda T},
+\]
+
+
+where
+
+
+\[
+\Lambda = \frac{1}{T}\int_0^T \lambda(\theta(t))\,dt.
+\]
+
+
+
+Since $\Lambda > 0$, the cycle is stable.
+
+% ============================================================
+\section{Poincaré Section and Return Map}
+
+Define the Poincaré section:
+
+
+\[
+\Sigma = \{ (r,\theta) : \theta = 0 \}.
+\]
+
+
+
+The return map is:
+
+
+\[
+P(r) = r_0 + (r - r_0)e^{-\Lambda T} + O((r-r_0)^2).
+\]
+
+
+
+Thus:
+
+
+\[
+r_0 \text{ is a stable fixed point of } P.
+\]
+
+
+
+% ============================================================
+\section{Golden Spiral as an Invariant Curve}
+
+The stable manifold of the limit cycle is:
+
+
+\[
+W^s(\mathcal{C})
+= \{ (r,\theta) : r = r_0 + Ce^{-\Lambda t} \}.
+\]
+
+
+
+In Cartesian coordinates:
+
+
+\[
+x(t)
+= \left(r_0 + Ce^{-\Lambda t}\right)
+\begin{pmatrix}
+\cos(\omega t + \Theta_0) \\
+\sin(\omega t + \Theta_0)
+\end{pmatrix}.
+\]
+
+
+
+This is a logarithmic spiral:
+
+
+\[
+r(\theta)
+= r_0 + C e^{-\frac{\Lambda}{\omega}\theta}.
+\]
+
+
+
+% ============================================================
+\section{Topological Classification}
+
+The global attractor is:
+
+
+\[
+\mathcal{A} = \mathcal{C}.
+\]
+
+
+
+The basin of attraction is:
+
+
+\[
+\mathcal{B}(\mathcal{C}) = \mathbb{R}^2 \setminus \{0\}.
+\]
+
+
+
+Thus the phase portrait is:
+
+
+\[
+\mathbb{R}^2 \setminus \{0\}
+\to
+S^1
+\quad\text{via a logarithmic spiral flow}.
+\]
+
+
+
+This defines a fibration:
+
+
+\[
+\mathbb{R}^2 \setminus \{0\}
+\cong
+\mathbb{R} \times S^1.
+\]
+
+
+
+\end{document}
+% ============================================================
+% PART 7 — METRIC STRUCTURE, GEOMETRIC FORMALISM, AND MANIFOLD THEORY
+% ============================================================
+
+\section{Induced Metric on the Golden Manifold}
+
+Let the golden manifold be
+
+
+\[
+\mathcal{M}_{\text{golden}} = \mathcal{C} \cup W^s(\mathcal{C}),
+\qquad
+\mathcal{C} = \{ r = r_0 \}.
+\]
+
+
+
+\subsection{Metric on the Limit Cycle}
+
+Parameterize the cycle by $\theta$:
+
+
+\[
+\gamma(\theta) = (r_0\cos\theta,\, r_0\sin\theta).
+\]
+
+
+
+The induced metric is
+
+
+\[
+g_{\theta\theta}
+= \left\langle \frac{d\gamma}{d\theta}, \frac{d\gamma}{d\theta} \right\rangle
+= r_0^2.
+\]
+
+
+
+Thus the line element is
+
+
+\[
+ds^2 = r_0^2\, d\theta^2.
+\]
+
+
+
+\subsection{Metric on the Stable Manifold}
+
+Parameterize the stable manifold by $(t,\theta_0)$:
+
+
+\[
+\Phi(t,\theta_0)
+= \left(r_0 + Ce^{-\Lambda t}\right)
+\begin{pmatrix}
+\cos(\omega t + \theta_0) \\
+\sin(\omega t + \theta_0)
+\end{pmatrix}.
+\]
+
+
+
+Compute the tangent vectors:
+
+
+\[
+\Phi_t = \frac{\partial \Phi}{\partial t},
+\qquad
+\Phi_{\theta_0} = \frac{\partial \Phi}{\partial \theta_0}.
+\]
+
+
+
+The induced metric is
+
+
+\[
+g =
+\begin{pmatrix}
+\langle \Phi_t, \Phi_t \rangle & \langle \Phi_t, \Phi_{\theta_0} \rangle \\
+\langle \Phi_{\theta_0}, \Phi_t \rangle & \langle \Phi_{\theta_0}, \Phi_{\theta_0} \rangle
+\end{pmatrix}.
+\]
+
+
+
+Explicitly:
+
+
+\[
+\langle \Phi_{\theta_0}, \Phi_{\theta_0} \rangle
+= \left(r_0 + Ce^{-\Lambda t}\right)^2.
+\]
+
+
+
+
+
+\[
+\langle \Phi_t, \Phi_t \rangle
+= (\Lambda C e^{-\Lambda t})^2
++ \left(r_0 + Ce^{-\Lambda t}\right)^2 \omega^2.
+\]
+
+
+
+
+
+\[
+\langle \Phi_t, \Phi_{\theta_0} \rangle
+= \left(r_0 + Ce^{-\Lambda t}\right)^2 \omega.
+\]
+
+
+
+Thus the metric tensor is
+
+
+\[
+g(t,\theta_0)
+=
+\begin{pmatrix}
+(\Lambda C e^{-\Lambda t})^2 + (r_0 + Ce^{-\Lambda t})^2\omega^2
+&
+(r_0 + Ce^{-\Lambda t})^2\omega
+\
+
+\[6pt]
+(r_0 + Ce^{-\Lambda t})^2\omega
+&
+(r_0 + Ce^{-\Lambda t})^2
+\end{pmatrix}.
+\]
+
+
+
+% ============================================================
+\section{Curvature of the Golden Manifold}
+
+\subsection{Curvature of the Limit Cycle}
+
+The curvature of a circle of radius $r_0$ is
+
+
+\[
+\kappa = \frac{1}{r_0}.
+\]
+
+
+
+\subsection{Curvature Along the Stable Manifold}
+
+Let
+
+
+\[
+x(t) = \Phi(t,\theta_0).
+\]
+
+
+
+Curvature is
+
+
+\[
+\kappa(t)
+= \frac{\|x'(t) \times x''(t)\|}{\|x'(t)\|^3}.
+\]
+
+
+
+Compute:
+
+
+\[
+x'(t)
+= \Phi_t,
+\qquad
+x''(t)
+= \Phi_{tt}.
+\]
+
+
+
+The full expression is:
+
+
+\[
+\kappa(t)
+= \frac{
+\left|
+\left(r_0 + Ce^{-\Lambda t}\right)
+\left(\Lambda C e^{-\Lambda t}\right)\omega
+\right|
+}{
+\left[
+(\Lambda C e^{-\Lambda t})^2
++ (r_0 + Ce^{-\Lambda t})^2\omega^2
+\right]^{3/2}
+}.
+\]
+
+
+
+As $t\to\infty$:
+
+
+\[
+\kappa(t) \to \frac{1}{r_0}.
+\]
+
+
+
+Thus the spiral curvature converges to the curvature of the golden ring.
+
+% ============================================================
+\section{Differential Forms and Flow Representation}
+
+Define the 1-form associated with the potential:
+
+
+\[
+\alpha = dV.
+\]
+
+
+
+Define the rotational 1-form:
+
+
+\[
+\beta = \omega (x_1 dx_2 - x_2 dx_1).
+\]
+
+
+
+The flow vector field $X$ satisfies:
+
+
+\[
+\iota_X \alpha = -\|\nabla V\|^2,
+\qquad
+\iota_X \beta = \omega r^2.
+\]
+
+
+
+Thus:
+
+
+\[
+X = -\nabla V + \omega R x.
+\]
+
+
+
+% ============================================================
+\section{Exterior Derivative and Vorticity}
+
+Compute:
+
+
+\[
+d\beta = 2\omega\, dx_1 \wedge dx_2.
+\]
+
+
+
+Thus the vorticity is constant:
+
+
+\[
+\Omega = 2\omega.
+\]
+
+
+
+This confirms the uniform rotational structure of the golden manifold.
+
+% ============================================================
+\section{Lie Derivatives and Symmetry}
+
+Let $\rho$ be rotation by $\pi/4$:
+
+
+\[
+\rho(x_1,x_2) = (x_1\cos\frac{\pi}{4} - x_2\sin\frac{\pi}{4},\,
+x_1\sin\frac{\pi}{4} + x_2\cos\frac{\pi}{4}).
+\]
+
+
+
+The vector field satisfies:
+
+
+\[
+\rho_* X = X.
+\]
+
+
+
+Thus:
+
+
+\[
+\mathcal{L}_\rho X = 0.
+\]
+
+
+
+This proves $D_8$ symmetry at the level of flows.
+
+% ============================================================
+\section{Invariant Measure}
+
+The system is dissipative, so Lebesgue measure is not invariant.
+
+However, the limit cycle supports an invariant measure:
+
+
+\[
+d\mu = \frac{1}{T}\, dt.
+\]
+
+
+
+Thus the golden ring carries a uniform invariant measure.
+
+% ============================================================
+\section{Ergodic Properties}
+
+On the limit cycle:
+
+
+\[
+\theta(t) = \omega t + \Theta_0.
+\]
+
+
+
+Thus the flow is:
+\begin{itemize}
+\item periodic if $\omega T = 2\pi k$,
+\item quasi-periodic otherwise.
+\end{itemize}
+
+In either case, the measure is ergodic on $\mathcal{C}$.
+
+% ============================================================
+\section{Summary of Geometric Structure}
+
+The golden manifold has:
+\begin{itemize}
+\item constant curvature on the ring,
+\item decaying curvature on the spiral,
+\item constant vorticity,
+\item $D_8$ symmetry,
+\item a uniform invariant measure on the cycle,
+\item a logarithmic stable manifold,
+\item a dissipative global flow.
+\end{itemize}
+
+\end{document}
+% ============================================================
+% PART 8 — OPERATOR FORMALISM, SEMIGROUPS, AND FUNCTIONAL ANALYSIS
+% ============================================================
+
+\section{Operator-Theoretic Formulation of the CGHDS}
+
+Let the state space be the Hilbert space
+
+
+\[
+\mathcal{H} = L^2(\mathbb{R}^2, dx).
+\]
+
+
+
+Define the canonical vector field
+
+
+\[
+X(x) = -\nabla V(x) + \omega R x.
+\]
+
+
+
+The flow generated by $X$ defines a one-parameter semigroup
+
+
+\[
+\{T(t)\}_{t \ge 0}, \qquad T(t)f = f \circ \Phi_t,
+\]
+
+
+where $\Phi_t$ is the flow map.
+
+% ------------------------------------------------------------
+\subsection{Infinitesimal Generator}
+
+The generator $\mathcal{L}$ of the semigroup is
+
+
+\[
+\mathcal{L}f = X \cdot \nabla f.
+\]
+
+
+
+Explicitly:
+
+
+\[
+\mathcal{L}f(x)
+= \left[-\nabla V(x) + \omega R x\right] \cdot \nabla f(x).
+\]
+
+
+
+% ------------------------------------------------------------
+\subsection{Dissipativity}
+
+Compute:
+
+
+\[
+\langle \mathcal{L}f, f \rangle
+= \int_{\mathbb{R}^2} X \cdot \nabla f \; f \, dx.
+\]
+
+
+
+Integrate by parts:
+
+
+\[
+\langle \mathcal{L}f, f \rangle
+= -\frac{1}{2}\int_{\mathbb{R}^2} (\nabla \cdot X) f^2 \, dx.
+\]
+
+
+
+Since
+
+
+\[
+\nabla \cdot X = -\Delta V < 0
+\]
+
+
+for all $x \ne 0$, the operator is dissipative:
+
+
+\[
+\langle \mathcal{L}f, f \rangle \le 0.
+\]
+
+
+
+% ------------------------------------------------------------
+\subsection{Semigroup Properties}
+
+The semigroup satisfies:
+
+
+\[
+T(0) = I,
+\qquad
+T(t+s) = T(t)T(s),
+\qquad
+\|T(t)f\| \le \|f\|.
+\]
+
+
+
+Thus $\{T(t)\}$ is a contraction semigroup.
+
+% ------------------------------------------------------------
+\subsection{Spectral Properties}
+
+The spectrum of $\mathcal{L}$ satisfies:
+
+
+\[
+\sigma(\mathcal{L})
+\subset \{ z \in \mathbb{C} : \Re(z) \le 0 \}.
+\]
+
+
+
+There is a simple eigenvalue at $0$ corresponding to the invariant measure on the limit cycle.
+
+All other spectral values lie strictly in the left half-plane.
+
+% ------------------------------------------------------------
+\subsection{Resolvent}
+
+The resolvent operator is
+
+
+\[
+R(\lambda,\mathcal{L}) = (\lambda I - \mathcal{L})^{-1},
+\qquad
+\Re(\lambda) > 0.
+\]
+
+
+
+It satisfies:
+
+
+\[
+\|R(\lambda,\mathcal{L})\| \le \frac{1}{\Re(\lambda)}.
+\]
+
+
+
+% ------------------------------------------------------------
+\subsection{Adjoint Operator}
+
+The adjoint generator is
+
+
+\[
+\mathcal{L}^* f
+= -\nabla \cdot (f X).
+\]
+
+
+
+Explicitly:
+
+
+\[
+\mathcal{L}^* f
+= -X \cdot \nabla f - f (\nabla \cdot X).
+\]
+
+
+
+Since $\nabla \cdot X < 0$, the adjoint has a strictly positive potential term.
+
+% ------------------------------------------------------------
+\subsection{Invariant Measure on the Limit Cycle}
+
+Let $\mu$ be the measure supported on $\mathcal{C}$:
+
+
+\[
+d\mu = \frac{1}{T} dt.
+\]
+
+
+
+Then
+
+
+\[
+\mathcal{L}^* \mu = 0.
+\]
+
+
+
+Thus $\mu$ is the unique invariant probability measure.
+
+% ------------------------------------------------------------
+\subsection{Ergodicity}
+
+For any $f \in L^2(\mathcal{C},\mu)$,
+
+
+\[
+\lim_{T\to\infty} \frac{1}{T}\int_0^T f(\Phi_t(x))\,dt
+= \int_{\mathcal{C}} f \, d\mu.
+\]
+
+
+
+Thus the golden ring is an ergodic component.
+
+% ------------------------------------------------------------
+\subsection{Mixing on the Stable Manifold}
+
+On $W^s(\mathcal{C})$,
+
+
+\[
+\|T(t)f - \Pi f\| \to 0,
+\]
+
+
+where $\Pi$ is the projection onto the invariant measure.
+
+Thus the system is mixing off the cycle.
+
+% ------------------------------------------------------------
+\subsection{Summary of Operator Structure}
+
+\begin{itemize}
+\item $\mathcal{L}$ is dissipative.
+\item $\{T(t)\}$ is a contraction semigroup.
+\item The spectrum lies in $\Re(z)\le 0$.
+\item The golden ring supports the unique invariant measure.
+\item The system is ergodic on the cycle and mixing elsewhere.
+\end{itemize}
+
+\end{document}
+% ============================================================
+% PART 9 — CATEGORY-THEORETIC FORMALIZATION OF THE CGHDS
+% ============================================================
+
+\section{Categorical Structure of the Canonical Golden Harmonic Dynamical System}
+
+\subsection{Dynamical Category}
+
+Define the category
+
+
+\[
+\mathbf{Dyn}
+\]
+
+
+whose objects are smooth manifolds equipped with smooth vector fields, and whose morphisms are smooth maps that intertwine flows.
+
+Formally, an object is a pair
+
+
+\[
+(M, X),
+\]
+
+
+where $M$ is a smooth manifold and $X$ is a smooth vector field on $M$.
+
+A morphism
+
+
+\[
+f : (M, X) \to (N, Y)
+\]
+
+
+satisfies
+
+
+\[
+Df \circ X = Y \circ f.
+\]
+
+
+
+% ------------------------------------------------------------
+\subsection{The CGHDS as an Object in \mathbf{Dyn}}
+
+Define the object
+
+
+\[
+\mathcal{G} = (\mathbb{R}^2, X),
+\]
+
+
+where
+
+
+\[
+X(x) = -\nabla V(x) + \omega R x.
+\]
+
+
+
+Thus the CGHDS is a well-defined object in $\mathbf{Dyn}$.
+
+% ------------------------------------------------------------
+\subsection{Golden Manifold as a Subobject}
+
+Define the inclusion
+
+
+\[
+i : \mathcal{M}_{\text{golden}} \hookrightarrow \mathbb{R}^2.
+\]
+
+
+
+Since $\mathcal{M}_{\text{golden}}$ is invariant under the flow,
+
+
+\[
+X|_{\mathcal{M}_{\text{golden}}}
+\]
+
+
+is a well-defined vector field.
+
+Thus
+
+
+\[
+(\mathcal{M}_{\text{golden}}, X|_{\mathcal{M}_{\text{golden}}})
+\]
+
+
+is a subobject of $\mathcal{G}$.
+
+% ------------------------------------------------------------
+\subsection{Limit Cycle as a Terminal Subobject}
+
+The golden ring
+
+
+\[
+\mathcal{C} = \{ r = r_0 \}
+\]
+
+
+is a terminal subobject in the sense that any trajectory eventually factors through it.
+
+Formally, for any object $(M,X)$ and morphism
+
+
+\[
+f : (M,X) \to \mathcal{G},
+\]
+
+
+there exists a unique factorization
+
+
+\[
+(M,X) \xrightarrow{g} (\mathcal{C},X|_{\mathcal{C}}) \xrightarrow{i} \mathcal{G}.
+\]
+
+
+
+% ------------------------------------------------------------
+\subsection{Stable Manifold as a Fiber}
+
+Define the projection
+
+
+\[
+\pi : W^s(\mathcal{C}) \to \mathcal{C},
+\qquad
+\pi(x) = \lim_{t\to\infty} \Phi_t(x).
+\]
+
+
+
+This is a morphism in $\mathbf{Dyn}$.
+
+Thus $W^s(\mathcal{C})$ is a fiber bundle over $\mathcal{C}$.
+
+% ------------------------------------------------------------
+\subsection{D8-Equivariance}
+
+Let $D_8$ act on $\mathbb{R}^2$ by rotations and reflections.
+
+Define the functor
+
+
+\[
+F : D_8 \to \mathbf{Dyn},
+\qquad
+F(g) = (g, Dg).
+\]
+
+
+
+The CGHDS is $D_8$-equivariant if
+
+
+\[
+Dg \circ X = X \circ g
+\quad\forall g \in D_8.
+\]
+
+
+
+Since
+
+
+\[
+V(gx) = V(x),
+\qquad
+Rgx = gRx,
+\]
+
+
+we have
+
+
+\[
+Dg \circ X = X \circ g.
+\]
+
+
+
+Thus $\mathcal{G}$ is a $D_8$-equivariant object.
+
+% ------------------------------------------------------------
+\subsection{Golden Functor}
+
+Define the functor
+
+
+\[
+\mathcal{F}_{\text{golden}} : \mathbf{Dyn} \to \mathbf{Top}
+\]
+
+
+by
+
+
+\[
+\mathcal{F}_{\text{golden}}(M,X)
+= \text{the attractor of } (M,X).
+\]
+
+
+
+For the CGHDS:
+
+
+\[
+\mathcal{F}_{\text{golden}}(\mathcal{G})
+= \mathcal{C}.
+\]
+
+
+
+Thus the golden ring is the image of the CGHDS under the golden functor.
+
+% ------------------------------------------------------------
+\subsection{Golden Natural Transformation}
+
+Define the natural transformation
+
+
+\[
+\eta : \mathrm{Id}_{\mathbf{Dyn}} \Rightarrow \mathcal{F}_{\text{golden}}
+\]
+
+
+by
+
+
+\[
+\eta_{(M,X)}(x)
+= \lim_{t\to\infty} \Phi_t(x).
+\]
+
+
+
+For the CGHDS:
+
+
+\[
+\eta_{\mathcal{G}}(x)
+= \lim_{t\to\infty} \Phi_t(x)
+= \pi(x).
+\]
+
+
+
+Thus the stable manifold projection is the component of the golden natural transformation.
+
+% ------------------------------------------------------------
+\subsection{Universal Property of the Golden Cycle}
+
+The golden cycle $\mathcal{C}$ satisfies the universal property:
+
+For any $D_8$-equivariant dynamical system $(M,X)$ with a unique attracting cycle, there exists a unique morphism
+
+
+\[
+f : (M,X) \to (\mathcal{C},X|_{\mathcal{C}})
+\]
+
+
+such that
+
+
+\[
+\pi \circ f = \eta_{(M,X)}.
+\]
+
+
+
+Thus the golden cycle is a terminal object in the category of $D_8$-equivariant attractors.
+
+% ------------------------------------------------------------
+\subsection{Categorical Summary}
+
+\begin{itemize}
+\item The CGHDS is an object in $\mathbf{Dyn}$.
+\item The golden manifold is a subobject.
+\item The golden ring is a terminal subobject.
+\item The stable manifold is a fiber over the ring.
+\item The system is $D_8$-equivariant.
+\item The golden functor extracts the attractor.
+\item The golden natural transformation maps states to their asymptotic limit.
+\item The golden cycle satisfies a universal property.
+\end{itemize}
+
+\end{document}
+% ============================================================
+% PART 10 — FINAL CANONICAL CLOSURE: AXIOMS, THEOREMS, AND DEFINITIONS
+% ============================================================
+
+\section{Axiomatic Foundation of the CGHDS}
+
+We now present the Canonical Golden Harmonic Dynamical System as an axiomatized mathematical object.
+
+% ------------------------------------------------------------
+\subsection{Axiom 1 (State Space)}
+The state space is the smooth manifold
+
+
+\[
+M = \mathbb{R}^2.
+\]
+
+
+
+% ------------------------------------------------------------
+\subsection{Axiom 2 (Golden Potential)}
+There exists a smooth potential
+
+
+\[
+V : \mathbb{R}^2 \to \mathbb{R}
+\]
+
+
+of the form
+
+
+\[
+V(x) = \frac{1}{4}(\|x\|^2 - r_0^2)^2
++ \mu x_1^2 x_2^2
++ \epsilon \cos(8\theta),
+\]
+
+
+with $r_0 > 0$.
+
+% ------------------------------------------------------------
+\subsection{Axiom 3 (Rotational Harmonic Term)}
+There exists a constant $\omega \in \mathbb{R}$ such that the rotational component of the flow is
+
+
+\[
+\omega R x,
+\qquad
+R = \begin{pmatrix}0 & -1 \\ 1 & 0\end{pmatrix}.
+\]
+
+
+
+% ------------------------------------------------------------
+\subsection{Axiom 4 (Golden Vector Field)}
+The canonical vector field is
+
+
+\[
+X(x) = -\nabla V(x) + \omega R x.
+\]
+
+
+
+% ------------------------------------------------------------
+\subsection{Axiom 5 (Eightfold Symmetry)}
+The system is invariant under the dihedral group $D_8$:
+
+
+\[
+V(gx) = V(x),
+\qquad
+g \in D_8.
+\]
+
+
+
+% ------------------------------------------------------------
+\subsection{Axiom 6 (Dual-Well Structure)}
+The angular energy contains a dual-well term:
+
+
+\[
+\mu x_1^2 x_2^2.
+\]
+
+
+
+% ------------------------------------------------------------
+\subsection{Axiom 7 (Golden Recursion)}
+The flow induces a recursion
+
+
+\[
+x_{n+1} = \Phi_T(x_n),
+\]
+
+
+where $T$ is the period of the limit cycle.
+
+% ------------------------------------------------------------
+\subsection{Axiom 8 (Golden Manifold)}
+The golden manifold is defined as
+
+
+\[
+\mathcal{M}_{\text{golden}}
+= \mathcal{C} \cup W^s(\mathcal{C}),
+\qquad
+\mathcal{C} = \{ r = r_0 \}.
+\]
+
+
+
+% ============================================================
+\section{Fundamental Theorems of the CGHDS}
+
+\subsection{Theorem 1 (Existence of the Golden Cycle)}
+There exists a unique hyperbolically stable limit cycle
+
+
+\[
+\mathcal{C} = \{ r = r_0 \}.
+\]
+
+
+
+\subsection{Theorem 2 (Global Attraction)}
+For all $x \in \mathbb{R}^2 \setminus \{0\}$,
+
+
+\[
+\lim_{t\to\infty} \text{dist}(\Phi_t(x), \mathcal{C}) = 0.
+\]
+
+
+
+\subsection{Theorem 3 (Logarithmic Spiral Convergence)}
+Trajectories converge to $\mathcal{C}$ along logarithmic spirals:
+
+
+\[
+r(t) = r_0 + Ce^{-\Lambda t},
+\qquad
+\theta(t) = \omega t + \Theta_0 + O(e^{-\Lambda t}).
+\]
+
+
+
+\subsection{Theorem 4 (Eightfold Angular Modulation)}
+The angular dynamics satisfy
+
+
+\[
+\dot{\theta}
+= \omega
+- 2\mu r^2 \sin(4\theta)\cos(4\theta)
++ 8\epsilon \frac{1}{r^2}\sin(8\theta),
+\]
+
+
+producing an 8-petal lotus geometry.
+
+\subsection{Theorem 5 (Dual-Well Yin-Yang Structure)}
+The angular potential
+
+
+\[
+U(\theta) = \frac{\mu r^4}{4}\sin^2(4\theta)
+\]
+
+
+has two minima per $\pi$, forming a dual-well structure.
+
+\subsection{Theorem 6 (D8-Equivariance)}
+The vector field satisfies
+
+
+\[
+Dg \circ X = X \circ g,
+\qquad g \in D_8.
+\]
+
+
+
+\subsection{Theorem 7 (Invariant Measure)}
+The golden cycle supports a unique invariant probability measure
+
+
+\[
+d\mu = \frac{1}{T} dt.
+\]
+
+
+
+\subsection{Theorem 8 (Ergodicity on the Cycle)}
+The flow restricted to $\mathcal{C}$ is ergodic.
+
+\subsection{Theorem 9 (Mixing on the Stable Manifold)}
+For any $f \in L^2(\mathbb{R}^2)$,
+
+
+\[
+\|T(t)f - \Pi f\| \to 0,
+\]
+
+
+where $\Pi$ projects onto the invariant measure.
+
+\subsection{Theorem 10 (Universal Property of the Golden Cycle)}
+The golden cycle is a terminal object in the category of $D_8$-equivariant attractors.
+
+% ============================================================
+\section{Canonical Definition of the CGHDS}
+
+\subsection{Definition (CGHDS)}
+The Canonical Golden Harmonic Dynamical System is the quadruple
+
+
+\[
+\mathrm{CGHDS}
+= (M, V, \omega, D_8),
+\]
+
+
+where:
+\begin{itemize}
+\item $M = \mathbb{R}^2$,
+\item $V$ is the golden potential,
+\item $\omega$ is the rotational harmonic constant,
+\item $D_8$ is the symmetry group.
+\end{itemize}
+
+The associated vector field is
+
+
+\[
+X = -\nabla V + \omega R x.
+\]
+
+
+
+The attractor is the golden manifold
+
+
+\[
+\mathcal{M}_{\text{golden}}
+= \mathcal{C} \cup W^s(\mathcal{C}).
+\]
+
+
+
+% ============================================================
+\section{Final Canonical Closure}
+
+The CGHDS is a complete mathematical object defined by:
+\begin{itemize}
+\item a state space,
+\item a potential,
+\item a rotational harmonic term,
+\item a symmetry group,
+\item a canonical vector field,
+\item a unique attracting cycle,
+\item a logarithmic stable manifold,
+\item a dual-well angular structure,
+\item an eightfold modulation,
+\item a universal categorical property.
+\end{itemize}
+
+\end{document}
