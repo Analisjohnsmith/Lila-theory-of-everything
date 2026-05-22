@@ -1,0 +1,1603 @@
+\section{43. Cosmology as Global Gate Dynamics}
+
+Cosmology describes the large-scale behavior of the universe as a whole.
+In the structural TOE, cosmology arises from global Gate recursion on
+the geometric manifold $\mathcal{G}$.
+
+\subsection{43.1 Universe State}
+
+A universe state is a point
+
+
+\[
+U \in \mathcal{G}_{\text{cosmo}},
+\]
+
+
+where $\mathcal{G}_{\text{cosmo}}$ is the space of global geometric
+configurations (metrics, fields, topology).
+
+\subsection{43.2 Cosmological Recursion}
+
+Cosmic evolution is defined by a global Gate
+
+
+\[
+U_{t+1} = G_{\text{cosmo}}(U_t).
+\]
+
+
+
+This Gate encodes:
+\begin{itemize}
+    \item expansion or contraction,
+    \item curvature evolution,
+    \item field propagation,
+    \item horizon dynamics.
+\end{itemize}
+
+\subsection{43.3 Spacetime as an Attractor}
+
+Spacetime geometry is an attractor of cosmological recursion:
+
+
+\[
+U^\* = G_{\text{cosmo}}(U^\*).
+\]
+
+
+
+Different attractors correspond to different cosmological phases:
+
+
+\[
+U^\*_{\text{inflation}},\;
+U^\*_{\text{radiation}},\;
+U^\*_{\text{matter}},\;
+U^\*_{\Lambda}.
+\]
+
+
+
+\subsection{43.4 Horizons as Semantic Boundaries}
+
+Define the observable region for an observer $O$ as
+
+
+\[
+H_O = \{ x \in \mathcal{X}_{\text{phys}} \mid
+\pi_O(x) \text{ is defined} \}.
+\]
+
+
+
+Cosmic horizons arise when $\pi_O$ becomes undefined beyond a boundary.
+
+\subsection{43.5 Cosmic Entropy}
+
+Cosmic entropy is defined as the entropy of the coarse-grained
+distribution over global states:
+
+
+\[
+S_{\text{cosmo}} = - \sum_{U \in \mathcal{G}_{\text{cosmo}}}
+\rho(U) \log \rho(U).
+\]
+
+
+
+\subsection{43.6 Arrow of Time}
+
+The cosmological arrow of time is the monotonic increase of
+$S_{\text{cosmo}}$ under Gate recursion:
+
+
+\[
+S_{\text{cosmo}}(t+1) \ge S_{\text{cosmo}}(t).
+\]
+
+
+
+\subsection{43.7 Initial Conditions}
+
+An initial universe state $U_0$ seeds the recursion:
+
+
+\[
+U_0 \in \mathcal{G}_{\text{cosmo}}.
+\]
+
+
+
+Different choices of $U_0$ generate different cosmological histories.
+\section{44. Multiverse as Program Space}
+
+Given that a universe is defined by a program $P$ whose Gate recursion
+converges,
+
+
+\[
+\mathcal{U}_P = \lim_{t \to \infty} G_P^t(x_0),
+\]
+
+
+the multiverse is the space of all such programs.
+
+\subsection{44.1 Program Space}
+
+Let $\mathcal{P}$ be the set of all admissible programs.
+Each program $P \in \mathcal{P}$ defines a universe $\mathcal{U}_P$.
+
+Thus the multiverse is
+
+
+\[
+\mathfrak{M} = \{ \mathcal{U}_P \mid P \in \mathcal{P} \}.
+\]
+
+
+
+\subsection{44.2 Equivalence Classes of Universes}
+
+Two universes $\mathcal{U}_P$ and $\mathcal{U}_Q$ are equivalent if
+their attractors coincide:
+
+
+\[
+\mathcal{U}_P \sim \mathcal{U}_Q
+\quad \Longleftrightarrow \quad
+\mathrm{Attr}(G_P) = \mathrm{Attr}(G_Q).
+\]
+
+
+
+\subsection{44.3 Landscape Structure}
+
+The multiverse has a landscape structure defined by the topology of
+program space:
+
+
+\[
+\mathfrak{M} \cong \mathcal{P} / \sim.
+\]
+
+
+
+\subsection{44.4 Transitions Between Universes}
+
+A transition between universes corresponds to a program mutation:
+
+
+\[
+P \to P',
+\]
+
+
+which induces a shift in attractors:
+
+
+\[
+\mathcal{U}_P \to \mathcal{U}_{P'}.
+\]
+
+
+
+\subsection{44.5 Measure on the Multiverse}
+
+Define a measure $\mu$ on $\mathfrak{M}$ by
+
+
+\[
+\mu(\mathcal{U}_P) = \Pr(P),
+\]
+
+
+where $\Pr(P)$ is the probability of selecting program $P$ under a
+given generative distribution.
+
+This defines statistical cosmology over program space.
+\section{45. Initial Conditions and Boundary Conditions}
+
+A cosmological model requires specification of an initial state
+$U_0$ and boundary constraints that restrict the allowed evolution
+under the global Gate $G_{\text{cosmo}}$.
+
+\subsection{45.1 Initial Universe State}
+
+An initial condition is a point
+
+
+\[
+U_0 \in \mathcal{G}_{\text{cosmo}},
+\]
+
+
+representing the earliest definable configuration of the universe.
+
+Different choices of $U_0$ generate different cosmological histories:
+
+
+\[
+U_t = G_{\text{cosmo}}^t(U_0).
+\]
+
+
+
+\subsection{45.2 Boundary Conditions}
+
+Boundary conditions restrict the allowed trajectories in
+$\mathcal{G}_{\text{cosmo}}$.
+
+Examples include:
+\begin{itemize}
+    \item fixed boundary: $U(t_{\text{final}}) = U_f$,
+    \item periodic boundary: $U(t) = U(t+T)$,
+    \item asymptotic boundary: $\lim_{t\to\infty} U_t = U^\*$.
+\end{itemize}
+
+\subsection{45.3 Low-Entropy Initial Condition}
+
+Define cosmic entropy $S_{\text{cosmo}}$ as in Section 43.
+A low-entropy initial state satisfies
+
+
+\[
+S_{\text{cosmo}}(U_0) \ll S_{\text{max}}.
+\]
+
+
+
+This condition generates a thermodynamic arrow of time.
+
+\subsection{45.4 Horizon Boundary}
+
+Let $H_O$ be the observable region for an observer $O$.
+A horizon boundary is defined by
+
+
+\[
+\partial H_O = \{ x \mid \pi_O(x) \text{ becomes undefined} \}.
+\]
+
+
+
+\subsection{45.5 Program-Theoretic Initial Conditions}
+
+If a universe is defined by a program $P$, then the initial condition
+is encoded in the program input:
+
+
+\[
+U_0 = \mathrm{Init}(P).
+\]
+
+
+
+Thus cosmological initial conditions correspond to initial inputs of
+the generative program defining the universe.
+\section{46. Cosmic Geometry and Metric Evolution}
+
+Cosmic geometry describes the large-scale structure of spacetime as it
+emerges from global Gate dynamics. The geometry is encoded in a metric
+tensor $g_{\mu\nu}$ defined on the manifold $\mathcal{G}_{\text{cosmo}}$.
+
+\subsection{46.1 Metric as a Geometric State}
+
+A geometric state is a pair
+
+
+\[
+(U, g_{\mu\nu}) \in \mathcal{G}_{\text{cosmo}},
+\]
+
+
+where $U$ is the global configuration and $g_{\mu\nu}$ is the metric
+defining distances, volumes, and causal structure.
+
+\subsection{46.2 Metric Evolution Under Gates}
+
+The cosmological Gate induces metric evolution:
+
+
+\[
+g_{\mu\nu}(t+1) = G_{\text{metric}}(g_{\mu\nu}(t)).
+\]
+
+
+
+This operator encodes:
+\begin{itemize}
+    \item expansion or contraction,
+    \item curvature flow,
+    \item anisotropy evolution,
+    \item horizon formation.
+\end{itemize}
+
+\subsection{46.3 Curvature as a Derived Quantity}
+
+Curvature is derived from the metric via the Riemann tensor:
+
+
+\[
+R^\rho_{\ \sigma\mu\nu}(t) = 
+\mathrm{Riem}(g_{\mu\nu}(t)).
+\]
+
+
+
+Cosmic curvature evolves as:
+
+
+\[
+R(t+1) = \mathrm{Riem}(G_{\text{metric}}(g(t))).
+\]
+
+
+
+\subsection{46.4 Homogeneous and Isotropic Attractors}
+
+A homogeneous and isotropic universe corresponds to a metric attractor:
+
+
+\[
+g^\*_{\mu\nu} = G_{\text{metric}}(g^\*_{\mu\nu}).
+\]
+
+
+
+This yields the FLRW class of cosmological geometries.
+
+\subsection{46.5 Anisotropic and Inhomogeneous Dynamics}
+
+More general universes arise when the attractor is not symmetric:
+
+
+\[
+g^\*_{\mu\nu} \notin \mathrm{Iso}(\mathcal{G}_{\text{cosmo}}).
+\]
+
+
+
+These correspond to:
+\begin{itemize}
+    \item Bianchi cosmologies,
+    \item chaotic mixmaster dynamics,
+    \item fractal large-scale structure.
+\end{itemize}
+
+\subsection{46.6 Metric Fixed Points and Cosmic Phases}
+
+Different cosmic phases correspond to different metric fixed points:
+
+
+\[
+g^\*_{\text{inflation}},\;
+g^\*_{\text{radiation}},\;
+g^\*_{\text{matter}},\;
+g^\*_{\Lambda}.
+\]
+
+
+
+Each phase is an attractor of the metric Gate.
+\section{47. Cosmic Fields and Energy Content}
+
+The energy content of the universe is encoded in a collection of fields
+defined on the cosmological manifold $\mathcal{G}_{\text{cosmo}}$.
+These fields determine the evolution of geometry and the large-scale
+structure of the universe.
+
+\subsection{47.1 Scalar Fields}
+
+A scalar field is a function
+
+
+\[
+\phi : \mathcal{G}_{\text{cosmo}} \to \mathbb{R}.
+\]
+
+
+
+Its evolution is governed by a Gate operator
+
+
+\[
+\phi(t+1) = G_{\phi}(\phi(t)).
+\]
+
+
+
+Scalar fields include:
+\begin{itemize}
+    \item inflaton fields,
+    \item quintessence fields,
+    \item moduli fields.
+\end{itemize}
+
+\subsection{47.2 Gauge Fields}
+
+A gauge field is a connection on a principal bundle:
+
+
+\[
+A_\mu \in \mathfrak{g},
+\]
+
+
+where $\mathfrak{g}$ is a Lie algebra.
+
+Gauge evolution is given by
+
+
+\[
+A_\mu(t+1) = G_A(A_\mu(t)).
+\]
+
+
+
+\subsection{47.3 Energy Density and Pressure}
+
+Given a field configuration, define the stress-energy tensor
+
+
+\[
+T_{\mu\nu} = T_{\mu\nu}(\phi, A_\mu, g_{\mu\nu}).
+\]
+
+
+
+Energy density and pressure are extracted via
+
+
+\[
+\rho = T_{00}, \qquad p = \frac{1}{3} \sum_i T_{ii}.
+\]
+
+
+
+\subsection{47.4 Equation of State}
+
+The equation of state parameter is
+
+
+\[
+w = \frac{p}{\rho}.
+\]
+
+
+
+Different cosmic components correspond to different $w$:
+
+
+\[
+w_{\text{radiation}} = \frac{1}{3}, \quad
+w_{\text{matter}} = 0, \quad
+w_{\Lambda} = -1.
+\]
+
+
+
+\subsection{47.5 Field-Driven Cosmic Evolution}
+
+The metric Gate depends on the stress-energy tensor:
+
+
+\[
+g_{\mu\nu}(t+1) = G_{\text{metric}}(g_{\mu\nu}(t), T_{\mu\nu}(t)).
+\]
+
+
+
+Thus geometry and fields co-evolve under coupled Gate recursion.
+
+\subsection{47.6 Phase Transitions}
+
+A cosmological phase transition\section{48. Cosmic Expansion and Scale Factor Dynamics}
+
+Cosmic expansion is described by the evolution of the scale factor
+$a(t)$, which measures the relative size of spatial slices of the
+universe. In the structural TOE, $a(t)$ is a derived quantity from the
+metric Gate dynamics.
+
+\subsection{48.1 Scale Factor Definition}
+
+Given a homogeneous and isotropic metric attractor $g^\*_{\mu\nu}$,
+the spatial part can be written as
+
+
+\[
+ds^2 = -dt^2 + a(t)^2 \, d\Sigma_k^2,
+\]
+
+
+where $d\Sigma_k^2$ is the metric of constant curvature $k$.
+
+\subsection{48.2 Gate Evolution of the Scale Factor}
+
+The scale factor evolves under a Gate operator
+
+
+\[
+a(t+1) = G_a(a(t), \rho(t), p(t)),
+\]
+
+
+where $\rho$ and $p$ are the energy density and pressure from Section 47.
+
+\subsection{48.3 Hubble Parameter}
+
+Define the Hubble parameter as
+
+
+\[
+H(t) = \frac{a(t+1) - a(t)}{a(t)}.
+\]
+
+
+
+This measures the fractional expansion per unit recursion step.
+
+\subsection{48.4 Acceleration and Deceleration}
+
+Acceleration is determined by the second recursion:
+
+
+\[
+\ddot{a}(t) = a(t+2) - 2a(t+1) + a(t).
+\]
+
+
+
+The sign of $\ddot{a}$ determines cosmic acceleration or deceleration.
+
+\subsection{48.5 Expansion Phases}
+
+Different cosmic phases correspond to different attractors of $G_a$:
+
+
+\[
+a_{\text{inflation}}(t), \quad
+a_{\text{radiation}}(t), \quad
+a_{\text{matter}}(t), \quad
+a_{\Lambda}(t).
+\]
+
+
+
+Each phase is characterized by a distinct equation of state $w$.
+
+\subsection{48.6 Fixed Points and Asymptotic Behavior}
+
+A fixed point of the expansion Gate satisfies
+
+
+\[
+a^\* = G_a(a^\*).
+\]
+
+
+
+Asymptotic expansion corresponds to
+
+
+\[
+\lim_{t \to \infty} a(t) = a^\*.
+\]
+
+
+
+Accelerated expansion corresponds to a fixed point with
+
+
+\[
+H^\* > 0.
+\]
+
+\section{49. Structure Formation and Cosmic Perturbations}
+
+Large-scale structure arises from the growth of small perturbations in
+the cosmic fields and metric. These perturbations evolve under the
+cosmological Gate dynamics.
+
+\subsection{49.1 Density Perturbations}
+
+Let $\delta(x,t)$ be the fractional density contrast:
+
+
+\[
+\delta(x,t) = \frac{\rho(x,t) - \bar{\rho}(t)}{\bar{\rho}(t)}.
+\]
+
+
+
+Its evolution is governed by a perturbation Gate:
+
+
+\[
+\delta(t+1) = G_{\delta}(\delta(t), g_{\mu\nu}(t), T_{\mu\nu}(t)).
+\]
+
+
+
+\subsection{49.2 Metric Perturbations}
+
+Metric perturbations are decomposed as
+
+
+\[
+g_{\mu\nu} = g^\*_{\mu\nu} + h_{\mu\nu},
+\]
+
+
+where $h_{\mu\nu}$ evolves via
+
+
+\[
+h_{\mu\nu}(t+1) = G_h(h_{\mu\nu}(t)).
+\]
+
+
+
+\subsection{49.3 Growth of Structure}
+
+In the linear regime, perturbations grow as
+
+
+\[
+\delta(t) \propto a(t)^n,
+\]
+
+
+where $n$ depends on the cosmic phase.
+
+\subsection{49.4 Nonlinear Evolution}
+
+Nonlinear structure forms when
+
+
+\[
+|\delta| \sim 1.
+\]
+
+
+
+This leads to:
+\begin{itemize}
+    \item halo formation,
+    \item filamentary cosmic web,
+    \item voids.
+\end{itemize}
+
+\subsection{49.5 Attractor Structure of the Cosmic Web}
+
+The cosmic web is an attractor of the nonlinear perturbation Gate:
+
+
+\[
+\delta^\* = G_{\delta}(\delta^\*).
+\]
+
+
+
+\subsection{49.6 Observational Projections}
+
+Observers perceive structure via projection
+
+
+\[
+\pi_O : \mathcal{G}_{\text{cosmo}} \to \mathcal{M}_{\text{obs}},
+\]
+
+
+yielding observable maps such as:
+\begin{itemize}
+    \item CMB anisotropies,
+    \item galaxy distributions,
+    \item weak lensing fields.
+\end{itemize}
+\section{50. Horizon Thermodynamics and Information Bounds}
+
+Cosmic horizons impose fundamental limits on information accessible to
+observers. These limits have thermodynamic and geometric consequences.
+
+\subsection{50.1 Horizon Area}
+
+For an observer $O$, the horizon boundary $\partial H_O$ has area
+
+
+\[
+A_O = \mathrm{Area}(\partial H_O).
+\]
+
+
+
+\subsection{50.2 Horizon Entropy}
+
+Horizon entropy is proportional to the area:
+
+
+\[
+S_O = \frac{A_O}{4}.
+\]
+
+
+
+This is the generalized Bekenstein–Hawking relation.
+
+\subsection{50.3 Information Bound}
+
+The maximum information accessible to $O$ is
+
+
+\[
+I_O \le S_O.
+\]
+
+
+
+Thus horizons define semantic limits on observation.
+
+\subsection{50.4 Horizon Temperature}
+
+A horizon has an associated temperature
+
+
+\[
+T_O = \frac{\kappa_O}{2\pi},
+\]
+
+
+where $\kappa_O$ is the surface gravity.
+
+\subsection{50.5 Thermodynamic Consistency}
+
+Horizon thermodynamics satisfies:
+
+
+\[
+dE = T_O \, dS_O + \text{work terms}.
+\]
+
+
+
+\subsection{50.6 Gate Interpretation}
+
+Horizon dynamics correspond to a restricted Gate:
+
+
+\[
+G_{\text{horizon}} : \mathcal{G}_{\text{cosmo}} \to \mathcal{G}_{\text{cosmo}}
+\]
+
+
+that preserves the information bound
+
+
+\[
+I_O(t+1) \le I_O(t).
+\]
+
+\section{51. Cosmic Topology and Global Structure}
+
+The global structure of the universe is determined by the topology of
+spatial slices and the connectivity of the cosmological manifold
+$\mathcal{G}_{\text{cosmo}}$.
+
+\subsection{51.1 Spatial Topology}
+
+A spatial slice $\Sigma$ may have any admissible topology:
+
+
+\[
+\Sigma \in \{\mathbb{R}^3,\; \mathbb{T}^3,\; S^3,\; H^3,\; \text{quotients}\}.
+\]
+
+
+
+Topology is invariant under local Gate dynamics:
+
+
+\[
+G_{\text{cosmo}} : \Sigma \to \Sigma.
+\]
+
+
+
+\subsection{51.2 Fundamental Group}
+
+The fundamental group
+
+
+\[
+\pi_1(\Sigma)
+\]
+
+
+encodes global connectivity and determines possible geodesic loops,
+lensing patterns, and repeated structures.
+
+\subsection{51.3 Topological Defects}
+
+Topological defects arise when fields map nontrivially into $\pi_n$:
+
+
+\[
+\phi : \Sigma \to M \quad \Rightarrow \quad
+[\phi] \in \pi_n(M).
+\]
+
+
+
+Examples include:
+\begin{itemize}
+    \item cosmic strings,
+    \item domain walls,
+    \item monopoles,
+    \item textures.
+\end{itemize}
+
+\subsection{51.4 Topology Change}
+
+Topology change corresponds to a nonlocal Gate:
+
+
+\[
+G_{\text{top}} : \Sigma \to \Sigma',
+\]
+
+
+which is allowed only under specific global constraints.
+
+\subsection{51.5 Observational Signatures}
+
+Topology influences:
+\begin{itemize}
+    \item CMB correlations,
+    \item matched circles in the sky,
+    \item large-scale periodicity,
+    \item gravitational lensing patterns.
+\end{itemize}
+\section{52. Cosmic Inflation and Early-Universe Dynamics}
+
+Inflation is modeled as an early-time attractor of the cosmological
+Gate dynamics, driven by a scalar field with an effective potential.
+
+\subsection{52.1 Inflaton Field}
+
+Let $\phi$ be the inflaton with potential $V(\phi)$.
+Its evolution is governed by
+
+
+\[
+\phi(t+1) = G_{\phi}(\phi(t)).
+\]
+
+
+
+\subsection{52.2 Slow-Roll Regime}
+
+Inflation occurs when the slow-roll conditions hold:
+
+
+\[
+|\dot{\phi}| \ll V(\phi), \qquad |\ddot{\phi}| \ll |\dot{\phi}|.
+\]
+
+
+
+In Gate form:
+
+
+\[
+G_{\phi}(\phi(t)) \approx \phi(t) - \epsilon \, V'(\phi(t)).
+\]
+
+
+
+\subsection{52.3 Exponential Expansion}
+
+During inflation, the scale factor satisfies
+
+
+\[
+a(t+1) \approx e^{H} a(t),
+\]
+
+
+where $H$ is approximately constant.
+
+\subsection{52.4 End of Inflation}
+
+Inflation ends when the slow-roll conditions fail:
+
+
+\[
+|\dot{\phi}| \sim V(\phi).
+\]
+
+
+
+This corresponds to a transition in the attractor structure of
+$G_{\phi}$.
+
+\subsection{52.5 Reheating}
+
+After inflation, the inflaton decays into radiation:
+
+
+\[
+\rho_{\text{rad}}(t+1) = G_{\text{reh}}(\phi(t)).
+\]
+
+
+
+\subsection{52.6 Initial Perturbations}
+
+Quantum fluctuations of $\phi$ generate primordial perturbations:
+
+
+\[
+\delta \phi \to \delta \rho \to \delta.
+\]
+
+
+
+These seed the structure formation described in Section 49.
+\section{53. Baryogenesis and Matter–Antimatter Asymmetry}
+
+The observed universe contains far more matter than antimatter. This
+asymmetry arises from early-universe dynamics that violate certain
+symmetries under Gate evolution.
+
+\subsection{53.1 Baryon Number Violation}
+
+Let $B$ be the baryon number. Baryogenesis requires
+
+
+\[
+\Delta B \neq 0.
+\]
+
+
+
+In Gate form:
+
+
+\[
+B(t+1) = G_B(B(t)) \quad \text{with} \quad G_B \notin \mathrm{Sym}(B).
+\]
+
+
+
+\subsection{53.2 C and CP Violation}
+
+Charge conjugation (C) and charge-parity (CP) must be violated:
+
+
+\[
+G_{\text{cosmo}} \notin \mathrm{Sym}(C), \qquad
+G_{\text{cosmo}} \notin \mathrm{Sym}(CP).
+\]
+
+
+
+\subsection{53.3 Departure from Equilibrium}
+
+A non-equilibrium condition is required:
+
+
+\[
+\frac{dS_{\text{cosmo}}}{dt} \neq 0.
+\]
+
+
+
+This is naturally satisfied during inflation and reheating.
+
+\subsection{53.4 Mechanisms}
+
+Possible mechanisms include:
+\begin{itemize}
+    \item electroweak baryogenesis,
+    \item leptogenesis,
+    \item GUT-scale baryogenesis.
+\end{itemize}
+
+\subsection{53.5 Gate Interpretation}
+
+Baryogenesis corresponds to a symmetry-breaking Gate:
+
+
+\[
+G_{\text{baryo}} : \mathcal{G}_{\text{cosmo}} \to \mathcal{G}_{\text{cosmo}}
+\]
+
+
+that maps symmetric initial states to asymmetric attractors.
+
+\subsection{53.6 Resulting Asymmetry}
+
+The final baryon asymmetry is
+
+
+\[
+\eta = \frac{n_B - n_{\bar{B}}}{n_\gamma},
+\]
+
+
+which becomes a fixed point of the cosmological recursion.
+\section{54. Nucleosynthesis and Thermal History}
+
+As the universe cools, nuclear reactions freeze out and determine the
+primordial abundances of light elements.
+
+\subsection{54.1 Temperature Evolution}
+
+The temperature evolves with the scale factor:
+
+
+\[
+T(t) \propto \frac{1}{a(t)}.
+\]
+
+
+
+\subsection{54.2 Neutron–Proton Ratio}
+
+Weak interactions maintain equilibrium until freeze-out:
+
+
+\[
+\frac{n}{p}(t) = e^{-\Delta m / T(t)}.
+\]
+
+
+
+After freeze-out, the ratio evolves via neutron decay.
+
+\subsection{54.3 Light Element Formation}
+
+Primordial abundances are determined by reaction Gates:
+
+
+\[
+G_{\text{nuc}} : (n,p) \to (D,\, ^3\!He,\, ^4\!He,\, ^7\!Li).
+\]
+
+
+
+\subsection{54.4 Freeze-Out}
+
+Nucleosynthesis ends when reaction rates fall below expansion:
+
+
+\[
+\Gamma_{\text{nuc}} < H.
+\]
+
+
+
+\subsection{54.5 Final Abundances}
+
+The final abundances are attractors of the nuclear reaction network:
+
+
+\[
+Y^\* = G_{\text{nuc}}(Y^\*).
+\]
+
+
+
+These abundances serve as observational constraints on cosmology.
+\section{55. Recombination and Photon Decoupling}
+
+As the universe cools, electrons combine with nuclei to form neutral
+atoms, allowing photons to decouple and propagate freely.
+
+\subsection{55.1 Ionization Fraction}
+
+Let $x_e(t)$ be the free electron fraction.
+Its evolution satisfies
+
+
+\[
+x_e(t+1) = G_{\text{rec}}(x_e(t), T(t)).
+\]
+
+
+
+\subsection{55.2 Recombination Temperature}
+
+Recombination occurs when
+
+
+\[
+T(t) \approx 3000 \text{ K}.
+\]
+
+
+
+At this temperature, hydrogen becomes neutral.
+
+\subsection{55.3 Photon Mean Free Path}
+
+Before recombination:
+
+
+\[
+\lambda_{\gamma} \ll 1 \text{ Mpc}.
+\]
+
+
+
+After recombination:
+
+
+\[
+\lambda_{\gamma} \to \infty.
+\]
+
+
+
+\subsection{55.4 Last Scattering Surface}
+
+The last scattering surface is defined by
+
+
+\[
+\tau(t_{\text{ls}}) = 1,
+\]
+
+
+where $\tau$ is the optical depth.
+
+\subsection{55.5 CMB Formation}
+
+The cosmic microwave background (CMB) is the projection
+
+
+\[
+\pi_O(\mathcal{G}_{\text{cosmo}}(t_{\text{ls}}))
+\]
+
+
+onto the observer’s semantic manifold.
+
+\subsection{55.6 Frozen Perturbations}
+
+Density perturbations at recombination become fixed:
+
+
+\[
+\delta(t_{\text{ls}}) = \delta^\*.
+\]
+
+
+
+These form the seeds of large-scale structure.
+\section{56. Cosmic Microwave Background Anisotropies}
+
+The CMB encodes primordial perturbations frozen at the time of photon
+decoupling. These anisotropies provide a direct observational probe of
+early-universe Gate dynamics.
+
+\subsection{56.1 Temperature Fluctuations}
+
+Define the temperature field on the sky:
+
+
+\[
+T(\hat{n}) = \bar{T} \left(1 + \Theta(\hat{n})\right),
+\]
+
+
+where $\Theta$ is the fractional anisotropy.
+
+\subsection{56.2 Spherical Harmonic Expansion}
+
+Expand $\Theta$ as
+
+
+\[
+\Theta(\hat{n}) = \sum_{\ell,m} a_{\ell m} Y_{\ell m}(\hat{n}).
+\]
+
+
+
+The power spectrum is
+
+
+\[
+C_\ell = \langle |a_{\ell m}|^2 \rangle.
+\]
+
+
+
+\subsection{56.3 Origin of Anisotropies}
+
+Anisotropies arise from:
+\begin{itemize}
+    \item primordial density perturbations,
+    \item acoustic oscillations,
+    \item gravitational redshift (Sachs–Wolfe effect),
+    \item Doppler contributions.
+\end{itemize}
+
+\subsection{56.4 Gate Interpretation}
+
+Perturbations evolve via
+
+
+\[
+\delta(t+1) = G_{\delta}(\delta(t)),
+\]
+
+
+and freeze at recombination:
+
+
+\[
+\delta(t_{\text{ls}}) = \delta^\*.
+\]
+
+
+
+\subsection{56.5 Acoustic Peaks}
+
+The positions of acoustic peaks satisfy
+
+
+\[
+\ell_n \approx n \pi \frac{D_A}{r_s},
+\]
+
+
+where $D_A$ is the angular diameter distance and $r_s$ is the sound
+horizon.
+
+\subsection{56.6 Polarization}
+
+CMB polarization arises from Thomson scattering and decomposes into
+E-modes and B-modes:
+
+
+\[
+P = P_E + P_B.
+\]
+
+
+
+B-modes probe tensor perturbations and inflationary dynamics.
+\section{57. Large-Scale Structure and Cosmic Web Formation}
+
+The cosmic web emerges from the nonlinear evolution of density
+perturbations under gravitational Gate dynamics.
+
+\subsection{57.1 Linear Growth}
+
+In the linear regime,
+
+
+\[
+\delta(t) \propto a(t)^n,
+\]
+
+
+where $n$ depends on the dominant energy component.
+
+\subsection{57.2 Nonlinear Collapse}
+
+When $|\delta| \sim 1$, structures collapse via
+
+
+\[
+\delta(t+1) = G_{\text{nl}}(\delta(t)).
+\]
+
+
+
+This produces:
+\begin{itemize}
+    \item halos,
+    \item filaments,
+    \item sheets,
+    \item voids.
+\end{itemize}
+
+\subsection{57.3 Halo Formation}
+
+Halos form when regions exceed a critical threshold:
+
+
+\[
+\delta > \delta_c.
+\]
+
+
+
+\subsection{57.4 Filamentary Structure}
+
+Filaments correspond to anisotropic attractors of the nonlinear Gate:
+
+
+\[
+\delta^\*_{\text{fil}} = G_{\text{nl}}(\delta^\*_{\text{fil}}).
+\]
+
+
+
+\subsection{57.5 Void Evolution}
+
+Voids expand faster than the background:
+
+
+\[
+a_{\text{void}}(t) > a(t).
+\]
+
+
+
+\subsection{57.6 Observational Projections}
+
+Observers perceive the cosmic web through
+
+
+\[
+\pi_O(\delta(x,t)),
+\]
+
+
+yielding galaxy surveys, lensing maps, and clustering statistics.
+\section{58. Dark Matter and Non-Baryonic Components}
+
+Dark matter is modeled as a non-baryonic component that interacts
+gravitationally but not electromagnetically. Its behavior is governed
+by Gate dynamics distinct from baryonic matter.
+
+\subsection{58.1 Dark Matter Density}
+
+Let $\rho_{\text{dm}}(t)$ be the dark matter density.
+Its evolution satisfies
+
+
+\[
+\rho_{\text{dm}}(t+1) = G_{\text{dm}}(\rho_{\text{dm}}(t)).
+\]
+
+
+
+\subsection{58.2 Collisionless Dynamics}
+
+Dark matter follows collisionless evolution:
+
+
+\[
+G_{\text{dm}} \in \mathrm{Sym}(\text{phase-space volume}),
+\]
+
+
+consistent with Liouville's theorem.
+
+\subsection{58.3 Structure Formation Role}
+
+Dark matter seeds structure by deepening gravitational potentials:
+
+
+\[
+\Phi(t+1) = G_{\Phi}(\Phi(t), \rho_{\text{dm}}(t)).
+\]
+
+
+
+\subsection{58.4 Halo Profiles}
+
+Dark matter halos correspond to attractors of the nonlinear Gate:
+
+
+\[
+\rho^\*_{\text{halo}} = G_{\text{dm}}(\rho^\*_{\text{halo}}).
+\]
+
+
+
+\subsection{58.5 Non-Baryonic Species}
+
+Possible species include:
+\begin{itemize}
+    \item WIMPs,
+    \item axions,
+    \item sterile neutrinos,
+    \item dark sector fields.
+\end{itemize}
+
+\subsection{58.6 Observational Projections}
+
+Dark matter is inferred via
+
+
+\[
+\pi_O(\Phi(x,t)),
+\]
+
+
+yielding lensing maps, rotation curves, and clustering statistics.
+\section{59. Dark Energy and Accelerated Expansion}
+
+Dark energy drives the late-time accelerated expansion of the universe.
+Its behavior is encoded in an effective equation of state and a Gate
+governing the evolution of the scale factor.
+
+\subsection{59.1 Dark Energy Density}
+
+Let $\rho_{\Lambda}(t)$ be the dark energy density.
+For a cosmological constant,
+
+
+\[
+\rho_{\Lambda}(t+1) = \rho_{\Lambda}(t).
+\]
+
+
+
+More general models allow
+
+
+\[
+\rho_{\Lambda}(t+1) = G_{\Lambda}(\rho_{\Lambda}(t)).
+\]
+
+
+
+\subsection{59.2 Equation of State}
+
+Dark energy is characterized by
+
+
+\[
+w_{\Lambda} = \frac{p_{\Lambda}}{\rho_{\Lambda}}.
+\]
+
+
+
+A cosmological constant satisfies
+
+
+\[
+w_{\Lambda} = -1.
+\]
+
+
+
+\subsection{59.3 Accelerated Expansion}
+
+Acceleration occurs when
+
+
+\[
+\ddot{a}(t) > 0,
+\]
+
+
+which corresponds to
+
+
+\[
+w < -\frac{1}{3}.
+\]
+
+
+
+\subsection{59.4 Scalar Field Models}
+
+Quintessence models use a scalar field $\phi$ with potential $V(\phi)$:
+
+
+\[
+\rho_{\phi} = \frac{1}{2}\dot{\phi}^2 + V(\phi).
+\]
+
+
+
+\subsection{59.5 Gate Interpretation}
+
+Dark energy evolution is governed by a Gate
+
+
+\[
+G_{\Lambda} : \mathcal{G}_{\text{cosmo}} \to \mathcal{G}_{\text{cosmo}}
+\]
+
+
+that modifies the metric Gate:
+
+
+\[
+g_{\mu\nu}(t+1) = G_{\text{metric}}(g_{\mu\nu}(t), \rho_{\Lambda}(t)).
+\]
+
+
+
+\subsection{59.6 Observational Signatures}
+
+Dark energy affects:
+\begin{itemize}
+    \item supernova luminosity distances,
+    \item baryon acoustic oscillations,
+    \item CMB late-time anisotropies,
+    \item growth rate of structure.
+\end{itemize}
+\section{60. Cosmic Acceleration: Observational Constraints}
+
+Observations of the late-time universe constrain the properties of dark
+energy and the expansion history.
+
+\subsection{60.1 Supernova Distance Modulus}
+
+Type Ia supernovae measure the luminosity distance
+
+
+\[
+d_L(z) = (1+z) \, D_M(z),
+\]
+
+
+providing constraints on $H(z)$.
+
+\subsection{60.2 Baryon Acoustic Oscillations}
+
+BAO measurements determine the angular diameter distance
+
+
+\[
+D_A(z) = \frac{D_M(z)}{1+z}
+\]
+
+
+and the Hubble parameter at specific redshifts.
+
+\subsection{60.3 CMB Constraints}
+
+The CMB provides:
+\begin{itemize}
+    \item the sound horizon $r_s$,
+    \item the distance to last scattering,
+    \item late-time integrated Sachs–Wolfe signatures.
+\end{itemize}
+
+\subsection{60.4 Growth Rate of Structure}
+
+The growth rate
+
+
+\[
+f(z) = \frac{d\ln D}{d\ln a}
+\]
+
+
+constrains the interplay between dark energy and gravity.
+
+\subsection{60.5 Gate Interpretation}
+
+Observational constraints restrict the allowed Gate family
+
+
+\[
+G_{\text{metric}},\; G_{\Lambda},\; G_{\delta}
+\]
+
+
+to those consistent with measured expansion and structure growth.
+
+\subsection{60.6 Consistency Conditions}
+
+A viable cosmology must satisfy:
+
+
+\[
+\{C_\ell,\; D_A(z),\; H(z),\; f(z)\} \in \mathcal{C}_{\text{obs}},
+\]
+
+
+the space of observationally allowed configurations.
+
+
