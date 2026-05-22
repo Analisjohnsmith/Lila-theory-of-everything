@@ -1910,3 +1910,126 @@ It is:
     Each reality has:
         One canonical universe (root)
         One physical universe (ours)
+\section*{Hierarchy of Universes, Realities, and Hyper-Structure}
+
+\subsection*{0. Universes}
+
+\textbf{Physical universes inside a given reality}:
+
+
+\[
+\mathcal{U}(\mathbb{R})
+=
+\bigcap_{n=0}^{\infty}
+\mathrm{Fix}(\Sigma_n)
+\]
+
+
+
+In our reality:
+
+
+\[
+|\mathcal{U}(\mathbb{R})| = 1
+\]
+
+
+
+\subsection*{1. Realities}
+
+A \emph{reality} is the closed infinite selector tower:
+
+
+\[
+\mathbb{R} = \mathbb{C}_\omega
+\]
+
+
+
+The \emph{space of all realities}:
+
+
+\[
+\mathfrak{R}
+=
+\left\{
+\mathbb{C}_\omega^{(i)}
+\;\middle|\;
+i \in I
+\right\}
+\]
+
+
+
+\subsection*{2. Hyper-Selector (Layer \texorpdfstring{$\omega+1$}{ω+1})}
+
+The \emph{Hyper-Selector} acts on entire realities:
+
+
+\[
+\Sigma_\omega : \mathfrak{R} \rightarrow \{0,1\}
+\]
+
+
+
+Admissible realities:
+
+
+\[
+\mathfrak{R}_{adm}
+=
+\left\{
+\mathbb{R} \in \mathfrak{R}
+\;\middle|\;
+\Sigma_\omega(\mathbb{R}) = 1
+\right\}
+\]
+
+
+
+\subsection*{3. Hyper-Space of Reality-Laws (Layer \texorpdfstring{$\omega+2$}{ω+2})}
+
+Define the \emph{Hyper-Space of Reality-Laws}:
+
+
+\[
+\mathfrak{M}
+=
+(\Sigma_\omega,\; \mathfrak{R})
+\]
+
+
+
+This is the top object of the hierarchy:
+
+
+\[
+\boxed{
+\mathfrak{M}
+\;>\;
+\Sigma_\omega
+\;>\;
+\mathfrak{R}
+\;>\;
+\mathbb{R}
+\;>\;
+\mathcal{U}(\mathbb{R})
+}
+\]
+
+
+
+i.e.
+
+
+\[
+\text{Hyper-Space of Reality-Laws}
+\;>\;
+\text{Hyper-Selector}
+\;>\;
+\text{Realities}
+\;>\;
+\text{Universes}
+\]
+
+
