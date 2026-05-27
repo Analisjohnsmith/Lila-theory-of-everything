@@ -1,0 +1,1219 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsfonts,mathtools}
+
+\title{GMTT — Evolved and Compressed Form (v1 → v3)}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Core Ontology (Time-Evolving Systems)}
+
+We define a time-indexed system space:
+
+\[
+\mathcal{T}_t
+\]
+
+or in the non-stationary extension:
+
+\[
+\mathcal{T}_t^{(i)} \in \mathbf{\mathfrak{T}}_t
+\]
+
+where $\mathbf{\mathfrak{T}}_t$ is a collection of competing system geometries.
+
+\section{Adaptive Constraint Structure}
+
+Each system carries a dynamic constraint field:
+
+\[
+\mathcal{C}_t(X) = (\mathcal{R}, \mathcal{I}, \mathcal{S})
+\]
+
+where:
+\begin{itemize}
+  \item $\mathcal{R}$ = resources
+  \item $\mathcal{I}$ = graded invariants
+  \item $\mathcal{S}$ = structural entropy
+\end{itemize}
+
+Evolution:
+
+\[
+\mathcal{C}_{t+1} = \mathcal{F}(\mathcal{C}_t, X_t)
+\]
+
+\section{Adaptive Variational Principle}
+
+Each system evolves by minimizing a time-dependent action:
+
+\[
+\gamma_t^\ast = \arg\min_\gamma \mathcal{A}_t[\gamma]
+\]
+
+with evolving action:
+
+\[
+\mathcal{A}_{t+1} = \mathcal{A}_t + \Delta(\mathcal{R}, \mathcal{S}, \mathcal{I})
+\]
+
+\section{Non-Stationary Geometry (GMTT v3)}
+
+Instead of a single category, we define a distribution over system geometries:
+
+\[
+\mu_t(\mathcal{T})
+\]
+
+Evolution is governed by:
+
+\[
+\partial_t \mu_t(\mathcal{T})
+=
+-\nabla \mathcal{E}(\mathcal{T}) \, \mu_t(\mathcal{T})
++
+\eta_t
+\]
+
+where:
+\begin{itemize}
+  \item $\mathcal{E}(\mathcal{T})$ = viability energy
+  \item $\eta_t$ = structural mutation noise
+\end{itemize}
+
+\section{Selection Over Competing Geometries}
+
+System evolution is a selection process:
+
+\[
+\mathcal{T}_{t+1}
+=
+\mathrm{Select}\left(
+\arg\min_{\mathcal{T}^{(i)}_t}
+\mathcal{A}[\cdot \mid \mathcal{T}^{(i)}_t]
+\right)
+\]
+
+\section{Meta-Stability Condition}
+
+Stability requires robustness under perturbation of structure:
+
+\[
+\mathbb{E}_{\delta \mathcal{T}}
+\left[
+\rho(J_{\phi+\delta})
+\right]
+< 1
+\]
+
+\section{Entropy Balance Law}
+
+\[
+\frac{d\mathcal{S}}{dt}
+=
+\Phi_{\text{noise}}
+-
+\Phi_{\text{control}}
+\]
+
+\section{Canonical Object of GMTT}
+
+The canonical object is the evolving distribution:
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsthm,amsfonts}
+\usepackage{mathtools}
+\usepackage{bbm}
+
+\title{General Mathematical Theory of Technology (GMTT)}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+
+\section{Category of technological systems}
+
+\subsection{Base category}
+
+Define a category $\mathcal{T}$:
+\begin{itemize}
+  \item Objects: technological systems $X,Y,\dots$
+  \item Morphisms: transformations $f : X \to Y$
+  \item Composition: $g \circ f : X \to Z$
+  \item Identities: $\mathrm{id}_X : X \to X$
+\end{itemize}
+
+Each object $X$ has:
+\begin{itemize}
+  \item State space $S_X$
+  \item Type/constraint structure $\tau_X$
+\end{itemize}
+
+\subsection{Enrichment over resources}
+
+Let $(\mathcal{R},\oplus,\leq)$ be a commutative monoid (or ordered semiring) of resources.
+
+Each morphism $f : X \to Y$ has a cost:
+
+
+\[
+  \mathrm{cost}(f) \in \mathcal{R}
+\]
+
+
+with:
+
+
+\[
+  \mathrm{cost}(g \circ f) \leq \mathrm{cost}(g) \oplus \mathrm{cost}(f).
+\]
+
+
+
+\subsection{Monoidal structure (parallel composition)}
+
+$\mathcal{T}$ is a (symmetric) monoidal category:
+
+
+\[
+  (\mathcal{T}, \otimes, I)
+\]
+
+
+with:
+\begin{itemize}
+  \item Tensor product of systems: $X \otimes Y$
+  \item Unit object: $I$
+  \item Parallel morphisms: $f \otimes g : X \otimes Y \to X' \otimes Y'$
+\end{itemize}
+and resource additivity:
+
+
+\[
+  \mathrm{cost}(f \otimes g) = \mathrm{cost}(f) \oplus \mathrm{cost}(g).
+\]
+
+
+
+\section{Dynamics and action principle}
+
+\subsection{Discrete evolution}
+
+For each system $X$:
+
+
+\[
+  \phi_X : X \to X
+\]
+
+
+is the evolution morphism. On states:
+
+
+\[
+  s_{t+1} = \phi_X(s_t), \quad s_t \in S_X.
+\]
+
+
+
+\subsection{Paths and executions}
+
+A path (execution) of length $T$:
+
+
+\[
+  \gamma = (s_0 \xrightarrow{\phi} s_1 \xrightarrow{\phi} \dots \xrightarrow{\phi} s_T),
+\]
+
+
+with $s_t \in S_X$.
+
+\subsection{Lagrangian and action}
+
+Lagrangian:
+
+
+\[
+  \mathcal{L} : S_X \times S_X \to \mathbb{R}
+\]
+
+
+e.g.
+
+
+\[
+  \mathcal{L}(s_t,s_{t+1}) = C(f_t) + \lambda E(s_t) + \mu V(s_{t+1}),
+\]
+
+
+where $C$ is step cost, $E$ entropy/complexity, $V$ constraint penalty.
+
+Action of a path:
+
+
+\[
+  \mathcal{A}[\gamma] = \sum_{t=0}^{T-1} \mathcal{L}(s_t,s_{t+1}).
+\]
+
+
+
+\subsection{Least action execution}
+
+Actual execution:
+
+
+\[
+  \gamma^\ast = \arg\min_{\gamma} \mathcal{A}[\gamma]
+\]
+
+
+subject to resource and invariant constraints.
+
+\section{Euler--Lagrange and constrained evolution}
+
+\subsection{Discrete Euler--Lagrange equation}
+
+Define partial derivatives:
+
+
+\[
+  \partial_1 \mathcal{L}(s_t,s_{t+1}) = \frac{\partial \mathcal{L}}{\partial s_t}, \quad
+  \partial_2 \mathcal{L}(s_{t-1},s_t) = \frac{\partial \mathcal{L}}{\partial s_t}.
+\]
+
+
+
+Stationarity:
+
+
+\[
+  \partial_2 \mathcal{L}(s_{t-1},s_t) + \partial_1 \mathcal{L}(s_t,s_{t+1}) = 0.
+\]
+
+
+
+\subsection{Resource constraints}
+
+Feasible morphisms:
+
+
+\[
+  \mathrm{Hom}^{\mathrm{feas}}_{\mathcal{T}}(X,X)
+  = \{ f : X \to X \mid \mathrm{cost}(f) \leq C_X \}.
+\]
+
+
+
+Constrained Euler--Lagrange:
+
+
+\[
+  \partial_2 \mathcal{L}(s_{t-1},s_t)
+  + \partial_1 \mathcal{L}(s_t,s_{t+1})
+  + \lambda_t \, \partial \mathrm{cost}(f_t) = 0.
+\]
+
+
+
+\section{Parallel and interacting systems}
+
+\subsection{Tensor evolution}
+
+For $X,Y$:
+
+
+\[
+  (s_{t+1}^X,s_{t+1}^Y) = (\phi_X(s_t^X),\phi_Y(s_t^Y)).
+\]
+
+
+
+\subsection{Interactions}
+
+Interaction morphisms:
+
+
+\[
+  \psi_{ij} : X_i \otimes X_j \to X_i \otimes X_j.
+\]
+
+
+
+Combined evolution:
+
+
+\[
+  \Phi = \Big(\bigotimes_i \phi_i\Big) \circ \Big(\bigotimes_{i<j} \psi_{ij}\Big).
+\]
+
+
+
+Coupled Euler--Lagrange:
+
+
+\[
+  \partial_2 \mathcal{L}_i(s_{t-1}^i,s_t^i)
+  + \partial_1 \mathcal{L}_i(s_t^i,s_{t+1}^i)
+  + \sum_{j \neq i} \partial_{s_t^i} \mathcal{L}_{ij}(s_t^i,s_t^j) = 0.
+\]
+
+
+
+\section{Fixed points, stability, attractors}
+
+\subsection{Fixed points}
+
+
+
+\[
+  \phi(s^\ast) = s^\ast, \quad s^\ast \in S_X.
+\]
+
+
+Set:
+
+
+\[
+  \mathrm{Fix}(\phi) = \{ s \in S_X \mid \phi(s) = s \}.
+\]
+
+
+
+\subsection{Linear stability}
+
+Jacobian:
+
+
+\[
+  J_\phi(s) = \frac{\partial \phi}{\partial s}\Big|_{s}.
+\]
+
+
+Stable if:
+
+
+\[
+  \rho(J_\phi(s^\ast)) < 1.
+\]
+
+
+
+\subsection{Lyapunov function}
+
+$V : S_X \to \mathbb{R}_{\ge 0}$ with:
+
+
+\[
+  V(s^\ast) = 0,\quad V(s) > 0 \ (s \neq s^\ast),\quad V(\phi(s)) - V(s) < 0.
+\]
+
+
+
+\subsection{Attractors and basins}
+
+Attractor $A \subseteq S_X$:
+
+
+\[
+  \lim_{t\to\infty} \phi^t(s_0) \in A.
+\]
+
+
+Basin:
+
+
+\[
+  B(A) = \{ s_0 \mid \lim_{t\to\infty} \phi^t(s_0) \in A \}.
+\]
+
+
+
+\section{Entropy, information, and symmetries}
+
+\subsection{Entropy}
+
+Distribution $p_t(s)$, entropy:
+
+
+\[
+  H_t = -\sum_s p_t(s)\log p_t(s).
+\]
+
+
+Entropy production:
+
+
+\[
+  \sigma_t = H_{t+1} - H_t.
+\]
+
+
+
+\subsection{Mutual information}
+
+For interacting systems $X,Y$:
+
+
+\[
+  I(X;Y) = H(X) + H(Y) - H(X,Y).
+\]
+
+
+Information flow rate:
+
+
+\[
+  \dot{I} = I(X_{t+1};Y_{t+1}) - I(X_t;Y_t).
+\]
+
+
+
+\subsection{Symmetry group and Noether-type laws}
+
+Symmetry group:
+
+
+\[
+  G_X = \{ g : X \to X \mid g \circ \phi = \phi \circ g \}.
+\]
+
+
+
+If $\mathcal{L}$ invariant under $g$:
+
+
+\[
+  \mathcal{L}(g(s_t),g(s_{t+1})) = \mathcal{L}(s_t,s_{t+1}),
+\]
+
+
+then a conserved quantity $Q_t$ exists, e.g.
+
+
+\[
+  Q_t = \frac{\partial \mathcal{L}}{\partial s_{t+1}} \cdot \xi(s_t),
+\]
+
+
+with $\xi$ the generator of $g$.
+
+\section{Hamiltonian and symplectic structure}
+
+\subsection{Hamiltonian formulation}
+
+Momentum:
+
+
+\[
+  p_t = \frac{\partial \mathcal{L}}{\partial s_{t+1}}.
+\]
+
+
+
+Hamiltonian:
+
+
+\[
+  H(s_t,p_t) = p_t s_{t+1} - \mathcal{L}(s_t,s_{t+1}).
+\]
+
+
+
+Evolution:
+
+
+\[
+  s_{t+1} = \frac{\partial H}{\partial p_t}, \quad
+  p_{t+1} = -\frac{\partial H}{\partial s_{t+1}}.
+\]
+
+
+
+\subsection{Poisson bracket and symplectic form}
+
+Poisson bracket:
+
+
+\[
+  \{F,G\} = \frac{\partial F}{\partial s}\frac{\partial G}{\partial p}
+           - \frac{\partial F}{\partial p}\frac{\partial G}{\partial s}.
+\]
+
+
+
+Symplectic form:
+
+
+\[
+  \omega = ds \wedge dp, \quad \phi^\ast \omega = \omega.
+\]
+
+
+
+\section{Sheaves, presheaves, and colimits of systems}
+
+\subsection{Presheaf of local states}
+
+Index category $\mathcal{I}_X$ of subsystems.
+
+Presheaf:
+
+
+\[
+  \mathcal{F}_X : \mathcal{I}_X^{op} \to \mathbf{Set},
+\]
+
+
+with $\mathcal{F}_X(i)$ local states, and restriction maps $\mathcal{F}_X(u)$.
+
+\subsection{Global state as limit}
+
+
+
+\[
+  S_X \cong \varprojlim \mathcal{F}_X,
+\]
+
+
+elements are compatible families $(s_i)$.
+
+\subsection{Sheaf condition}
+
+For a cover $\{i_\alpha\}$, local $s_\alpha \in \mathcal{F}_X(i_\alpha)$ agreeing on overlaps glue to a unique global $s \in S_X$.
+
+\subsection{Colimit of systems}
+
+Diagram $D : \mathcal{J} \to \mathcal{T}$, colimit:
+
+
+\[
+  \mathrm{colim}\, D
+\]
+
+
+is the glued system.
+
+\section{Functors, adjunctions, monads, comonads, operads}
+
+\subsection{Semantics functor}
+
+Semantic category $\mathcal{S}$, functor:
+
+
+\[
+  \mathcal{M} : \mathcal{T} \to \mathcal{S}.
+\]
+
+
+
+\subsection{Adjunctions}
+
+
+
+\[
+  L : \mathcal{T}_{\mathrm{impl}} \leftrightarrows \mathcal{T}_{\mathrm{abs}} : R,
+\]
+
+
+with:
+
+
+\[
+  \mathrm{Hom}_{\mathrm{abs}}(L(X),Y) \cong \mathrm{Hom}_{\mathrm{impl}}(X,R(Y)).
+\]
+
+
+
+\subsection{Monads and comonads}
+
+Monad $(T,\eta,\mu)$ on $\mathcal{T}$:
+
+
+\[
+  T : \mathcal{T} \to \mathcal{T},\quad
+  \eta : 1 \Rightarrow T,\quad
+  \mu : T^2 \Rightarrow T.
+\]
+
+
+
+Comonad $(G,\epsilon,\delta)$:
+
+
+\[
+  G : \mathcal{T} \to \mathcal{T},\quad
+  \epsilon : G \Rightarrow 1,\quad
+  \delta : G \Rightarrow G^2.
+\]
+
+
+
+\subsection{Operads}
+
+Operad $\mathcal{O}$ with operations $\mathcal{O}(n)$ and composition; $\mathcal{O}$-algebras are concrete composable technological systems.
+
+\section{Homotopy, model structure, and higher categories}
+
+\subsection{Homotopy of morphisms}
+
+$f,g : X \to Y$ homotopic if:
+
+
+\[
+  H : X \times I \to Y,\quad H(x,0)=f(x),\ H(x,1)=g(x).
+\]
+
+
+
+\subsection{Model category structure}
+
+Define weak equivalences, fibrations, cofibrations on $\mathcal{T}$, giving a Quillen model category.
+
+Homotopy category:
+
+
+\[
+  Ho(\mathcal{T}) = \mathcal{T}[\text{weak eq}^{-1}].
+\]
+
+
+
+\subsection{$\infty$-groupoid of behaviors}
+
+$\Pi_\infty(X)$ with:
+\begin{itemize}
+  \item 0-cells: states
+  \item 1-cells: executions
+  \item 2-cells: homotopies of executions
+  \item $\dots$
+\end{itemize}
+
+\subsection{$\infty$-category of systems}
+
+$\mathcal{T}_\infty$ with objects systems, 1-morphisms transformations, higher morphisms coherences.
+
+\section{Cohomology, derived categories, deformation}
+
+\subsection{Cohomology}
+
+Cochain complex $C^k(X)$, coboundary $d$, cohomology:
+
+
+\[
+  H^k(X) = \ker d / \mathrm{im}\, d.
+\]
+
+
+
+\subsection{Derived category}
+
+Chain complexes $\mathrm{Ch}(\mathcal{T})$, localize at quasi-isomorphisms:
+
+
+\[
+  D(\mathcal{T}) = \mathrm{Ch}(\mathcal{T})[q\text{-iso}^{-1}].
+\]
+
+
+
+\subsection{Deformation complex and $L_\infty$-structure}
+
+Deformation complex:
+
+
+\[
+  \mathrm{Def}(X) = \mathbf{R}\mathrm{Hom}(X,X).
+\]
+
+
+
+Maurer--Cartan:
+
+
+\[
+  d\alpha + \frac{1}{2}[\alpha,\alpha] = 0.
+\]
+
+
+
+$L_\infty$-algebra $(l_1,l_2,\dots)$ encodes higher interactions.
+
+\section{Probabilistic and coalgebraic structure}
+
+\subsection{Probabilistic systems}
+
+State space $(S_X,\mathcal{F}_X,\mu_X)$, Markov kernel:
+
+
+\[
+  K(s,A) = \mathbb{P}(s_{t+1}\in A \mid s_t=s).
+\]
+
+
+
+Path probability:
+
+
+\[
+  \mathbb{P}(\gamma) = \prod_{t=0}^{T-1} K(s_t,\{s_{t+1}\}).
+\]
+
+
+
+Stochastic action:
+
+
+\[
+  \mathcal{A}[\gamma] = -\log \mathbb{P}(\gamma) + \sum_t \mathcal{L}(s_t,s_{t+1}).
+\]
+
+
+
+\subsection{Categorical probability}
+
+Probability monad $T$ on $\mathbf{Set}$:
+
+
+\[
+  T(X) = \{\text{finitely supported probability measures on } X\}.
+\]
+
+
+
+Lift to $\mathcal{T}$, stochastic systems as $T$-algebras.
+
+\subsection{Coalgebraic systems}
+
+Coalgebra:
+
+
+\[
+  c : X \to F(X)
+\]
+
+
+for functor $F$; behavior via unique morphism into final coalgebra.
+
+Bisimulation: relation $R \subseteq X \times Y$ preserved by $c_X,c_Y$.
+
+\section{Logic, temporal properties, and games}
+
+\subsection{Temporal logic}
+
+Formulas $\varphi$ over paths $\gamma$ with operators:
+
+
+\[
+  \mathbf{G}\varphi,\quad \mathbf{F}\varphi,\quad \varphi\,\mathbf{U}\,\psi.
+\]
+
+
+
+\subsection{Fixed-point logics}
+
+$\mu$-calculus:
+
+
+\[
+  \mu X.\,\varphi(X),\quad \nu X.\,\varphi(X).
+\]
+
+
+
+\subsection{Game semantics}
+
+Positions = states, moves = morphisms, strategies = policies, winning conditions = safety/liveness/security.
+
+\section{Domain theory and types}
+
+\subsection{Domains and least fixed points}
+
+Domain $(S_X,\sqsubseteq)$, Scott-continuous $\phi$:
+
+
+\[
+  \phi(\bigsqcup_i s_i) = \bigsqcup_i \phi(s_i).
+\]
+
+
+
+Least fixed point:
+
+
+\[
+  \mathrm{lfp}(\phi) = \bigsqcup_{n\ge 0} \phi^n(\bot).
+\]
+
+
+
+\subsection{Abstract interpretation}
+
+Concrete domain $(C,\sqsubseteq_C)$, abstract $(A,\sqsubseteq_A)$, Galois connection:
+
+
+\[
+  \alpha : C \leftrightarrows A : \gamma,
+\]
+
+
+with:
+
+
+\[
+  \alpha(c) \sqsubseteq_A a \iff c \sqsubseteq_C \gamma(a).
+\]
+
+
+
+\subsection{Linear logic and session types}
+
+Linear types for resource-sensitive computation; session types for protocol correctness.
+
+\section{Security as invariants and unrepresentable states}
+
+\subsection{Unrepresentable bad states}
+
+Forbidden $Bad \subseteq S_X$ enforced by:
+
+
+\[
+  \forall f : Y \to X,\quad f(S_Y) \cap Bad = \emptyset.
+\]
+
+
+
+\subsection{Type-level security}
+
+Type system $\tau_X$, judgment:
+
+
+\[
+  \vdash s : \tau_X \Rightarrow P(s),
+\]
+
+
+for security property $P$.
+
+\subsection{Information flow lattice}
+
+Labels $(L,\leq)$, $\ell(s)\in L$, allowed flows:
+
+
+\[
+  \ell(s) \leq \ell(s')
+\]
+
+
+for any $s \to s'$.
+
+\subsection{Non-interference}
+
+If $s_1 \sim_{\mathrm{low}} s_2$, then:
+
+
+\[
+  \phi(s_1) \sim_{\mathrm{low}} \phi(s_2).
+\]
+
+
+
+\subsection{Capabilities and subobjects}
+
+Capability $c : X \to Y$; authorization as subobject $i : A \hookrightarrow X$.
+
+\section{Global summary}
+
+GMTT is the structure:
+
+
+\[
+  \mathfrak{T} = (\mathcal{T}, \otimes, \mathcal{R}, \phi, \mathcal{L}, \mathcal{A},
+  \text{homotopy, cohomology, derived, probabilistic, logical, domain, security layers}).
+\]
+
+
+
+It treats technological systems as:
+\begin{itemize}
+  \item objects in a resource-enriched, monoidal, dynamical category,
+  \item evolving by an action principle,
+  \item structured by homotopy and cohomology,
+  \item constrained by logical and type-theoretic invariants,
+  \item secured by making illegal states and flows unrepresentable.
+\end{itemize}
+
+\end{document}
+
+\[
+\boxed{
+\mu_t(\mathcal{T})  \documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsfonts,mathtools}
+
+\title{General Mathematical Theory of Technology (GMTT)}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Axioms of Technological Systems}
+
+We define a technological system as a structured object satisfying:
+
+\begin{itemize}
+  \item (A1) Representability: Each system $X$ has a state space $S_X$.
+  \item (A2) Composability: Systems form a category $\mathcal{T}$ with morphisms $f:X\to Y$.
+  \item (A3) Resource structure: Each morphism has cost $\mathrm{cost}(f)\in\mathcal{R}$.
+  \item (A4) Parallel composition: $(\mathcal{T},\otimes,I)$ is a symmetric monoidal category.
+  \item (A5) Dynamics: Each system evolves via a state map $\phi_X:S_X\to S_X$.
+\end{itemize}
+
+\section{Resource-Enriched Category Structure}
+
+Composition respects resource ordering:
+
+\[
+\mathrm{cost}(g\circ f) \leq \mathrm{cost}(g)\oplus \mathrm{cost}(f).
+\]
+
+Parallel composition satisfies:
+
+\[
+\mathrm{cost}(f\otimes g)=\mathrm{cost}(f)\oplus \mathrm{cost}(g).
+\]
+
+\section{Dynamics and Variational Principle}
+
+System evolution is governed by a discrete action:
+
+\[
+\gamma = (s_0 \to s_1 \to \cdots \to s_T),
+\]
+
+\[
+\mathcal{A}[\gamma]=\sum_t \mathcal{L}(s_t,s_{t+1}).
+\]
+
+Evolution selects optimal paths:
+
+\[
+\gamma^\ast=\arg\min_\gamma \mathcal{A}[\gamma].
+\]
+
+Discrete Euler--Lagrange condition:
+
+\[
+\partial_2 \mathcal{L}(s_{t-1},s_t)+\partial_1 \mathcal{L}(s_t,s_{t+1})=0.
+\]
+
+\section{Constraints and Stability}
+
+Each system has constraint structure:
+
+\[
+\mathcal{C}_t(X)=(\mathcal{R},\mathcal{I},\mathcal{S})
+\]
+
+where:
+\begin{itemize}
+  \item $\mathcal{R}$: resources
+  \item $\mathcal{I}$: graded invariants
+  \item $\mathcal{S}$: structural entropy
+\end{itemize}
+
+Evolution:
+
+\[
+\mathcal{C}_{t+1}=\mathcal{F}(\mathcal{C}_t,X_t).
+\]
+
+Stability requires:
+
+\[
+\rho(J_\phi(s^\ast))<1.
+\]
+
+Meta-stability under perturbation:
+
+\[
+\mathbb{E}_{\delta \phi}[\rho(J_{\phi+\delta})]<1.
+\]
+
+\section{Entropy and Information}
+
+Entropy:
+
+\[
+H_t=-\sum_s p_t(s)\log p_t(s).
+\]
+
+Entropy flow:
+
+\[
+\frac{d\mathcal{S}}{dt}=\Phi_{\text{noise}}-\Phi_{\text{control}}.
+\]
+
+Mutual information:
+
+\[
+I(X;Y)=H(X)+H(Y)-H(X,Y).
+\]
+
+\section{Probabilistic Structure}
+
+Markov kernel:
+
+\[
+K(s,A)=\mathbb{P}(s_{t+1}\in A\mid s_t=s).
+\]
+
+Path probability:
+
+\[
+\mathbb{P}(\gamma)=\prod_t K(s_t,s_{t+1}).
+\]
+
+Stochastic action:
+
+\[
+\mathcal{A}[\gamma]=-\log \mathbb{P}(\gamma)+\sum_t \mathcal{L}(s_t,s_{t+1}).
+\]
+
+\section{Higher Structures}
+
+\begin{itemize}
+  \item Sheaves encode local-to-global consistency:
+  \[
+  S_X \cong \varprojlim \mathcal{F}_X
+  \]
+
+  \item Homotopy:
+  \[
+  H:X\times I \to Y
+  \]
+
+  \item Derived structure:
+  \[
+  D(\mathcal{T})=\mathrm{Ch}(\mathcal{T})[q\text{-iso}^{-1}]
+  \]
+
+  \item $L_\infty$ deformation:
+  \[
+  d\alpha+\frac{1}{2}[\alpha,\alpha]=0
+  \]
+\end{itemize}
+
+\section{Logical and Security Structure}
+
+Information flow constraint:
+
+\[
+\ell(s)\leq \ell(s')
+\]
+
+Non-interference:
+
+\[
+s_1 \sim_{\text{low}} s_2 \Rightarrow \phi(s_1)\sim_{\text{low}}\phi(s_2).
+\]
+
+Forbidden states:
+
+\[
+f(S_Y)\cap Bad=\emptyset.
+\]
+
+\section{Non-Stationary Geometry (GMTT v3)}
+
+We generalize systems to a distribution over system geometries:
+
+\[
+\mu_t(\mathcal{T})
+\]
+
+Evolution:
+
+\[
+\partial_t \mu_t(\mathcal{T})
+=
+-\nabla \mathcal{E}(\mathcal{T})\,\mu_t(\mathcal{T})
++\eta_t
+\]
+
+where:
+\begin{itemize}
+  \item $\mathcal{E}(\mathcal{T})$: viability energy
+  \item $\eta_t$: structural mutation noise
+\end{itemize}
+
+Selection interpretation:
+
+\[
+\mathcal{T}_{t+1}
+=
+\mathrm{Select}\left(
+\arg\min_{\mathcal{T}^{(i)}} \mathcal{A}[\cdot \mid \mathcal{T}^{(i)}]
+\right).
+\]
+
+\section{Canonical Object}
+
+The canonical object of GMTT is:
+
+\[
+\boxed{
+\mu_t(\mathcal{T})
+}
+\]
+
+interpreted as a probability measure over system architectures.
+
+\section{Geometric Interpretation}
+
+GMTT can be viewed as:
+
+\begin{itemize}
+  \item Energy landscape dynamics $\mathcal{E}(\mathcal{T})$
+  \item Probability flow $\mu_t(\mathcal{T})$
+  \item Phase-space evolution of system architectures
+\end{itemize}
+
+\section{Final Unified Form}
+
+\[
+\boxed{
+\text{GMTT} =
+\text{evolution of a distribution over compositional system-structures under viability pressure}
+}
+\]
+
+\end{document}
+}
+\]
+
+interpreted as a probability measure over system architectures.
+
+\section{Geometric Interpretation}
+
+Equivalent views:
+
+\begin{itemize}
+  \item Energy landscape: $\mathcal{E}(\mathcal{T})$
+  \item Probability flow: $\mu_t(\mathcal{T})$
+  \item Phase space dynamics: system trajectories under selection
+\end{itemize}
+
+\section{Final Unified Form}
+
+\[
+\boxed{
+\text{Reality (GMTT)} =
+\text{evolution of a distribution over compositional system-structures under viability pressure}
+}
+\]
+
+\end{document}
