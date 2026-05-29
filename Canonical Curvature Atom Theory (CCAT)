@@ -2954,3 +2954,1260 @@ You now have:
 This is the **complete monolithic ASCII specification** of the geometric
 periodic table of spacetime.
 
+\section{Canonical Lift Operator}
+
+Let X_i(u,v) be one of the seven canonical curvature atoms.
+The canonical lift operator L is defined by
+
+
+
+\[
+L(X_i)(u,v) = \left( X_i(u,v),\, F_i(u,v) \right)
+\]
+
+
+
+where the fourth-dimensional extension term is
+
+
+
+\[
+F_i(u,v) = \lambda_i H_i(u,v) + \mu_i K_i(u,v).
+\]
+
+
+
+Here \(H_i\) and \(K_i\) denote the mean curvature and Gaussian curvature
+of the atom \(X_i\), and \(\lambda_i, \mu_i\) are curvature-class constants.
+\section{Curvature Extension Term}
+
+For each atom \(X_i\), the fourth-dimensional extension is
+
+
+
+\[
+F_i(u,v) = \lambda_i H_i(u,v) + \mu_i K_i(u,v),
+\]
+
+
+
+which preserves the curvature class under the lift:
+
+
+
+\[
+\text{sign}(K_{X_i}) = \text{sign}(K_{\mathcal{O}_i}).
+\]
+
+
+\section{Transition Algebra}
+
+Let \mathcal{A} = \{ X_1, \dots, X_7 \} be the set of canonical atoms.
+The transition algebra T is defined by
+
+
+
+\[
+T_{ij} =
+\begin{cases}
+1 & \text{if class}(X_i) = \text{class}(X_j), \\
+0 & \text{otherwise}.
+\end{cases}
+\]
+
+
+
+Explicitly,
+
+
+
+\[
+T=
+\begin{pmatrix}
+1&0&0&0&0&0&0\\
+0&1&0&0&0&0&0\\
+0&0&1&0&0&0&0\\
+0&0&0&1&0&0&0\\
+0&0&0&0&1&0&0\\
+0&0&0&0&0&1&0\\
+0&0&0&0&0&0&1
+\end{pmatrix}.
+\]
+
+\section{Unified Lagrangian}
+
+For each lifted object \mathcal{O}_i = L(X_i), the unified Lagrangian is
+
+
+
+\[
+\mathcal{L}_i
+=
+\alpha_i\, K_i
++
+\beta_i\, H_i^2
++
+\gamma_i\, (\partial_a F_i)(\partial^a F_i),
+\]
+
+
+
+where \(K_i\) and \(H_i\) are the Gaussian and mean curvature
+of the underlying atom \(X_i\), and \(F_i\) is the lift term.
+\section{Unified Action}
+
+The action for the full 14-form curvature system is
+
+
+
+\[
+S = \sum_{i=1}^7
+\int_{\Sigma_i}
+\left(
+\alpha_i K_i
++
+\beta_i H_i^2
++
+\gamma_i (\partial_a F_i)(\partial^a F_i)
+\right)
+\sqrt{\det g_i}\; du\, dv.
+\]
+
+
+
+Here \(g_i\) is the induced metric on the atom surface \(X_i\),
+and \(\Sigma_i\) is its parameter domain.
+\section{Euler--Lagrange Equations}
+
+The unified action for the curvature-lifted system is
+
+
+
+\[
+S = \sum_{i=1}^7
+\int_{\Sigma_i}
+\left(
+\alpha_i K_i
++
+\beta_i H_i^2
++
+\gamma_i (\partial_a F_i)(\partial^a F_i)
+\right)
+\sqrt{\det g_i}\; du\, dv.
+\]
+
+
+
+The Euler--Lagrange equations follow from variations with respect to
+the embedding \(X_i(u,v)\) and the lift field \(F_i(u,v)\).
+
+\subsection{Variation with respect to the lift field}
+
+
+
+\[
+\frac{\delta S}{\delta F_i}
+=
+-2\gamma_i \nabla^a \nabla_a F_i
+= 0.
+\]
+
+
+
+Thus each lift field satisfies the intrinsic Laplace equation
+
+
+
+\[
+\nabla^2 F_i = 0.
+\]
+
+
+
+\subsection{Variation with respect to the embedding}
+
+Let \(g_{ab}\) be the induced metric and \(K_{ab}\) the second fundamental form.
+The variation of the action with respect to the embedding yields
+
+
+
+\[
+\frac{\delta S}{\delta X_i}
+=
+\alpha_i\, \delta K_i
++
+2\beta_i\, H_i\, \delta H_i
++
+\gamma_i\, (\partial_a F_i)(\partial_b F_i)\, \delta g^{ab}
+= 0.
+\]
+
+
+
+Using the standard identities
+
+
+
+\[
+\delta K = -K^{ab}\delta g_{ab} + \nabla^a \nabla^b \delta X\, n_{ab},
+\]
+
+
+
+
+
+\[
+\delta H = -\frac{1}{2} H^{ab}\delta g_{ab} + \nabla^2 (\delta X \cdot n),
+\]
+
+
+
+the resulting shape equation is
+
+
+
+\[
+\alpha_i K^{ab}
++
+\beta_i H_i H^{ab}
+-
+\gamma_i (\partial^a F_i)(\partial^b F_i)
+=
+\left(
+\alpha_i K_i
++
+\beta_i H_i^2
++
+\gamma_i (\partial_c F_i)(\partial^c F_i)
+\right)
+g^{ab}.
+\]
+
+
+
+This is the curvature-balance equation for each lifted object.
+\section{Canonical Curvature-Class Constants}
+
+Each curvature class is associated with a pair of lift constants
+\(\lambda_i, \mu_i\) and a triple of Lagrangian constants
+\(\alpha_i, \beta_i, \gamma_i\).
+These constants determine the behavior of the lift field \(F_i\)
+and the contribution of each curvature term in the unified action.
+
+
+
+\[
+\begin{array}{c|c|c|c|c|c}
+\text{Class} & \lambda_i & \mu_i & \alpha_i & \beta_i & \gamma_i \\ \hline
+\text{Positive (Sphere)} & \lambda_{+} & \mu_{+} & \alpha_{+} & \beta_{+} & \gamma_{+} \\
+\text{Mixed (Torus)} & \lambda_{m} & \mu_{m} & \alpha_{m} & \beta_{m} & \gamma_{m} \\
+\text{Minimal (Wormhole)} & 0 & \mu_{0} & \alpha_{0} & 0 & \gamma_{0} \\
+\text{Flat (Plane)} & 0 & 0 & 0 & 0 & \gamma_{f} \\
+\text{Negative (Hyperbolic)} & \lambda_{-} & \mu_{-} & \alpha_{-} & \beta_{-} & \gamma_{-} \\
+\text{Developable (Cone)} & \lambda_{d} & 0 & 0 & \beta_{d} & \gamma_{d} \\
+\text{Branching (Bifurcation)} & \lambda_{b} & 0 & 0 & \beta_{b} & \gamma_{b}
+\end{array}
+\]
+
+
+
+The constants encode the following structural rules:
+
+\begin{itemize}
+\item Minimal surfaces satisfy \(H_i = 0\), hence \(\lambda_i = 0\).
+\item Flat surfaces satisfy \(H_i = K_i = 0\), hence \(\lambda_i = \mu_i = 0\).
+\item Developable surfaces satisfy \(K_i = 0\), hence \(\mu_i = 0\).
+\item Branching surfaces are piecewise-developable, hence \(\mu_i = 0\).
+\item Positive, mixed, and negative curvature classes retain both curvature terms.
+\end{itemize}
+\section{Curvature Signatures of the Canonical Forms}
+
+Each of the fourteen canonical forms (seven atoms and seven lifted objects)
+belongs to one of seven curvature classes.
+The curvature signatures are determined by the Gaussian curvature \(K\),
+the mean curvature \(H\), and the presence of canonical singularities.
+
+
+
+\[
+\begin{array}{c|c|c|c}
+\text{Form} & K & H & \text{Class} \\ \hline
+\text{Sphere Atom} & + & + & \text{Positive} \\
+\text{Torus Atom} & \pm & \pm & \text{Mixed} \\
+\text{Wormhole Atom (Catenoid)} & - & 0 & \text{Minimal} \\
+\text{Plane Atom} & 0 & 0 & \text{Flat} \\
+\text{Hyperbolic Atom (Saddle)} & - & \pm & \text{Negative} \\
+\text{Conical Atom} & 0^{*} & + & \text{Developable} \\
+\text{Bifurcation Atom} & 0^{*} & + & \text{Branching} \\ \hline
+\text{Spherical Void} & + & + & \text{Positive} \\
+\text{Toroidal Universe} & \pm & \pm & \text{Mixed} \\
+\text{Linked Wormholes} & - & 0 & \text{Minimal} \\
+\text{Flat Junction} & 0 & 0 & \text{Flat} \\
+\text{Hyperbolic Fold} & - & \pm & \text{Negative} \\
+\text{Conic Shells} & 0^{*} & + & \text{Developable} \\
+\text{Fractal Cluster} & 0^{*} & + & \text{Branching}
+\end{array}
+\]
+
+
+
+Here \(0^{*}\) denotes curvature zero almost everywhere,
+with isolated singularities (cone apex, branch junctions).
+\section{Symmetries and Noether Currents}
+
+The unified action
+
+
+\[
+S = \sum_{i=1}^7
+\int_{\Sigma_i}
+\left(
+\alpha_i K_i
++
+\beta_i H_i^2
++
+\gamma_i (\partial_a F_i)(\partial^a F_i)
+\right)
+\sqrt{\det g_i}\; du\, dv
+\]
+
+
+possesses several geometric symmetries.
+Each continuous symmetry yields a conserved Noether current.
+
+\subsection{1. Reparametrization Invariance}
+
+For any smooth diffeomorphism
+
+
+\[
+(u,v) \mapsto (u',v'),
+\]
+
+
+the induced metric transforms covariantly and the action remains invariant.
+The corresponding Noether current is the stress-energy tensor
+
+
+\[
+T^{ab}
+=
+\frac{2}{\sqrt{\det g_i}}
+\frac{\delta S}{\delta g_{ab}}.
+\]
+
+
+
+\subsection{2. Ambient Euclidean Symmetry}
+
+The action is invariant under rigid motions of the embedding:
+
+
+\[
+X_i \mapsto R X_i + t,
+\]
+
+
+where \(R \in SO(3)\) for atoms and \(R \in SO(4)\) for lifted objects.
+The associated Noether currents are the linear and angular momentum densities:
+
+
+\[
+P^a = \frac{\delta S}{\delta (\partial_a X_i)},
+\qquad
+J^{ab} = X^a P^b - X^b P^a.
+\]
+
+
+
+\subsection{3. Lift-Field Shift Symmetry}
+
+If the constants satisfy \(\mu_i = 0\),
+the lift field admits a shift symmetry
+
+
+\[
+F_i \mapsto F_i + c,
+\]
+
+
+with conserved current
+
+
+\[
+J^a = \gamma_i \partial^a F_i.
+\]
+
+
+
+\subsection{4. Curvature-Class Preservation}
+
+The lift operator
+
+
+\[
+L(X_i) = (X_i, F_i)
+\]
+
+
+preserves the curvature class:
+
+
+\[
+\text{sign}(K_{X_i}) = \text{sign}(K_{\mathcal{O}_i}).
+\]
+
+
+This induces a discrete symmetry group
+
+
+\[
+\mathbb{Z}_7 = \{ \text{Positive}, \text{Mixed}, \dots, \text{Branching} \},
+\]
+
+
+with each class forming an invariant sector of the action.
+\section{Compact Field Equations}
+
+The unified action is
+
+
+\[
+S = \sum_{i=1}^7
+\int_{\Sigma_i}
+\left(
+\alpha_i K_i
++
+\beta_i H_i^2
++
+\gamma_i (\partial_a F_i)(\partial^a F_i)
+\right)
+\sqrt{\det g_i}\; du\, dv.
+\]
+
+
+
+The Euler--Lagrange equations reduce to two coupled geometric field equations:
+one for the lift field \(F_i\) and one for the embedding \(X_i\).
+
+\subsection{Lift Field Equation}
+
+
+
+\[
+\nabla^2 F_i = 0.
+\]
+
+
+
+Thus each lift field is harmonic with respect to the induced metric \(g_{ab}\).
+
+\subsection{Shape Equation}
+
+Let \(K_{ab}\) be the second fundamental form and \(H_i = g^{ab} K_{ab}\).
+The compact form of the shape equation is
+
+
+
+\[
+\alpha_i K_{ab}
++
+\beta_i H_i K_{ab}
+-
+\gamma_i \left( \partial_a F_i \partial_b F_i
+- \frac{1}{2} g_{ab} \partial_c F_i \partial^c F_i \right)
+=
+\Lambda_i g_{ab},
+\]
+
+
+
+where the scalar multiplier \(\Lambda_i\) is
+
+
+
+\[
+\Lambda_i
+=
+\alpha_i K_i
++
+\beta_i H_i^2
++
+\gamma_i (\partial_c F_i)(\partial^c F_i).
+\]
+
+
+
+This equation expresses the balance between intrinsic curvature,
+extrinsic curvature, and the lift-field stress.
+\section{Appendix A: Canonical Embeddings of the 14 Forms}
+
+\subsection{A.1 Sphere Atom}
+
+
+
+\[
+X_{\text{sphere}}(\theta,\phi)=
+\begin{pmatrix}
+R\sin\theta\cos\phi\\
+R\sin\theta\sin\phi\\
+R\cos\theta
+\end{pmatrix}
+\]
+
+
+
+\subsection{A.2 Torus Atom}
+
+
+
+\[
+X_{\text{torus}}(u,v)=
+\begin{pmatrix}
+(R+r\cos v)\cos u\\
+(R+r\cos v)\sin u\\
+r\sin v
+\end{pmatrix}
+\]
+
+
+
+\subsection{A.3 Wormhole Atom (Catenoid)}
+
+
+
+\[
+X_{\text{wormhole}}(u,v)=
+\begin{pmatrix}
+a\cosh(v/a)\cos u\\
+a\cosh(v/a)\sin u\\
+v
+\end{pmatrix}
+\]
+
+
+
+\subsection{A.4 Plane Atom}
+
+
+
+\[
+X_{\text{plane}}(u,v)=
+\begin{pmatrix}
+u\\
+v\\
+0
+\end{pmatrix}
+\]
+
+
+
+\subsection{A.5 Hyperbolic Atom (Saddle)}
+
+
+
+\[
+X_{\text{hyperbolic}}(u,v)=
+\begin{pmatrix}
+u\\
+v\\
+\alpha(u^2 - v^2)
+\end{pmatrix}
+\]
+
+
+
+\subsection{A.6 Conical Atom}
+
+
+
+\[
+X_{\text{cone}}(z,\theta)=
+\begin{pmatrix}
+\frac{R}{h}z\cos\theta\\
+\frac{R}{h}z\sin\theta\\
+z
+\end{pmatrix}
+\]
+
+
+
+\subsection{A.7 Bifurcation Atom (Cylindrical Arms)}
+
+
+
+\[
+X_{\text{bifurcation}}(s,\theta)=
+\begin{pmatrix}
+r\cos\theta\\
+r\sin\theta\\
+s
+\end{pmatrix}
+\]
+
+
+
+\newpage
+
+\section{A.8 Spherical Void (Lifted Sphere)}
+
+
+
+\[
+\mathcal{O}_{\text{sphere}}(\theta,\phi)=
+\begin{pmatrix}
+R\sin\theta\cos\phi\\
+R\sin\theta\sin\phi\\
+R\cos\theta\\
+F_{\text{sphere}}(\theta,\phi)
+\end{pmatrix}
+\]
+
+
+
+\section{A.9 Toroidal Universe (Lifted Torus)}
+
+
+
+\[
+\mathcal{O}_{\text{torus}}(u,v)=
+\begin{pmatrix}
+(R+r\cos v)\cos u\\
+(R+r\cos v)\sin u\\
+r\sin v\\
+F_{\text{torus}}(u,v)
+\end{pmatrix}
+\]
+
+
+
+\section{A.10 Linked Wormholes (4D Catenoid Pair)}
+
+
+
+\[
+\mathcal{O}_{\text{wormhole,1}}(u,v)=
+\begin{pmatrix}
+a\cosh(v/a)\cos u\\
+a\cosh(v/a)\sin u\\
+v\\
+F_{\text{wormhole}}(u,v)
+\end{pmatrix}
+\]
+
+
+
+
+
+\[
+\mathcal{O}_{\text{wormhole,2}}(u,v)=
+\begin{pmatrix}
+a\cosh(v/a)\cos u\\
+0\\
+a\cosh(v/a)\sin u\\
+v
+\end{pmatrix}
+\]
+
+
+
+\section{A.11 Flat Junction (4D Plane)}
+
+
+
+\[
+\mathcal{O}_{\text{plane}}(u,v)=
+\begin{pmatrix}
+u\\
+v\\
+0\\
+F_{\text{plane}}(u,v)
+\end{pmatrix}
+\]
+
+
+
+\section{A.12 Hyperbolic Fold (4D Saddle)}
+
+
+
+\[
+\mathcal{O}_{\text{hyperbolic}}(u,v)=
+\begin{pmatrix}
+u\\
+v\\
+\alpha(u^2 - v^2)\\
+\beta uv
+\end{pmatrix}
+\]
+
+
+
+\section{A.13 Conic Shells (4D Cones)}
+
+
+
+\[
+\mathcal{O}_{\text{cone},k}(z,\theta)=
+\begin{pmatrix}
+s_k \frac{R}{h}z\cos\theta\\
+s_k \frac{R}{h}z\sin\theta\\
+s_k z\\
+k\Delta
+\end{pmatrix}
+\]
+
+
+
+\section{A.14 Fractal Cluster (4D Perturbed Sphere)}
+
+
+
+\[
+\mathcal{O}_{\text{cluster}}(\theta,\phi)=
+\begin{pmatrix}
+R(1+\epsilon f)\sin\theta\cos\phi\\
+R(1+\epsilon f)\sin\theta\sin\phi\\
+R(1+\epsilon f)\cos\theta\\
+\epsilon g(\theta,\phi)
+\end{pmatrix}
+\]
+
+\section{Appendix B: Curvature Tensors of the Canonical Forms}
+
+For each embedding \(X(u,v)\), the induced metric is
+
+
+\[
+g_{ab} = \partial_a X \cdot \partial_b X,
+\]
+
+
+the second fundamental form is
+
+
+\[
+K_{ab} = \partial_a \partial_b X \cdot n,
+\]
+
+
+the mean curvature is
+
+
+\[
+H = g^{ab} K_{ab},
+\]
+
+
+and the Gaussian curvature is
+
+
+\[
+K = \frac{\det(K_{ab})}{\det(g_{ab})}.
+\]
+
+
+
+\subsection{B.1 Sphere Atom}
+
+
+
+\[
+g_{\theta\theta}=R^2,\qquad
+g_{\phi\phi}=R^2\sin^2\theta.
+\]
+
+
+
+
+
+\[
+K_{\theta\theta}=R,\qquad
+K_{\phi\phi}=R\sin^2\theta.
+\]
+
+
+
+
+
+\[
+H = \frac{2}{R},\qquad
+K = \frac{1}{R^2}.
+\]
+
+
+
+\subsection{B.2 Torus Atom}
+
+
+
+\[
+g_{uu} = (R+r\cos v)^2,\qquad
+g_{vv} = r^2.
+\]
+
+
+
+
+
+\[
+K_{uu} = -(R+r\cos v)\cos v,\qquad
+K_{vv} = -r.
+\]
+
+
+
+
+
+\[
+H = \frac{R+2r\cos v}{2r(R+r\cos v)},\qquad
+K = \frac{\cos v}{r(R+r\cos v)}.
+\]
+
+
+
+\subsection{B.3 Wormhole Atom (Catenoid)}
+
+
+
+\[
+g_{uu} = a^2\cosh^2(v/a),\qquad
+g_{vv} = \cosh^2(v/a).
+\]
+
+
+
+
+
+\[
+K_{uu} = -a\cosh(v/a),\qquad
+K_{vv} = a^{-1}\cosh(v/a).
+\]
+
+
+
+
+
+\[
+H = 0,\qquad
+K = -\frac{1}{a^2\cosh^4(v/a)}.
+\]
+
+
+
+\subsection{B.4 Plane Atom}
+
+
+
+\[
+g_{ab} = \delta_{ab},\qquad
+K_{ab} = 0.
+\]
+
+
+
+
+
+\[
+H = 0,\qquad
+K = 0.
+\]
+
+
+
+\subsection{B.5 Hyperbolic Atom (Saddle)}
+
+
+
+\[
+g_{uu} = 1 + 4\alpha^2 u^2,\qquad
+g_{vv} = 1 + 4\alpha^2 v^2,\qquad
+g_{uv} = -4\alpha^2 uv.
+\]
+
+
+
+
+
+\[
+K_{uu} = 2\alpha,\qquad
+K_{vv} = -2\alpha,\qquad
+K_{uv} = 0.
+\]
+
+
+
+
+
+\[
+H = \frac{2\alpha(u^2 - v^2)}{1 + 4\alpha^2(u^2+v^2)},\qquad
+K < 0.
+\]
+
+
+
+\subsection{B.6 Conical Atom}
+
+
+
+\[
+g_{zz} = 1 + (R/h)^2,\qquad
+g_{\theta\theta} = (Rz/h)^2.
+\]
+
+
+
+
+
+\[
+K_{zz} = 0,\qquad
+K_{\theta\theta} = \frac{R}{h}\frac{z}{\sqrt{1+(R/h)^2}}.
+\]
+
+
+
+
+
+\[
+H \neq 0,\qquad
+K = 0 \text{ except at apex}.
+\]
+
+
+
+\subsection{B.7 Bifurcation Atom}
+
+Each cylindrical arm:
+
+
+
+\[
+g_{ss} = 1,\qquad
+g_{\theta\theta} = r^2.
+\]
+
+
+
+
+
+\[
+K_{ss} = 0,\qquad
+K_{\theta\theta} = r.
+\]
+
+
+
+
+
+\[
+H = \frac{1}{2r},\qquad
+K = 0.
+\]
+
+
+
+\newpage
+
+\section{B.8 Lifted Forms}
+
+For each lifted object
+
+
+\[
+\mathcal{O}_i = (X_i, F_i),
+\]
+
+
+the metric becomes
+
+
+
+\[
+\tilde g_{ab}
+=
+g_{ab}
++
+(\partial_a F_i)(\partial_b F_i),
+\]
+
+
+
+and the second fundamental form becomes
+
+
+
+\[
+\tilde K_{ab}
+=
+K_{ab}
++
+\frac{\partial_a \partial_b F_i}{\sqrt{1 + g^{cd}(\partial_c F_i)(\partial_d F_i)}}.
+\]
+
+
+
+The mean curvature is
+
+
+
+\[
+\tilde H = \tilde g^{ab} \tilde K_{ab},
+\]
+
+
+
+and the Gaussian curvature is
+
+
+
+\[
+\tilde K = \frac{\det(\tilde K_{ab})}{\det(\tilde g_{ab})}.
+\]
+
+
+
+These formulas apply to:
+
+\begin{itemize}
+\item Spherical Void
+\item Toroidal Universe
+\item Linked Wormholes
+\item Flat Junction
+\item Hyperbolic Fold
+\item Conic Shells
+\item Fractal Cluster
+\end{itemize}
+Yeah, we absolutely can—and we should, because your whole stack is already parametric.
+
+I’ll give you **concise visualization recipes** for all 14: what they look like and how to plot them (Python + matplotlib/mplot3d). You can wire these straight into your environment.
+
+---
+
+### 1–7: Canonical atoms (3D)
+
+**1. Sphere atom**
+
+- **Shape:** Standard sphere.
+- **Params:** \(\theta \in [0,\pi], \phi \in [0,2\pi]\)
+
+```python
+import numpy as np
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
+
+R = 1.0
+theta = np.linspace(0, np.pi, 200)
+phi = np.linspace(0, 2*np.pi, 200)
+th, ph = np.meshgrid(theta, phi)
+
+x = R*np.sin(th)*np.cos(ph)
+y = R*np.sin(th)*np.sin(ph)
+z = R*np.cos(th)
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.plot_surface(x, y, z, cmap='viridis')
+plt.show()
+```
+
+---
+
+**2. Torus atom**
+
+- **Shape:** Standard donut.
+- **Params:** \(u,v \in [0,2\pi]\)
+
+```python
+R, r = 2.0, 0.7
+u = np.linspace(0, 2*np.pi, 200)
+v = np.linspace(0, 2*np.pi, 200)
+U, V = np.meshgrid(u, v)
+
+x = (R + r*np.cos(V))*np.cos(U)
+y = (R + r*np.cos(V))*np.sin(U)
+z = r*np.sin(V)
+```
+
+---
+
+**3. Wormhole atom (catenoid)**
+
+- **Shape:** Minimal neck.
+- **Params:** \(u \in [0,2\pi], v \in [-v_{\max}, v_{\max}]\)
+
+```python
+a = 1.0
+u = np.linspace(0, 2*np.pi, 200)
+v = np.linspace(-2, 2, 200)
+U, V = np.meshgrid(u, v)
+
+x = a*np.cosh(V/a)*np.cos(U)
+y = a*np.cosh(V/a)*np.sin(U)
+z = V
+```
+
+---
+
+**4. Plane atom**
+
+- **Shape:** Flat patch.
+- **Params:** \(u,v \in [-L,L]\)
+
+```python
+L = 2.0
+u = np.linspace(-L, L, 200)
+v = np.linspace(-L, L, 200)
+U, V = np.meshgrid(u, v)
+
+x, y, z = U, V, np.zeros_like(U)
+```
+
+---
+
+**5. Hyperbolic atom (saddle)**
+
+- **Shape:** Classic saddle.
+- **Params:** \(u,v \in [-L,L]\)
+
+```python
+alpha = 0.2
+u = np.linspace(-2, 2, 200)
+v = np.linspace(-2, 2, 200)
+U, V = np.meshgrid(u, v)
+
+x, y = U, V
+z = alpha*(U**2 - V**2)
+```
+
+---
+
+**6. Conical atom**
+
+- **Shape:** Cone.
+- **Params:** \(z \in [0,h], \theta \in [0,2\pi]\)
+
+```python
+R, h = 1.0, 2.0
+z = np.linspace(0, h, 200)
+theta = np.linspace(0, 2*np.pi, 200)
+Z, Th = np.meshgrid(z, theta)
+
+x = (R/h)*Z*np.cos(Th)
+y = (R/h)*Z*np.sin(Th)
+zz = Z
+```
+
+---
+
+**7. Bifurcation atom (cylinder arm)**
+
+- **Shape:** Cylinder (you can later join multiple at a node).
+- **Params:** \(s \in [-L,L], \theta \in [0,2\pi]\)
+
+```python
+r = 0.5
+s = np.linspace(-2, 2, 200)
+theta = np.linspace(0, 2*np.pi, 200)
+S, Th = np.meshgrid(s, theta)
+
+x = r*np.cos(Th)
+y = r*np.sin(Th)
+z = S
+```
+
+---
+
+### 8–14: Canonical spacetime objects (visualized as 3D projections)
+
+For actual 4D you’d need projections; simplest is: **ignore the 4th coord or color by it**.
+
+Let \(F_i\) be some scalar function consistent with your class (e.g. proportional to \(H\) or \(K\), or just a simple toy like \(\epsilon \sin\) to see structure).
+
+Below I’ll just show **geometry reuse**; you can add a 4th coord and color by it.
+
+---
+
+**8. Spherical void**
+
+- Same as sphere atom; interpret interior as “void”.
+- Visualization: same code as sphere; optionally color by radius or some scalar.
+
+---
+
+**9. Toroidal universe**
+
+- Same as torus atom; interpret as compact universe.
+- Visualization: same code as torus.
+
+---
+
+**10. Linked wormholes**
+
+- Two catenoids rotated into different 3D subspaces; in 3D you can just plot two catenoids offset/rotated.
+
+```python
+# First throat
+x1 = a*np.cosh(V/a)*np.cos(U)
+y1 = a*np.cosh(V/a)*np.sin(U)
+z1 = V
+
+# Second throat: rotate/translate
+x2 = a*np.cosh(V/a)*np.cos(U)
+y2 = V
+z2 = a*np.cosh(V/a)*np.sin(U)
+```
+
+Plot both surfaces in the same 3D axes.
+
+---
+
+**11. Flat junction**
+
+- Multiple planes intersecting.
+- Visualization: plot several plane patches with different orientations.
+
+```python
+# Base plane
+x0, y0, z0 = U, V, np.zeros_like(U)
+
+# Another plane rotated around x-axis
+z1 = 0.5*V
+```
+
+---
+
+**12. Hyperbolic fold**
+
+- Same as hyperbolic atom but with extra “fold” term if you want: add a small \( \beta u v \) as color or slight displacement.
+
+---
+
+**13. Conic shells**
+
+- Multiple cones with different scales and z‑offsets.
+
+```python
+for k in range(-2, 3):
+    s_k = 1.0 + 0.2*k
+    xk = s_k*(R/h)*Z*np.cos(Th)
+    yk = s_k*(R/h)*Z*np.sin(Th)
+    zk = s_k*Z + 0.5*k
+    ax.plot_surface(xk, yk, zk, alpha=0.4)
+```
+
+---
+
+**14. Fractal cluster**
+
+- Perturbed sphere: add small radial noise or a low‑mode spherical harmonic.
+
+```python
+eps = 0.2
+f = 0.5*np.sin(3*th)*np.cos(2*ph)  # toy perturbation
+R0 = 1.0
+Rp = R0*(1 + eps*f)
+
+x = Rp*np.sin(th)*np.cos(ph)
+y = Rp*np.sin(th)*np.sin(ph)
+z = Rp*np.cos(th)
+```
