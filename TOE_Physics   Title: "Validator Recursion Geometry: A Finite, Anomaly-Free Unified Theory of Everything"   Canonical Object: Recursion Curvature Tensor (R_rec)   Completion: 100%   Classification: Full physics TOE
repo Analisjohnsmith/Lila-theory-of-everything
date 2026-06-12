@@ -7880,4 +7880,96 @@ Anomaly cancellation:
 \]
 
 
+% =========================================
+% CANONICAL ATTRACTOR  \mathcal{C}
+% =========================================
+
+\section{Canonical Attractor \texorpdfstring{$\mathcal{C}$}{C}}
+
+\subsection{Branch--Fuse Substrate}
+
+Let the state space be
+\begin{equation}
+S = \{ s_i \mid i \in \mathbb{N} \}.
+\end{equation}
+
+Let the Branch--Fuse evolution operator be
+\begin{equation}
+\mathcal{E} : S \to \mathcal{P}(S),
+\qquad
+\mathcal{E}(s_i) = B(s_i) \cup F(s_i),
+\end{equation}
+with transition weights
+\begin{equation}
+\beta_{ij} \ge 0,
+\qquad
+\sum_j \beta_{ij} = 1,
+\end{equation}
+and edge set
+\begin{equation}
+E = \{ (s_i, s_j, \beta_{ij}) \mid s_j \in \mathcal{E}(s_i) \}.
+\end{equation}
+
+Define the $n$-step evolution:
+\begin{equation}
+\mathcal{E}^n(s_0)
+=
+\underbrace{\mathcal{E}\circ\mathcal{E}\circ\cdots\circ\mathcal{E}}_{n\ \text{times}}(s_0).
+\end{equation}
+
+\subsection{Graph Limit Definition}
+
+Consider the sequence of rooted graphs
+\begin{equation}
+\mathcal{G}_n = (S_n, E_n, s_0),
+\qquad
+S_n = \mathcal{E}^n(s_0).
+\end{equation}
+
+We say that $\mathcal{G}_n$ converges in the local weak sense to a limit graph
+$\mathcal{C}$ if for every finite radius $R$ and every rooted finite graph
+$H$,
+\begin{equation}
+\lim_{n\to\infty}
+\mathbb{P}\big( B_R(\mathcal{G}_n, s_0) \cong H \big)
+=
+\mathbb{P}\big( B_R(\mathcal{C}, s_\infty) \cong H \big),
+\end{equation}
+where $B_R(\cdot)$ denotes the ball of radius $R$ around the root.
+
+\subsection{Canonical Attractor}
+
+\begin{equation}
+\boxed{
+\mathcal{C}
+=
+\lim_{n\to\infty} \mathcal{E}^n(s_0)
+}
+\end{equation}
+in the sense of local weak graph convergence.
+
+Moreover, $\mathcal{C}$ is the unique fixed point of the induced
+probability kernel $P$ on rooted graphs:
+\begin{equation}
+P(\mathcal{G} \to \mathcal{G}')
+=
+\prod_{(i,j)\in E(\mathcal{G})} \beta_{ij},
+\end{equation}
+such that
+\begin{equation}
+\boxed{
+P(\mathcal{C} \to \mathcal{C}) = 1,
+\qquad
+P(\mathcal{G} \to \mathcal{C}) > 0
+\ \text{for all admissible } \mathcal{G}.
+}
+\end{equation}
+
+Equivalently, $\mathcal{C}$ is the unique attractor satisfying
+\begin{equation}
+\mathcal{E}(\mathcal{C}) = \mathcal{C},
+\qquad
+\forall s_0 \in S:\ 
+\lim_{n\to\infty} \mathcal{E}^n(s_0) = \mathcal{C}.
+\end{equation}
 
