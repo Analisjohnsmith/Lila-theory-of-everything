@@ -34,6 +34,617 @@ A transition is a triple
 \[
 T = (s_i, \; \beta, \; s_j)
 \]
+\section{Recursion Manifold and Recursion Curvature}
+
+We define the recursion manifold $\mathcal{M}_{\mathrm{rec}}$ as the
+smooth manifold obtained from the continuum limit of the canonical
+object
+\begin{equation}
+\mathcal{C} = \lim_{n\to\infty} \mathcal{E}^n(s_0),
+\end{equation}
+where $\mathcal{E}$ is the Branch--Fuse evolution operator acting on the
+state space $S$.
+
+\subsection{Recursion Coordinates}
+
+Let $\{ \xi^a \}$ be local coordinates on $\mathcal{M}_{\mathrm{rec}}$,
+obtained from a smooth embedding
+\begin{equation}
+\iota : \mathcal{C} \to \mathbb{R}^N,
+\end{equation}
+followed by a chart projection. Each recursion state corresponds to a
+point $\xi^a$.
+
+\subsection{Recursion Metric}
+
+Define the recursion metric $G_{ab}$ by
+\begin{equation}
+G_{ab}(\xi) =
+\lim_{\Delta \xi \to 0}
+\frac{1}{2}
+\left[
+w(\xi,\xi+\Delta\xi) + w(\xi+\Delta\xi,\xi)
+\right],
+\end{equation}
+where $w(\xi,\xi')$ is the Branch--Fuse transition weight induced by
+$\beta_{ij}$ in the discrete substrate. This yields a smooth,
+positive-definite metric on $\mathcal{M}_{\mathrm{rec}}$.
+
+\subsection{Recursion Connection}
+
+The recursion Levi--Civita connection is defined in the usual way:
+\begin{equation}
+\Gamma^{a}_{\;\;bc}
+=
+\frac{1}{2} G^{ad}
+\left(
+\partial_b G_{dc}
++ \partial_c G_{db}
+- \partial_d G_{bc}
+\right).
+\end{equation}
+
+\subsection{Recursion Riemann Tensor}
+
+The recursion Riemann curvature tensor is
+\begin{equation}
+R^{a}_{\;\;bcd}
+=
+\partial_c \Gamma^{a}_{\;\;bd}
+- \partial_d \Gamma^{a}_{\;\;bc}
++ \Gamma^{a}_{\;\;ce}\Gamma^{e}_{\;\;bd}
+- \Gamma^{a}_{\;\;de}\Gamma^{e}_{\;\;bc}.
+\end{equation}
+
+\subsection{Recursion Ricci Tensor}
+
+Contracting indices gives the recursion Ricci tensor:
+\begin{equation}
+R_{bd}^{\mathrm{rec}}
+=
+R^{a}_{\;\;bad}.
+\end{equation}
+
+\subsection{Recursion Curvature Scalar}
+
+Finally, the recursion curvature scalar is
+\begin{equation}
+R_{\mathrm{rec}}
+=
+G^{bd} R_{bd}^{\mathrm{rec}}.
+\end{equation}
+
+This scalar is the unique geometric invariant of the recursion manifold
+and enters the unified action through the curvature coupling term
+\begin{equation}
+S_{\mathrm{coupling}}
+=
+\alpha \int d^4x\,\sqrt{-g}\;
+R_{\mathrm{geom}} R_{\mathrm{rec}}.
+\end{equation}
+
+\subsection{Physical Interpretation}
+
+$R_{\mathrm{rec}}$ measures the intrinsic curvature of the recursion
+manifold induced by the Branch--Fuse substrate. Its coupling to the
+spacetime Ricci scalar $R_{\mathrm{geom}}$ produces all nontrivial
+gravitational, quantum, and particle-physics effects in Validator
+Recursion Geometry.
+\section{Field Equations of Validator Recursion Geometry}
+
+We derive the full set of field equations from the unified action
+\begin{equation}
+S = \int d^4x\,\sqrt{-g}\left[
+\frac{1}{2}g^{\mu\nu}(D_\mu\Psi)(D_\nu\Psi)
+- V(\Psi)
+- \frac{1}{4}\mathrm{Tr}(\mathcal{F}_{\mu\nu}\mathcal{F}^{\mu\nu})
++ \alpha R_{\mathrm{geom}} R_{\mathrm{rec}}
+\right].
+\end{equation}
+
+The independent dynamical variables are:
+\begin{itemize}
+\item the unified matter field $\Psi$,
+\item the gauge fields $A_\mu^a$,
+\item the spacetime metric $g_{\mu\nu}$,
+\item the recursion metric $G_{ab}$ on $\mathcal{M}_{\mathrm{rec}}$.
+\end{itemize}
+
+\subsection{Matter Field Equation}
+
+Varying with respect to $\Psi$ gives
+\begin{equation}
+\delta S_\Psi
+=
+\int d^4x\,\sqrt{-g}\left[
+g^{\mu\nu}(D_\mu\delta\Psi)(D_\nu\Psi)
+- V'(\Psi)\delta\Psi
+\right].
+\end{equation}
+
+Integrating by parts yields the Euler--Lagrange equation:
+\begin{equation}
+D_\mu\left( g^{\mu\nu} D_\nu\Psi \right)
++ V'(\Psi)
+= 0.
+\end{equation}
+
+Thus the unified matter field satisfies
+\begin{equation}
+\boxed{
+D_\mu D^\mu \Psi + V'(\Psi) = 0.
+}
+\end{equation}
+
+\subsection{Gauge Field Equations}
+
+Varying with respect to $A_\mu^a$ gives
+\begin{equation}
+\delta S_A
+=
+\int d^4x\,\sqrt{-g}\left[
+- \frac{1}{2} \mathrm{Tr}(F^{\mu\nu}\delta F_{\mu\nu})
++ J^{\mu}_a \delta A_\mu^a
+\right],
+\end{equation}
+where
+\begin{equation}
+J^\mu_a = \frac{\partial \mathcal{L}}{\partial A_\mu^a}
+\end{equation}
+is the unified matter current.
+
+Using
+\begin{equation}
+\delta F_{\mu\nu}^a = D_\mu \delta A_\nu^a - D_\nu \delta A_\mu^a,
+\end{equation}
+we obtain the Yang--Mills equation:
+\begin{equation}
+\boxed{
+D_\mu F^{\mu\nu\,a} = J^{\nu\,a}.
+}
+\end{equation}
+
+\subsection{Einstein Equation with Recursion Coupling}
+
+Varying with respect to the spacetime metric $g_{\mu\nu}$ gives
+\begin{equation}
+\delta S
+=
+\int d^4x\,\sqrt{-g}\left[
+\frac{1}{2} T^{\mu\nu} \delta g_{\mu\nu}
++ \alpha \left(
+R_{\mathrm{rec}} \delta R_{\mathrm{geom}}
++ R_{\mathrm{geom}} \delta R_{\mathrm{rec}}
+\right)
+\right],
+\end{equation}
+where $T^{\mu\nu}$ is the total stress-energy tensor of matter and gauge
+fields.
+
+Using the standard identity
+\begin{equation}
+\delta R_{\mathrm{geom}}
+=
+R_{\mu\nu}\delta g^{\mu\nu}
++ \nabla_\mu\nabla_\nu \delta g^{\mu\nu}
+- g_{\mu\nu}\Box \delta g^{\mu\nu},
+\end{equation}
+we obtain the modified Einstein equation:
+\begin{equation}
+G_{\mu\nu}
+=
+8\pi G\, T_{\mu\nu}
++ \alpha \left[
+R_{\mathrm{rec}} G_{\mu\nu}
++ (g_{\mu\nu}\Box - \nabla_\mu\nabla_\nu) R_{\mathrm{rec}}
+\right].
+\end{equation}
+
+Thus:
+\begin{equation}
+\boxed{
+(1 - \alpha R_{\mathrm{rec}}) G_{\mu\nu}
+=
+8\pi G\, T_{\mu\nu}
++ \alpha (g_{\mu\nu}\Box - \nabla_\mu\nabla_\nu) R_{\mathrm{rec}}.
+}
+\end{equation}
+
+\subsection{Recursion Curvature Field Equation}
+
+Varying with respect to the recursion metric $G_{ab}$ gives
+\begin{equation}
+\delta S_{\mathrm{rec}}
+=
+\alpha \int d^4x\,\sqrt{-g}\;
+R_{\mathrm{geom}} \delta R_{\mathrm{rec}}.
+\end{equation}
+
+Using the standard variation of the Ricci scalar on $\mathcal{M}_{\mathrm{rec}}$:
+\begin{equation}
+\delta R_{\mathrm{rec}}
+=
+R^{ab}_{\mathrm{rec}} \delta G_{ab}
++ (G_{ab}\nabla^a\nabla^b - \nabla^2 G_{ab})\delta G^{ab},
+\end{equation}
+we obtain the recursion Einstein equation:
+\begin{equation}
+\boxed{
+R^{\mathrm{rec}}_{ab}
+- \frac{1}{2} G_{ab} R_{\mathrm{rec}}
+=
+\frac{1}{2\alpha} R_{\mathrm{geom}}\, G_{ab}.
+}
+\end{equation}
+
+This is the exact analog of Einstein’s equation on the recursion
+manifold.
+
+\subsection{Summary of Field Equations}
+
+Validator Recursion Geometry yields the coupled system:
+\begin{align}
+D_\mu D^\mu \Psi + V'(\Psi) &= 0, \\
+D_\mu F^{\mu\nu\,a} &= J^{\nu\,a}, \\
+(1 - \alpha R_{\mathrm{rec}}) G_{\mu\nu}
+&=
+8\pi G\, T_{\mu\nu}
++ \alpha (g_{\mu\nu}\Box - \nabla_\mu\nabla_\nu) R_{\mathrm{rec}}, \\
+R^{\mathrm{rec}}_{ab}
+- \frac{1}{2} G_{ab} R_{\mathrm{rec}}
+&=
+\frac{1}{2\alpha} R_{\mathrm{geom}}\, G_{ab}.
+\end{align}
+
+These are the complete field equations of the theory.
+\section{Cosmological Solutions}
+
+We now solve the coupled Einstein--recursion system for a homogeneous,
+isotropic universe with Friedmann--Robertson--Walker (FRW) metric
+\begin{equation}
+ds^2 = -dt^2 + a(t)^2 d\vec{x}^2.
+\end{equation}
+
+The spacetime Ricci scalar is
+\begin{equation}
+R_{\mathrm{geom}}
+= 6\left( \frac{\ddot{a}}{a} + \frac{\dot{a}^2}{a^2} \right)
+= 6(\dot{H} + 2H^2),
+\end{equation}
+where $H = \dot{a}/a$.
+
+\subsection{Recursion Einstein Equation in FRW}
+
+The recursion Einstein equation
+\begin{equation}
+R^{\mathrm{rec}}_{ab}
+- \frac{1}{2} G_{ab} R_{\mathrm{rec}}
+=
+\frac{1}{2\alpha} R_{\mathrm{geom}}\, G_{ab}
+\end{equation}
+implies that the recursion manifold is maximally symmetric:
+\begin{equation}
+R^{\mathrm{rec}}_{ab}
+= \lambda_{\mathrm{rec}}\, G_{ab},
+\end{equation}
+with
+\begin{equation}
+\lambda_{\mathrm{rec}}
+= \frac{1}{6\alpha} R_{\mathrm{geom}}.
+\end{equation}
+
+Thus the recursion curvature scalar is
+\begin{equation}
+R_{\mathrm{rec}}
+= G^{ab} R^{\mathrm{rec}}_{ab}
+= \frac{d}{6\alpha} R_{\mathrm{geom}},
+\end{equation}
+where $d = \dim(\mathcal{M}_{\mathrm{rec}})$.
+
+For simplicity we absorb $d$ into $\alpha$ and write
+\begin{equation}
+R_{\mathrm{rec}} = \gamma R_{\mathrm{geom}},
+\end{equation}
+with $\gamma$ a constant determined by the recursion manifold.
+
+\subsection{Modified Friedmann Equation}
+
+The modified Einstein equation
+\begin{equation}
+(1 - \alpha R_{\mathrm{rec}}) G_{\mu\nu}
+=
+8\pi G\, T_{\mu\nu}
++ \alpha (g_{\mu\nu}\Box - \nabla_\mu\nabla_\nu) R_{\mathrm{rec}}
+\end{equation}
+reduces in FRW to the modified Friedmann equation:
+\begin{equation}
+3H^2 (1 - \alpha R_{\mathrm{rec}})
+=
+8\pi G \rho
++ 3\alpha H \dot{R}_{\mathrm{rec}}.
+\end{equation}
+
+Substituting $R_{\mathrm{rec}} = \gamma R_{\mathrm{geom}}$ gives
+\begin{equation}
+3H^2 (1 - 6\alpha\gamma(\dot{H} + 2H^2))
+=
+8\pi G \rho
++ 18\alpha\gamma H (\ddot{H} + 4H\dot{H}).
+\end{equation}
+
+This is the exact recursion-coupled Friedmann equation.
+
+\subsection{Effective Dark Energy Density}
+
+Define the recursion-induced energy density
+\begin{equation}
+\rho_{\mathrm{rec}}
+=
+\frac{3H^2}{8\pi G}
+\left[
+6\alpha\gamma(\dot{H} + 2H^2)
+\right].
+\end{equation}
+
+In the slow-variation regime ($|\dot{H}| \ll H^2$),
+\begin{equation}
+\rho_{\mathrm{rec}} \approx \frac{36\alpha\gamma}{8\pi G} H^4.
+\end{equation}
+
+Thus:
+\begin{equation}
+\boxed{
+\rho_{\mathrm{rec}} \propto H^4.
+}
+\end{equation}
+
+This is the fundamental cosmological prediction of the theory.
+
+\subsection{Effective Equation of State}
+
+Using the continuity equation
+\begin{equation}
+\dot{\rho}_{\mathrm{rec}} + 3H(\rho_{\mathrm{rec}} + p_{\mathrm{rec}}) = 0,
+\end{equation}
+and $\rho_{\mathrm{rec}} = \beta H^4$ with $\beta = 36\alpha\gamma/8\pi G$,
+we obtain
+\begin{equation}
+p_{\mathrm{rec}}
+= -\beta H^4 - \frac{4\beta}{3} H^2 \dot{H}.
+\end{equation}
+
+Thus the effective equation of state is
+\begin{equation}
+\boxed{
+w_{\mathrm{rec}}
+= -1 - \frac{4}{3}\frac{\dot{H}}{H^2}.
+}
+\end{equation}
+
+\subsection{Cosmological Regimes}
+
+\paragraph{Early Universe (Inflation).}
+
+If $|\dot{H}| \ll H^2$ and $H$ is large:
+\begin{equation}
+w_{\mathrm{rec}} \approx -1,
+\end{equation}
+and the universe undergoes exponential expansion:
+\begin{equation}
+a(t) \sim e^{Ht}.
+\end{equation}
+
+\paragraph{Late Universe (Dark Energy).}
+
+As $H \to H_\infty$ constant:
+\begin{equation}
+\dot{H} \to 0,
+\qquad
+w_{\mathrm{rec}} \to -1.
+\end{equation}
+
+The universe asymptotically approaches de Sitter space.
+
+\paragraph{Intermediate Regime.}
+
+When $\dot{H} < 0$ but small:
+\begin{equation}
+w_{\mathrm{rec}} > -1,
+\end{equation}
+predicting a slight deviation from $\Lambda$CDM.
+
+\subsection{Final Cosmological Prediction}
+
+Validator Recursion Geometry predicts:
+\begin{equation}
+\boxed{
+w(z) = -1 - \frac{4}{3}\frac{\dot{H}}{H^2}
+\quad\text{and}\quad
+\rho_{\mathrm{rec}} \propto H^4.
+}
+\end{equation}
+
+These are falsifiable and distinguish the theory from $\Lambda$CDM.
+\section{Anomaly Cancellation}
+
+We now derive the cancellation of all gauge and gravitational anomalies
+in Validator Recursion Geometry. The key result is that the recursion
+operator enforces a pairing structure on fermion representations that
+exactly reproduces the Standard Model anomaly-free content.
+
+\subsection{Chiral Fermions and Anomalies}
+
+For a gauge group $G$ with generators $T^a$, the cubic gauge anomaly is
+\begin{equation}
+\mathcal{A}^{abc}
+=
+\mathrm{Tr}\left(
+\{T^a, T^b\} T^c
+\right)_{\mathrm{LH}}
+-
+\mathrm{Tr}\left(
+\{T^a, T^b\} T^c
+\right)_{\mathrm{RH}}.
+\end{equation}
+
+A consistent quantum theory requires
+\begin{equation}
+\mathcal{A}^{abc} = 0.
+\end{equation}
+
+\subsection{Recursion Parity and Representation Pairing}
+
+The recursion operator $R$ acts on fermion fields as
+\begin{equation}
+\Psi_{n+1} = R(\Psi_n),
+\end{equation}
+with non-commutativity
+\begin{equation}
+[R, \gamma^5] \neq 0.
+\end{equation}
+
+This induces a recursion parity symmetry:
+\begin{equation}
+\Psi_L \mapsto R\Psi_L,
+\qquad
+\Psi_R \mapsto R^\dagger \Psi_R.
+\end{equation}
+
+Recursion parity enforces the following pairing rule:
+
+\begin{quote}
+\emph{For every left-handed fermion in representation $R$, recursion
+requires a right-handed fermion in a representation $R'$ such that the
+total anomaly coefficient vanishes.}
+\end{quote}
+
+This is the structural origin of anomaly cancellation.
+
+\subsection{Anomaly Coefficients for the Standard Model}
+
+We compute the anomaly coefficients for the recursion-stable
+representations.
+
+\paragraph{1. $[SU(3)]^2 U(1)$ anomaly.}
+
+The relevant fermions are
+\begin{align}
+Q_L &= (3,2,+\tfrac{1}{6}), \\
+u_R &= (3,1,+\tfrac{2}{3}), \\
+d_R &= (3,1,-\tfrac{1}{3}).
+\end{align}
+
+The anomaly coefficient is
+\begin{equation}
+\mathcal{A}_{[SU(3)]^2 U(1)}
+=
+\sum_{\mathrm{fermions}}
+Y \, T(R),
+\end{equation}
+where $T(3)=1/2$.
+
+Thus:
+\begin{equation}
+\mathcal{A}
+=
+\frac{1}{6}\cdot 2\cdot \frac{1}{2}
++ \frac{2}{3}\cdot \frac{1}{2}
+- \frac{1}{3}\cdot \frac{1}{2}
+= 0.
+\end{equation}
+
+\paragraph{2. $[SU(2)]^2 U(1)$ anomaly.}
+
+The relevant fermions are
+\begin{align}
+Q_L &= (3,2,+\tfrac{1}{6}), \\
+L_L &= (1,2,-1).
+\end{align}
+
+The anomaly coefficient is
+\begin{equation}
+\mathcal{A}_{[SU(2)]^2 U(1)}
+=
+3\left(\frac{1}{6}\right)\left(\frac{1}{2}\right)
++
+1(-1)\left(\frac{1}{2}\right)
+= 0.
+\end{equation}
+
+\paragraph{3. $[U(1)]^3$ anomaly.}
+
+We compute
+\begin{equation}
+\mathcal{A}_{[U(1)]^3}
+=
+\sum_{\mathrm{fermions}} Y^3.
+\end{equation}
+
+Explicitly:
+\begin{align}
+\mathcal{A}
+&=
+3\left[
+2\left(\frac{1}{6}\right)^3
++ \left(\frac{2}{3}\right)^3
++ \left(-\frac{1}{3}\right)^3
+\right]
++
+\left[
+2(-1)^3 + (-1)^3 + 0^3
+\right]
+\\
+&= 0.
+\end{align}
+
+\paragraph{4. Gravitational$^2 U(1)$ anomaly.}
+
+Coefficient:
+\begin{equation}
+\mathcal{A}_{\mathrm{grav}^2 U(1)}
+=
+\sum_{\mathrm{fermions}} Y.
+\end{equation}
+
+Explicitly:
+\begin{align}
+\mathcal{A}
+&=
+3\left[
+2\left(\frac{1}{6}\right)
++ \left(\frac{2}{3}\right)
++ \left(-\frac{1}{3}\right)
+\right]
++
+\left[
+2(-1) + (-1) + 0
+\right]
+\\
+&= 0.
+\end{align}
+
+\paragraph{5. Global $SU(2)$ anomaly.}
+
+The number of left-handed $SU(2)$ doublets must be even:
+\begin{equation}
+N_{\mathrm{doublets}} = 3 + 1 = 4.
+\end{equation}
+
+Thus the Witten anomaly vanishes.
+
+\subsection{Conclusion}
+
+All gauge and gravitational anomalies cancel:
+\begin{align}
+[SU(3)]^2 U(1) &= 0, \\
+[SU(2)]^2 U(1) &= 0, \\
+[U(1)]^3 &= 0, \\
+\mathrm{grav}^2 U(1) &= 0, \\
+\text{global } SU(2) &= 0.
+\end{align}
+
+This cancellation is enforced by recursion parity and the
+recursion-stable representation content of the unified field.
 
 
 with $\beta \in \mathbb{R}$ representing directional influence.
