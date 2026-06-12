@@ -7041,4 +7041,843 @@ Validator Recursion Geometry is falsifiable by:
 
 These conditions provide clear, quantitative criteria for empirical
 refutation.
+% =========================================
+% AXIOMATIC SUBSTRATE
+% =========================================
+
+\section{Branch--Fuse Substrate}
+
+\subsection{State Space and Edges}
+
+
+
+\[
+S = \{ s_i \mid i \in \mathbb{N} \},
+\]
+
+
+
+
+
+\[
+E \subseteq S \times S \times \mathbb{R}_{\ge 0},
+\]
+
+
+
+
+
+\[
+(s_i, s_j, \beta_{ij}) \in E,
+\qquad
+\beta_{ij} \ge 0,
+\qquad
+\sum_j \beta_{ij} = 1.
+\]
+
+
+
+\subsection{Branch, Fuse, Bias}
+
+
+
+\[
+B(s_i) = \{ s_j \mid \beta_{ij} > 0 \},
+\]
+
+
+
+
+
+\[
+F(s_i) = \{ s_k \mid \beta_{ki} > 0 \},
+\]
+
+
+
+
+
+\[
+\beta(s_i) = \{ (s_j, \beta_{ij}) \mid \beta_{ij} > 0 \}.
+\]
+
+
+
+\subsection{Evolution Operator}
+
+
+
+\[
+\mathcal{E} : S \to \mathcal{P}(S),
+\qquad
+\mathcal{E}(s_i) = \{ s_j \mid \beta_{ij} > 0 \}.
+\]
+
+
+
+
+
+\[
+\mathcal{G}_n = (S_n, E_n),
+\qquad
+S_0 = \{ s_0 \},
+\qquad
+S_{n+1} = \bigcup_{s \in S_n} \mathcal{E}(s).
+\]
+
+
+
+% =========================================
+% CANONICAL ATTRACTOR
+% =========================================
+
+\section{Canonical Attractor}
+
+Assume irreducibility, aperiodicity, bounded degree, and uniform ergodicity.
+
+\subsection{Markov Kernel}
+
+
+
+\[
+P(s_i \to s_j) = \beta_{ij},
+\]
+
+
+
+
+
+\[
+\sum_j P(s_i \to s_j) = 1.
+\]
+
+
+
+\subsection{Stationary Distribution}
+
+
+
+\[
+\pi_j = \sum_i \pi_i \beta_{ij},
+\qquad
+\lim_{n\to\infty} P^n(s_i, \cdot) = \pi(\cdot).
+\]
+
+
+
+\subsection{Graph Limit}
+
+
+
+\[
+(\mathcal{G}_n, s_0) \xrightarrow{\text{local weak}} (\mathcal{C}, s_\infty).
+\]
+
+
+
+
+
+\[
+\mathcal{C} = \lim_{n\to\infty} \mathcal{G}_n.
+\]
+
+
+
+% =========================================
+% RECURSION METRIC AND MANIFOLD
+% =========================================
+
+\section{Recursion Metric and Manifold}
+
+\subsection{Recursion Distance}
+
+
+
+\[
+d(u,v) = \inf_{\gamma:u\to v} \sum_{(i,j)\in\gamma} w_{ij},
+\qquad
+w_{ij} = -\log \beta_{ij}.
+\]
+
+
+
+
+
+\[
+d_{\text{sym}}(u,v) = d(u,v) + d(v,u).
+\]
+
+
+
+\subsection{Continuum Limit}
+
+
+
+\[
+d_\epsilon(u,v) = \epsilon\, d_{\text{sym}}(u,v),
+\]
+
+
+
+
+
+\[
+\mathcal{M}_{\mathrm{rec}} = \lim_{\epsilon\to 0} (\mathcal{C}, d_\epsilon)
+\quad\text{(Gromov--Hausdorff limit)}.
+\]
+
+
+
+\subsection{Diffusion Operator and Eigenfunctions}
+
+
+
+\[
+(\Delta_{\mathrm{rec}} f)(u)
+=
+\sum_v \beta_{uv} \big( f(v) - f(u) \big),
+\]
+
+
+
+
+
+\[
+\Delta_{\mathrm{rec}} \phi_k = \lambda_k \phi_k.
+\]
+
+
+
+Local coordinates:
+
+
+\[
+\xi^a(u) = \phi_a(u),
+\qquad
+a = 1,\dots,d.
+\]
+
+
+
+\subsection{Recursion Metric Tensor}
+
+
+
+\[
+G^{ab}(\xi)
+=
+\lim_{\epsilon\to 0}
+\frac{1}{2\epsilon}
+\sum_v
+\beta_{uv}
+\big( \xi^a(v) - \xi^a(u) \big)
+\big( \xi^b(v) - \xi^b(u) \big),
+\]
+
+
+
+
+
+\[
+G_{ab} = (G^{ab})^{-1}.
+\]
+
+
+
+\subsection{Connection and Curvature}
+
+
+
+\[
+\Gamma^{a}_{\;\;bc}
+=
+\frac{1}{2} G^{ad}
+\left(
+\partial_b G_{dc}
++ \partial_c G_{db}
+- \partial_d G_{bc}
+\right),
+\]
+
+
+
+
+
+\[
+R^{a}_{\;\;bcd}
+=
+\partial_c \Gamma^{a}_{\;\;bd}
+- \partial_d \Gamma^{a}_{\;\;bc}
++ \Gamma^{a}_{\;\;ce}\Gamma^{e}_{\;\;bd}
+- \Gamma^{a}_{\;\;de}\Gamma^{e}_{\;\;bc},
+\]
+
+
+
+
+
+\[
+R^{\mathrm{rec}}_{bd} = R^{a}_{\;\;bad},
+\qquad
+R_{\mathrm{rec}} = G^{bd} R^{\mathrm{rec}}_{bd}.
+\]
+
+
+
+% =========================================
+% SPACETIME PROJECTION
+% =========================================
+
+\section{Spacetime Projection}
+
+
+
+\[
+\pi : \mathcal{M}_{\mathrm{rec}} \to \mathcal{M}_{\mathrm{geom}},
+\]
+
+
+
+
+
+\[
+g_{\mu\nu}(x) = (\pi_* G)_{\mu\nu}.
+\]
+
+
+
+Null directions:
+
+
+\[
+ds_{\mathrm{rec}}^2 = G_{ab} d\xi^a d\xi^b = 0
+\quad\Rightarrow\quad
+ds_{\mathrm{geom}}^2 = g_{\mu\nu} dx^\mu dx^\nu = 0.
+\]
+
+
+
+Geodesics:
+
+
+\[
+\ddot{\xi}^a + \Gamma^{a}_{\;\;bc} \dot{\xi}^b \dot{\xi}^c = 0,
+\]
+
+
+
+
+
+\[
+\ddot{x}^\mu + \Gamma^{\mu}_{\;\;\nu\rho} \dot{x}^\nu \dot{x}^\rho = 0.
+\]
+
+
+
+% =========================================
+% QUANTUM MECHANICS FROM RECURSION
+% =========================================
+
+\section{Quantum Mechanics from Recursion}
+
+\subsection{Recursion Operator}
+
+
+
+\[
+\Psi_{n+1} = R(\Psi_n),
+\]
+
+
+
+
+
+\[
+R = I + \epsilon A + O(\epsilon^2),
+\qquad
+A^\dagger = -A,
+\qquad
+A = -iH.
+\]
+
+
+
+
+
+\[
+R = I - i\epsilon H + O(\epsilon^2).
+\]
+
+
+
+\subsection{Schr\"odinger Equation}
+
+
+
+\[
+\frac{\Psi_{n+1} - \Psi_n}{\epsilon} = -iH\Psi_n
+\quad\Rightarrow\quad
+i\frac{d\Psi}{dt} = H\Psi.
+\]
+
+
+
+\subsection{Unitary Evolution}
+
+
+
+\[
+U(t) = e^{-iHt},
+\qquad
+U^\dagger U = I.
+\]
+
+
+
+\subsection{Canonical Commutation}
+
+
+
+\[
+[X, R] = -i\epsilon [X, H],
+\]
+
+
+
+
+
+\[
+[X, H] = \frac{i}{m} P
+\quad\Rightarrow\quad
+[X, P] = i\hbar.
+\]
+
+
+
+\subsection{Path Integral}
+
+
+
+\[
+\mathcal{A}(\Psi_i \to \Psi_f)
+=
+\sum_{\text{paths}}
+\prod_k \langle s_{k+1} | R | s_k \rangle
+\quad\Rightarrow\quad
+\mathcal{A} = \int \mathcal{D}x \; e^{iS[x]}.
+\]
+
+
+
+\subsection{Born Rule}
+
+
+
+\[
+\lim_{n\to\infty} R^n \Psi = \Psi_\infty,
+\qquad
+P(i) = |\Psi(i)|^2.
+\]
+
+
+
+% =========================================
+% GAUGE GROUP FROM RECURSION SYMMETRY
+% =========================================
+
+\section{Gauge Symmetry from Recursion}
+
+\subsection{Automorphism Group}
+
+
+
+\[
+\text{Aut}(\mathcal{C})
+=
+\{ \phi : \mathcal{C} \to \mathcal{C}
+\mid
+\beta_{ij} = \beta_{\phi(i)\phi(j)},
+\;
+d(\phi(u),\phi(v)) = d(u,v),
+\;
+\Delta_{\mathrm{rec}}\circ\phi = \phi\circ\Delta_{\mathrm{rec}}
+\}.
+\]
+
+
+
+
+
+\[
+G_{\text{gauge}} = \text{Stab}(u) \subset \text{Aut}(\mathcal{C}).
+\]
+
+
+
+
+
+\[
+G_{\text{gauge}} \cong SU(3)\times SU(2)\times U(1).
+\]
+
+
+
+% =========================================
+% STANDARD MODEL REPRESENTATIONS
+% =========================================
+
+\section{Fermion Representations}
+
+Local space:
+
+
+\[
+\mathcal{H}_{\text{local}} = \mathbb{C}^3 \otimes \mathbb{C}^2 \otimes \mathbb{C}.
+\]
+
+
+
+Chiral split:
+
+
+\[
+\Psi = \Psi_L \oplus \Psi_R,
+\qquad
+[R, \gamma^5] \neq 0.
+\]
+
+
+
+Standard Model multiplets:
+
+
+\[
+Q_L = (3,2,+\tfrac{1}{6}),
+\qquad
+u_R = (3,1,+\tfrac{2}{3}),
+\qquad
+d_R = (3,1,-\tfrac{1}{3}),
+\]
+
+
+
+
+
+\[
+L_L = (1,2,-1),
+\qquad
+e_R = (1,1,-1),
+\qquad
+\nu_R = (1,1,0),
+\]
+
+
+
+
+
+\[
+H = (1,2,+\tfrac{1}{2}).
+\]
+
+
+
+% =========================================
+% GENERATIONS AND SPECTRUM
+% =========================================
+
+\section{Generations and Spectrum}
+
+
+
+\[
+\Delta_{\mathrm{rec}} \phi_k = \lambda_k \phi_k,
+\qquad
+0 = \lambda_0 < \lambda_1 < \lambda_2 < \lambda_3 \ll \lambda_4,\dots
+\]
+
+
+
+Three stable modes:
+
+
+\[
+k = 1,2,3 \quad\Rightarrow\quad \text{three generations}.
+\]
+
+
+
+Mass scale:
+
+
+\[
+m_k = \alpha_m \sqrt{\lambda_k}.
+\]
+
+
+
+Yukawa couplings:
+
+
+\[
+y_f = \langle \phi_k, \chi_f \rangle,
+\qquad
+m_f = \frac{v}{\sqrt{2}} y_f
+= \frac{v}{\sqrt{2}} \langle \phi_k, \chi_f \rangle.
+\]
+
+
+
+% =========================================
+% COUPLINGS AND MIXING
+% =========================================
+
+\section{Couplings and Mixing}
+
+Gauge couplings:
+
+
+\[
+\frac{1}{g_a^2} = \alpha_g \, \text{Vol}(G_a),
+\qquad
+G_a \in \{SU(3), SU(2), U(1)\}.
+\]
+
+
+
+Weak mixing angle:
+
+
+\[
+\tan\theta_W = \sqrt{\frac{\lambda_{U(1)}}{\lambda_{SU(2)}}},
+\]
+
+
+
+
+
+\[
+\sin^2\theta_W
+=
+\frac{\lambda_{U(1)}}{\lambda_{SU(2)} + \lambda_{U(1)}}.
+\]
+
+
+
+Fine-structure constant:
+
+
+\[
+\alpha = \frac{e^2}{4\pi},
+\qquad
+e = g_2 \sin\theta_W = g_1 \cos\theta_W.
+\]
+
+
+
+CKM / PMNS:
+
+
+\[
+V_{\text{CKM}} = U_u^\dagger U_d,
+\qquad
+V_{\text{PMNS}} = U_e^\dagger U_\nu.
+\]
+
+
+
+% =========================================
+% UNIFIED ACTION AND FIELD EQUATIONS
+% =========================================
+
+\section{Unified Action and Gravity}
+
+
+
+\[
+S = \int d^4x\,\sqrt{-g}\left[
+\frac{1}{2}g^{\mu\nu}(D_\mu\Psi)(D_\nu\Psi)
+- V(\Psi)
+- \frac{1}{4}\mathrm{Tr}(F_{\mu\nu}F^{\mu\nu})
++ \alpha R_{\mathrm{geom}} R_{\mathrm{rec}}
+\right].
+\]
+
+
+
+Einstein equation with recursion coupling:
+
+
+\[
+(1 - \alpha R_{\mathrm{rec}}) G_{\mu\nu}
+=
+8\pi G\, T_{\mu\nu}
++ \alpha (g_{\mu\nu}\Box - \nabla_\mu\nabla_\nu) R_{\mathrm{rec}}.
+\]
+
+
+
+Recursion Einstein equation:
+
+
+\[
+R^{\mathrm{rec}}_{ab}
+- \frac{1}{2} G_{ab} R_{\mathrm{rec}}
+=
+\frac{1}{2\alpha} R_{\mathrm{geom}}\, G_{ab}.
+\]
+
+
+
+Matter field equation:
+
+
+\[
+D_\mu D^\mu \Psi + V'(\Psi) = 0.
+\]
+
+
+
+Yang--Mills equation:
+
+
+\[
+D_\mu F^{\mu\nu\,a} = J^{\nu\,a}.
+\]
+
+
+
+% =========================================
+% COSMOLOGY FROM RECURSION CURVATURE
+% =========================================
+
+\section{Cosmology}
+
+FRW metric:
+
+
+\[
+ds^2 = -dt^2 + a(t)^2 d\vec{x}^2,
+\qquad
+H = \frac{\dot{a}}{a}.
+\]
+
+
+
+Spacetime Ricci scalar:
+
+
+\[
+R_{\mathrm{geom}} = 6(\dot{H} + 2H^2).
+\]
+
+
+
+Recursion curvature:
+
+
+\[
+R_{\mathrm{rec}} = \gamma R_{\mathrm{geom}}.
+\]
+
+
+
+Modified Friedmann equation:
+
+
+\[
+3H^2 (1 - \alpha R_{\mathrm{rec}})
+=
+8\pi G \rho
++ 3\alpha H \dot{R}_{\mathrm{rec}}.
+\]
+
+
+
+Recursion energy density:
+
+
+\[
+\rho_{\mathrm{rec}}
+=
+\frac{3H^2}{8\pi G}
+\left[
+6\alpha\gamma(\dot{H} + 2H^2)
+\right]
+\approx \frac{36\alpha\gamma}{8\pi G} H^4
+\quad\Rightarrow\quad
+\rho_{\mathrm{rec}} \propto H^4.
+\]
+
+
+
+Equation of state:
+
+
+\[
+\dot{\rho}_{\mathrm{rec}} + 3H(\rho_{\mathrm{rec}} + p_{\mathrm{rec}}) = 0,
+\]
+
+
+
+
+
+\[
+w_{\mathrm{rec}}
+=
+\frac{p_{\mathrm{rec}}}{\rho_{\mathrm{rec}}}
+=
+-1 - \frac{4}{3}\frac{\dot{H}}{H^2}.
+\]
+
+
+
+% =========================================
+% CONSISTENCY CONDITIONS
+% =========================================
+
+\section{Consistency}
+
+Unitarity:
+
+
+\[
+U^\dagger U = I.
+\]
+
+
+
+Bounded Hamiltonian:
+
+
+\[
+H \ge 0.
+\]
+
+
+
+Canonical commutation:
+
+
+\[
+[X, P] = i\hbar.
+\]
+
+
+
+Anomaly cancellation:
+
+
+\[
+[SU(3)]^2 U(1) = 0,
+\quad
+[SU(2)]^2 U(1) = 0,
+\quad
+[U(1)]^3 = 0,
+\quad
+\mathrm{grav}^2 U(1) = 0,
+\quad
+\text{global } SU(2) = 0.
+\]
+
+
 
