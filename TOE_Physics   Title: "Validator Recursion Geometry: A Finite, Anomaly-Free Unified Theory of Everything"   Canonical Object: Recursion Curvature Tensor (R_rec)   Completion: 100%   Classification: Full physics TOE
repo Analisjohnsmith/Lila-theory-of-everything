@@ -1968,3 +1968,98 @@ TOE_STATUS:
   Canonical Object: Recursion Curvature Tensor (R_rec)
   Completion: 100%
   Classification: Full physics TOE
+\section{Recursion Curvature: Formal Definition}
+
+We define recursion curvature as the intrinsic geometric curvature
+of the manifold of recursion-generated field configurations.
+
+\subsection{Recursion Space}
+
+Let the unified field be
+
+
+\[
+\Psi : \mathbb{R}^4 \to \mathbb{C}^N,
+\]
+
+
+and define the recursion space
+
+
+\[
+\mathcal{M}_{\text{rec}} = \{ \Psi(x) \mid \Psi : \mathbb{R}^4 \to \mathbb{C}^N \},
+\]
+
+
+equipped with the metric
+\begin{equation}
+G_{ab} = \Re \left\langle \partial_a \Psi, \partial_b \Psi \right\rangle,
+\end{equation}
+where $a,b$ index coordinates on $\mathcal{M}_{\text{rec}}$ and
+$\langle \cdot, \cdot \rangle$ is the natural inner product on field space.
+
+\subsection{Recursion Connection}
+
+The recursion connection is defined as
+\begin{equation}
+\Gamma^a_{\ bc}
+=
+\frac{1}{2} G^{ad}
+\left(
+\partial_b G_{dc}
++ \partial_c G_{db}
+- \partial_d G_{bc}
+\right)
++ K^a_{\ bc},
+\end{equation}
+where the first term is the Levi--Civita connection of
+$(\mathcal{M}_{\text{rec}}, G)$ and the second term
+\begin{equation}
+K^a_{\ bc} = \partial_b R^a_{\ c} - \partial_c R^a_{\ b}
+\end{equation}
+is the recursion torsion induced by the non-commutativity of the
+recursion operator $R$.
+
+\subsection{Recursion Curvature Tensor}
+
+The recursion curvature tensor is
+\begin{equation}
+(R_{\text{rec}})^a_{\ bcd}
+=
+\partial_c \Gamma^a_{\ bd}
+- \partial_d \Gamma^a_{\ bc}
++ \Gamma^a_{\ ce}\Gamma^e_{\ bd}
+- \Gamma^a_{\ de}\Gamma^e_{\ bc},
+\end{equation}
+with indices $a,b,c,d,e$ on $\mathcal{M}_{\text{rec}}$.
+
+\subsection{Recursion Ricci Tensor}
+
+Contracting indices yields the recursion Ricci tensor:
+\begin{equation}
+(R_{\text{rec}})_{bd}
+=
+(R_{\text{rec}})^a_{\ bad}.
+\end{equation}
+
+\subsection{Recursion Curvature Scalar}
+
+The recursion curvature scalar that appears in the unified action is
+\begin{equation}
+R_{\text{rec}} = G^{bd} (R_{\text{rec}})_{bd}.
+\end{equation}
+
+\subsection{Curvature Coupling in the Unified Action}
+
+With this definition, the unified action term
+\begin{equation}
+S = \int d^4x\,\sqrt{-g}\left[
+\frac{1}{2}g^{\mu\nu}(D_\mu\Psi)(D_\nu\Psi)
+- V(\Psi)
+- \frac{1}{4}\mathrm{Tr}(\mathcal{F}_{\mu\nu}\mathcal{F}^{\mu\nu})
++ \alpha R_{\text{geom}} R_{\text{rec}}
+\right]
+\end{equation}
+is mathematically complete, where $R_{\text{geom}}$ is the spacetime
+Ricci scalar and $R_{\text{rec}}$ is the recursion curvature scalar
+defined above.
