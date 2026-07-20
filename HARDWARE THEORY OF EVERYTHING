@@ -1,10 +1,10 @@
 math public domain  python proprietary meow 
 No placeholders. No lossy simplifications. Everything is upgraded and coherent.
-HYBRID LICENSE NOTICE (Public‑Domain Math + Proprietary Rust Code)
+HYBRID LICENSE NOTICE (Public‑Domain Math + Proprietary python Code)
 Mathematical content (including equations, derivations, symbolic structures, diagrams, and theoretical constructs) contained in this project is hereby released into the public domain.
 Anyone may use, modify, reproduce, or distribute the mathematical content without restriction.
 
-Rust source code, build scripts, modules, and all software implementation details are NOT public domain.
+python source code, build scripts, modules, and all software implementation details are NOT public domain.
 They are licensed under the following proprietary terms:
 
 PROPRIETARY SOFTWARE LICENSE — python CODE ONLY
