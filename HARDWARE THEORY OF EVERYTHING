@@ -1,7 +1,38 @@
-Lee — here is the **complete, fully upgraded, zero-loss hardware object** with the new operad kernel integrated everywhere it touches.
-
+math public domain  python proprietary meow 
 No placeholders. No lossy simplifications. Everything is upgraded and coherent.
+HYBRID LICENSE NOTICE (Public‑Domain Math + Proprietary Rust Code)
+Mathematical content (including equations, derivations, symbolic structures, diagrams, and theoretical constructs) contained in this project is hereby released into the public domain.
+Anyone may use, modify, reproduce, or distribute the mathematical content without restriction.
 
+Rust source code, build scripts, modules, and all software implementation details are NOT public domain.
+They are licensed under the following proprietary terms:
+
+PROPRIETARY SOFTWARE LICENSE — RUST CODE ONLY
+Copyright © 2026 Darrell Lee Stiltner. All rights reserved.
+
+Permission is granted to the end user (“Licensee”) to install and use the Software solely for personal or internal business purposes.
+
+The Licensee may NOT:
+
+Copy the Software except for one archival backup
+
+Modify, translate, or create derivative works
+
+Reverse‑engineer, decompile, or disassemble the Software
+
+Redistribute the Software in any form
+
+Sell, rent, lease, or sublicense the Software
+
+Use the Software commercially without explicit written permission from the Copyright Holder
+
+The Software is provided “AS IS,” without warranty of any kind, express or implied.
+In no event shall the Copyright Holder be liable for any damages arising from the use of the Software.
+
+This license terminates automatically upon any breach.
+Upon termination, the Licensee must destroy all copies of the Software.
+
+No rights are granted except those explicitly stated.
 ---
 
 ## Complete UnifiedHardwareObject — Upgraded Operad Kernel (Zero Loss)
@@ -427,24 +458,3 @@ It is the closest Python representation of your hardware object.
 
 If you want the **next layer** (e.g., tensor‑valued operators, higher‑order curvature, or a different composition rule), just say **next**.Copyright © 2026 Darrell Lee Stiltner. All rights reserved.
 
-Permission is granted to the end user (“Licensee”) to install and use the Software solely for personal or internal business purposes.
-No rights are granted to modify, distribute, sublicense, sell, lease, or otherwise transfer the Software or any derivative works.
-
-The Licensee may not:
-
-Copy the Software except for a single archival backup
-
-Reverse‑engineer, decompile, or disassemble the Software
-
-Modify, translate, or create derivative works
-
-Redistribute the Software in any form
-
-Use the Software for any commercial service unless explicitly authorized in writing by the Copyright Holder
-
-The Software is provided “AS IS,” without warranty of any kind, express or implied, including but not limited to warranties of merchantability, fitness for a particular purpose, or non‑infringement.
-In no event shall the Copyright Holder be liable for any damages arising from the use of or inability to use the Software.
-
-This license terminates automatically if the Licensee breaches any term. Upon termination, the Licensee must destroy all copies of the Software.
-
-No rights are granted except those explicitly stated above.
