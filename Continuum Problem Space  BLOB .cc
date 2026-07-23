@@ -1,5 +1,5 @@
 this is a app  it's the space of all structural problems and solutions.
- NEARLY STILL WORKING
+ NEARLY STILL WORKING on it
  7/2/26 
 # =============================================================================
 #  Copyright (C) 2026  Darrell Lee (Līlā) Stiltner
