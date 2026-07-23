@@ -1,0 +1,212 @@
+from enum import Enum
+from dataclasses import dataclass
+import numpy as np
+
+# -----------------------------
+# 1. Problem class taxonomy
+# -----------------------------
+
+class ProblemClass(Enum):
+    GEOMETRIC_STRUCTURE      = "geometric_structure"
+    FIELD_CONFIGURATION      = "field_configuration"
+    CURVATURE_DISTRIBUTION   = "curvature_distribution"
+    CAUSAL_STRUCTURE         = "causal_structure"
+    INTERFERENCE_PATTERN     = "interference_pattern"
+    MODE_FAMILY              = "mode_family"
+    PDE_EVOLUTION            = "pde_evolution"
+
+class UnsupportedProblemClass(Exception):
+    pass
+
+
+# -----------------------------
+# 2. Core ontology primitives
+# -----------------------------
+
+@dataclass
+class CurvatureAtom:
+    """
+    Minimal local generator of spacetime geometry.
+    """
+    params: dict  # e.g. {"kappa": ..., "lambda": ..., "sigma": ...}
+
+    def metric_tensor(self, x: float, y: float, t: float) -> np.ndarray:
+        # Placeholder: your actual metric generator goes here
+        g00 = -1.0
+        g11 = 1.0 + self.params.get("kappa", 0.0) * x
+        g22 = 1.0 + self.params.get("lambda", 0.0) * y
+        g33 = 1.0 + self.params.get("sigma", 0.0) * t
+        return np.diag([g00, g11, g22, g33])
+
+
+@dataclass
+class FieldMode:
+    """
+    A single field configuration / mode on spacetime.
+    """
+    amplitude: np.ndarray      # complex field
+    metric: np.ndarray         # local metric tensor
+    metadata: dict             # e.g. {"frequency": ..., "mode_id": ...}
+
+
+@dataclass
+class CausalStructure:
+    """
+    Encodes causal cones / CTC admissibility / connectivity.
+    """
+    adjacency: np.ndarray      # graph or lattice connectivity
+    cones: np.ndarray          # light-cone / causal cone descriptors
+    metadata: dict
+
+
+# -----------------------------
+# 3. Unified generative spacetime engine
+# -----------------------------
+
+class SpacetimeEngine:
+    """
+    Unified generative spacetime engine:
+    one generator, many structural outputs.
+    """
+
+    def __init__(self, curvature_atom: CurvatureAtom):
+        self.curvature_atom = curvature_atom
+
+    # ---- core generator ----
+
+    def generate_metric_field(self, grid_x, grid_y, t: float) -> np.ndarray:
+        """
+        Generate spacetime metric over a grid at time t.
+        """
+        H, W = len(grid_y), len(grid_x)
+        metric_field = np.zeros((H, W, 4, 4))
+        for j, y in enumerate(grid_y):
+            for i, x in enumerate(grid_x):
+                metric_field[j, i] = self.curvature_atom.metric_tensor(x, y, t)
+        return metric_field
+
+    def generate_field_mode(self, metric_field: np.ndarray, freq: float) -> FieldMode:
+        """
+        Generate a field configuration (mode) on a given metric field.
+        """
+        H, W, _, _ = metric_field.shape
+        # Placeholder: your actual PDE / eigenmode solver goes here
+        phase = np.linspace(0, 2 * np.pi, H * W).reshape(H, W)
+        amplitude = np.exp(1j * phase * freq)
+
+        return FieldMode(
+            amplitude=amplitude,
+            metric=metric_field,
+            metadata={"frequency": freq, "mode_id": f"mode_{freq}"}
+        )
+
+    def generate_causal_structure(self, metric_field: np.ndarray) -> CausalStructure:
+        """
+        Derive causal structure from metric (cones, connectivity, CTC checks).
+        """
+        H, W, _, _ = metric_field.shape
+        # Placeholder: simple lattice adjacency
+        adjacency = np.zeros((H * W, H * W), dtype=int)
+        # ... fill adjacency based on neighborhood + metric constraints ...
+
+        cones = np.ones((H, W, 2))  # dummy cone parameters (e.g. opening angle, sign)
+        return CausalStructure(
+            adjacency=adjacency,
+            cones=cones,
+            metadata={"ctc_admissible": False}
+        )
+
+    # ---- problem-class interface ----
+
+    def solve_structural_problem(self, problem_class: ProblemClass, **kwargs):
+        """
+        Map high-level problem class → appropriate generative routine.
+        """
+        grid_x = kwargs.get("grid_x", np.linspace(-1, 1, 128))
+        grid_y = kwargs.get("grid_y", np.linspace(-1, 1, 128))
+        t      = kwargs.get("t", 0.0)
+        freq   = kwargs.get("freq", 1.0)
+
+        metric_field = self.generate_metric_field(grid_x, grid_y, t)
+
+        if problem_class == ProblemClass.GEOMETRIC_STRUCTURE:
+            return metric_field
+
+        elif problem_class == ProblemClass.FIELD_CONFIGURATION:
+            return self.generate_field_mode(metric_field, freq)
+
+        elif problem_class == ProblemClass.CURVATURE_DISTRIBUTION:
+            # Example: scalar curvature approximation from metric
+            # Placeholder: you’d plug in your actual curvature computation
+            curvature = np.random.randn(*metric_field.shape[:2])
+            return curvature
+
+        elif problem_class == ProblemClass.CAUSAL_STRUCTURE:
+            return self.generate_causal_structure(metric_field)
+
+        elif problem_class == ProblemClass.INTERFERENCE_PATTERN:
+            # Example: superposition of multiple modes
+            mode1 = self.generate_field_mode(metric_field, freq)
+            mode2 = self.generate_field_mode(metric_field, freq * 2.0)
+            interference = mode1.amplitude + mode2.amplitude
+            return interference
+
+        elif problem_class == ProblemClass.MODE_FAMILY:
+            # Example: generate a family of modes over frequencies
+            freqs = kwargs.get("freqs", [0.5, 1.0, 2.0, 4.0])
+            modes = [self.generate_field_mode(metric_field, f) for f in freqs]
+            return modes
+
+        elif problem_class == ProblemClass.PDE_EVOLUTION:
+            # Example: time evolution of a field mode
+            steps = kwargs.get("steps", 10)
+            freq  = kwargs.get("freq", 1.0)
+            history = []
+            for k in range(steps):
+                tk = t + k * kwargs.get("dt", 0.1)
+                mf = self.generate_metric_field(grid_x, grid_y, tk)
+                mode = self.generate_field_mode(mf, freq)
+                history.append(mode)
+            return history
+
+        else:
+            raise UnsupportedProblemClass(f"Unsupported problem class: {problem_class}")
+
+
+# -----------------------------
+# 4. Example usage
+# -----------------------------
+
+if __name__ == "__main__":
+    atom = CurvatureAtom(params={"kappa": 0.1, "lambda": -0.05, "sigma": 0.02})
+    engine = SpacetimeEngine(curvature_atom=atom)
+
+    # geometric structure (spacetime metric field)
+    metric = engine.solve_structural_problem(ProblemClass.GEOMETRIC_STRUCTURE)
+
+    # field configuration (single mode)
+    mode = engine.solve_structural_problem(ProblemClass.FIELD_CONFIGURATION, freq=3.0)
+
+    # interference pattern (multi-mode superposition)
+    interference = engine.solve_structural_problem(
+        ProblemClass.INTERFERENCE_PATTERN,
+        freq=2.0
+    )
+
+    # causal structure
+    causal = engine.solve_structural_problem(ProblemClass.CAUSAL_STRUCTURE)
+
+    # mode family
+    modes = engine.solve_structural_problem(
+        ProblemClass.MODE_FAMILY,
+        freqs=[0.5, 1.0, 2.0, 4.0]
+    )
+
+    # PDE evolution (time evolution of a mode)
+    evolution = engine.solve_structural_problem(
+        ProblemClass.PDE_EVOLUTION,
+        freq=1.5,
+        steps=20,
+        dt=0.05
+    )
+cc4.0 nc 
