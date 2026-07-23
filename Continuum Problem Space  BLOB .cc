@@ -1,5 +1,4 @@
-this is a app  it's  the space of all structural problems and the
-the space of all structural problems and solutions. 7/2/26 
+this is a app  it's the space of all structural problems and solutions. 7/2/26 
 # =============================================================================
 #  Copyright (C) 2026  Darrell Lee (Līlā) Stiltner
 #
