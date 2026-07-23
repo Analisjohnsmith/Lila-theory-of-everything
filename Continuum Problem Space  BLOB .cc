@@ -1482,3 +1482,417 @@ print("Cone angles shape:", angle.shape)
 state = engine.step()
 print("Kernel state:", state)
 */
+```rust
+// Cargo.toml
+// [package]
+// name = "structural_kernel"
+// version = "0.1.0"
+// edition = "2021"
+//
+// [dependencies]
+// ndarray = "0.15"
+// eframe = "0.27"
+// egui = "0.27"
+// serde = { version = "1.0", features = ["derive"] }
+// serde_json = "1.0"
+
+use eframe::egui;
+use ndarray::{Array1, Array2, Array3, Array4};
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+pub enum ProblemClass {
+    GeometricStructure,
+    CurvatureDistribution,
+    FieldConfiguration,
+    CausalStructure,
+    ModeFamily,
+    PdeEvolution,
+}
+
+// ========== GEOMETRY CORE ==========
+
+pub fn general_metric_tensor(x: f64, y: f64, t: f64) -> Array2<f64> {
+    let mut g = Array2::<f64>::zeros((4, 4));
+    g[(0, 0)] = -1.0 - 0.1 * t;
+    g[(1, 1)] = 1.0 + 0.1 * x;
+    g[(2, 2)] = 1.0 - 0.05 * y;
+    g[(3, 3)] = 1.0 + 0.02 * t;
+    g[(0, 1)] = 0.01 * x * t;
+    g[(1, 0)] = g[(0, 1)];
+    g[(1, 2)] = 0.02 * x * y;
+    g[(2, 1)] = g[(1, 2)];
+    g[(2, 3)] = 0.03 * y * t;
+    g[(3, 2)] = g[(2, 3)];
+    g[(1, 3)] = 0.015 * x * t;
+    g[(3, 1)] = g[(1, 3)];
+    g
+}
+
+fn invert_4x4(m: &Array2<f64>) -> Array2<f64> {
+    let mut a = [[0.0; 4]; 4];
+    for i in 0..4 { for j in 0..4 { a[i][j] = m[(i, j)]; } }
+    let mut aug = [[0.0; 8]; 4];
+    for i in 0..4 { for j in 0..4 { aug[i][j] = a[i][j]; } aug[i][4 + i] = 1.0; }
+    for i in 0..4 {
+        let mut pivot = i;
+        for r in i + 1..4 { if aug[r][i].abs() > aug[pivot][i].abs() { pivot = r; } }
+        if pivot != i { aug.swap(i, pivot); }
+        let diag = aug[i][i];
+        if diag.abs() < 1e-12 { continue; }
+        for j in 0..8 { aug[i][j] /= diag; }
+        for r in 0..4 {
+            if r == i { continue; }
+            let factor = aug[r][i];
+            for c in 0..8 { aug[r][c] -= factor * aug[i][c]; }
+        }
+    }
+    let mut out = Array2::<f64>::zeros((4, 4));
+    for i in 0..4 { for j in 0..4 { out[(i, j)] = aug[i][4 + j]; } }
+    out
+}
+
+pub fn numerical_derivative_metric(metric_field: &Array4<f64>, h: f64, axis: usize) -> Array4<f64> {
+    let mut d = Array4::<f64>::zeros(metric_field.dim());
+    let (ny, nx, _, _) = metric_field.dim();
+    match axis {
+        1 => for j in 0..ny { for i in 1..nx - 1 { for a in 0..4 { for b in 0..4 {
+            d[(j, i, a, b)] = (metric_field[(j, i + 1, a, b)] - metric_field[(j, i - 1, a, b)]) / (2.0 * h);
+        }}}}
+        0 => for j in 1..ny - 1 { for i in 0..nx { for a in 0..4 { for b in 0..4 {
+            d[(j, i, a, b)] = (metric_field[(j + 1, i, a, b)] - metric_field[(j - 1, i, a, b)]) / (2.0 * h);
+        }}}}
+        _ => {}
+    }
+    d
+}
+
+pub fn christoffel_symbols(metric: &Array4<f64>, dmetric_dx: &Array4<f64>, dmetric_dy: &Array4<f64>) -> Array4<f64> {
+    let (ny, nx, _, _) = metric.dim();
+    let mut gamma = Array4::<f64>::zeros((ny, nx, 4, 4 * 4 * 4));
+    for j in 0..ny { for i in 0..nx {
+        let mut g = Array2::<f64>::zeros((4, 4));
+        for a in 0..4 { for b in 0..4 { g[(a, b)] = metric[(j, i, a, b)]; } }
+        let inv = invert_4x4(&g);
+        for a in 0..4 { for b in 0..4 { for c in 0..4 {
+            let dg_ac = if b == 1 { dmetric_dx[(j, i, a, c)] } else if b == 2 { dmetric_dy[(j, i, a, c)] } else { 0.0 };
+            let dg_ab = if c == 1 { dmetric_dx[(j, i, a, b)] } else if c == 2 { dmetric_dy[(j, i, a, b)] } else { 0.0 };
+            let dg_bc = if a == 1 { dmetric_dx[(j, i, b, c)] } else if a == 2 { dmetric_dy[(j, i, b, c)] } else { 0.0 };
+            let mut sum = 0.0;
+            for d in 0..4 {
+                let dg_cd = if b == 1 { dmetric_dx[(j, i, c, d)] } else if b == 2 { dmetric_dy[(j, i, c, d)] } else { 0.0 };
+                let dg_bd = if c == 1 { dmetric_dx[(j, i, b, d)] } else if c == 2 { dmetric_dy[(j, i, b, d)] } else { 0.0 };
+                let dg_bc_d = if d == 1 { dmetric_dx[(j, i, b, c)] } else if d == 2 { dmetric_dy[(j, i, b, c)] } else { 0.0 };
+                sum += inv[(a, d)] * (dg_cd + dg_bd - dg_bc_d);
+            }
+            gamma[(j, i, a, a * 16 + b * 4 + c)] = 0.5 * sum;
+        }}}
+    }}
+    gamma
+}
+
+pub fn numerical_derivative_gamma(gamma: &Array4<f64>, h: f64, axis: usize) -> Array4<f64> {
+    let mut d = Array4::<f64>::zeros(gamma.dim());
+    let (ny, nx, _, _) = gamma.dim();
+    match axis {
+        1 => for j in 0..ny { for i in 1..nx - 1 { for a in 0..4 { for idx in 0..(4 * 4 * 4) {
+            d[(j, i, a, idx)] = (gamma[(j, i + 1, a, idx)] - gamma[(j, i - 1, a, idx)]) / (2.0 * h);
+        }}}}
+        0 => for j in 1..ny - 1 { for i in 0..nx { for a in 0..4 { for idx in 0..(4 * 4 * 4) {
+            d[(j, i, a, idx)] = (gamma[(j + 1, i, a, idx)] - gamma[(j - 1, i, a, idx)]) / (2.0 * h);
+        }}}}
+        _ => {}
+    }
+    d
+}
+
+pub fn ricci_tensor(gamma: &Array4<f64>, dgamma_dx: &Array4<f64>, dgamma_dy: &Array4<f64>) -> Array4<f64> {
+    let (ny, nx, _, _) = gamma.dim();
+    let mut ricci = Array4::<f64>::zeros((ny, nx, 4, 4));
+    for j in 0..ny { for i in 0..nx { for a in 0..4 { for b in 0..4 {
+        let mut sum = 0.0;
+        for k in 0..4 {
+            let idx_kij = k * 16 + a * 4 + b;
+            let dgamma_kij = if k == 1 { dgamma_dx[(j, i, k, idx_kij)] } else if k == 2 { dgamma_dy[(j, i, k, idx_kij)] } else { 0.0 };
+            let idx_kik = k * 16 + a * 4 + k;
+            let dgamma_jik = if b == 1 { dgamma_dx[(j, i, k, idx_kik)] } else if b == 2 { dgamma_dy[(j, i, k, idx_kik)] } else { 0.0 };
+            let mut gamma_term = 0.0;
+            for l in 0..4 {
+                let idx_il = a * 16 + l * 4 + k;
+                let idx_jk = l * 16 + b * 4 + k;
+                gamma_term += gamma[(j, i, a, idx_il)] * gamma[(j, i, l, idx_jk)];
+            }
+            sum += dgamma_kij - dgamma_jik + gamma_term;
+        }
+        ricci[(j, i, a, b)] = sum;
+    }}}}
+    ricci
+}
+
+pub fn riemann_tensor(gamma: &Array4<f64>, dgamma_dx: &Array4<f64>, dgamma_dy: &Array4<f64>) -> Array4<f64> {
+    let (ny, nx, _, _) = gamma.dim();
+    let mut riemann = Array4::<f64>::zeros((ny, nx, 4, 4 * 4 * 4));
+    for j in 0..ny { for i in 0..nx { for a in 0..4 { for b in 0..4 { for c in 0..4 { for d in 0..4 {
+        let idx_bd = a * 16 + b * 4 + d;
+        let dgamma_c_bd = if c == 1 { dgamma_dx[(j, i, a, idx_bd)] } else if c == 2 { dgamma_dy[(j, i, a, idx_bd)] } else { 0.0 };
+        let idx_bc = a * 16 + b * 4 + c;
+        let dgamma_d_bc = if d == 1 { dgamma_dx[(j, i, a, idx_bc)] } else if d == 2 { dgamma_dy[(j, i, a, idx_bc)] } else { 0.0 };
+        let mut gamma_terms = 0.0;
+        for e in 0..4 {
+            let idx_ce = a * 16 + c * 4 + e;
+            let idx_bd_e = e * 16 + b * 4 + d;
+            let idx_de = a * 16 + d * 4 + e;
+            let idx_bc_e = e * 16 + b * 4 + c;
+            gamma_terms += gamma[(j, i, a, idx_ce)] * gamma[(j, i, e, idx_bd_e)] - gamma[(j, i, a, idx_de)] * gamma[(j, i, e, idx_bc_e)];
+        }
+        riemann[(j, i, a, a * 64 + b * 16 + c * 4 + d)] = dgamma_c_bd - dgamma_d_bc + gamma_terms;
+    }}}}}}
+    riemann
+}
+
+// ========== RICCI FLOW ==========
+
+pub fn ricci_flow_step(metric: &Array4<f64>, ricci: &Array4<f64>, dt: f64) -> Array4<f64> {
+    let mut new_metric = metric.clone();
+    let (ny, nx, _, _) = metric.dim();
+    for j in 0..ny { for i in 0..nx { for a in 0..4 { for b in 0..4 {
+        new_metric[(j, i, a, b)] = metric[(j, i, a, b)] - 2.0 * dt * ricci[(j, i, a, b)];
+    }}}}
+    new_metric
+}
+
+pub fn evolve_ricci_flow(metric: &Array4<f64>, grid_x: &Array1<f64>, grid_y: &Array1<f64>, steps: usize, dt: f64) -> Vec<Array4<f64>> {
+    let mut history = Vec::new();
+    let mut g = metric.clone();
+    let dx = grid_x[1] - grid_x[0];
+    let dy = grid_y[1] - grid_y[0];
+    for _ in 0..steps {
+        let dmetric_dx = numerical_derivative_metric(&g, dx, 1);
+        let dmetric_dy = numerical_derivative_metric(&g, dy, 0);
+        let gamma = christoffel_symbols(&g, &dmetric_dx, &dmetric_dy);
+        let dgamma_dx = numerical_derivative_gamma(&gamma, dx, 1);
+        let dgamma_dy = numerical_derivative_gamma(&gamma, dy, 0);
+        let ricci = ricci_tensor(&gamma, &dgamma_dx, &dgamma_dy);
+        g = ricci_flow_step(&g, &ricci, dt);
+        history.push(g.clone());
+    }
+    history
+}
+
+// ========== PDE ON GEOMETRY ==========
+
+pub fn pde_geometry_step(field: &Array2<f64>, metric: &Array4<f64>, grid_x: &Array1<f64>, grid_y: &Array1<f64>, dt: f64, c: f64) -> Array2<f64> {
+    let (h, w) = field.dim();
+    let dx = grid_x[1] - grid_x[0];
+    let dy = grid_y[1] - grid_y[0];
+    let mut next = field.clone();
+    for j in 1..h - 1 { for i in 1..w - 1 {
+        let g11 = metric[(j, i, 1, 1)];
+        let g22 = metric[(j, i, 2, 2)];
+        let d2phi_dx2 = (field[(j, i + 1)] - 2.0 * field[(j, i)] + field[(j, i - 1)]) / (dx * dx);
+        let d2phi_dy2 = (field[(j + 1, i)] - 2.0 * field[(j, i)] + field[(j - 1, i)]) / (dy * dy);
+        let lap_geom = (1.0 / g11) * d2phi_dx2 + (1.0 / g22) * d2phi_dy2;
+        next[(j, i)] = field[(j, i)] + dt * c * lap_geom;
+    }}
+    next
+}
+
+pub fn evolve_pde_on_geometry(initial_field: &Array2<f64>, metric: &Array4<f64>, grid_x: &Array1<f64>, grid_y: &Array1<f64>, steps: usize, dt: f64, c: f64) -> Vec<Array2<f64>> {
+    let mut history = Vec::new();
+    let mut phi = initial_field.clone();
+    for _ in 0..steps { phi = pde_geometry_step(&phi, metric, grid_x, grid_y, dt, c); history.push(phi.clone()); }
+    history
+}
+
+// ========== STRUCTURAL DOMAIN ==========
+
+pub fn structural_domain_step(metric: &Array4<f64>, field: &Array2<f64>, curvature: &Array2<f64>, grid_x: &Array1<f64>, grid_y: &Array1<f64>, dt: f64) -> (Array4<f64>, Array2<f64>) {
+    let (h, w) = field.dim();
+    let dx = grid_x[1] - grid_x[0];
+    let dy = grid_y[1] - grid_y[0];
+    let mut new_metric = metric.clone();
+    let mut new_field = field.clone();
+    for j in 1..h - 1 { for i in 1..w - 1 {
+        let g11 = metric[(j, i, 1, 1)];
+        let g22 = metric[(j, i, 2, 2)];
+        let d2phi_dx2 = (field[(j, i + 1)] - 2.0 * field[(j, i)] + field[(j, i - 1)]) / (dx * dx);
+        let d2phi_dy2 = (field[(j + 1, i)] - 2.0 * field[(j, i)] + field[(j - 1, i)]) / (dy * dy);
+        let lap_geom = (1.0 / g11) * d2phi_dx2 + (1.0 / g22) * d2phi_dy2;
+        new_field[(j, i)] = field[(j, i)] + dt * lap_geom;
+        for a in 0..4 { for b in 0..4 { new_metric[(j, i, a, b)] = metric[(j, i, a, b)] + dt * curvature[(j, i)]; } }
+    }}
+    (new_metric, new_field)
+}
+
+pub fn evolve_structural_domain(metric: &Array4<f64>, field: &Array2<f64>, curvature: &Array2<f64>, grid_x: &Array1<f64>, grid_y: &Array1<f64>, steps: usize, dt: f64) -> Vec<(Array4<f64>, Array2<f64>)> {
+    let mut history = Vec::new();
+    let mut g = metric.clone();
+    let mut phi = field.clone();
+    for _ in 0..steps {
+        let (new_g, new_phi) = structural_domain_step(&g, &phi, &curvature, grid_x, grid_y, dt);
+        g = new_g; phi = new_phi;
+        history.push((g.clone(), phi.clone()));
+    }
+    history
+}
+
+// ========== STRUCTURAL PROBLEM COMPILER ==========
+
+pub fn structural_problem_compile(metric: &Array4<f64>, curvature: &Array2<f64>, field: &Array2<f64>, causal: &Array2<f64>, modes: &Vec<Array2<f64>>) -> HashMap<String, serde_json::Value> {
+    let mut out = HashMap::new();
+    out.insert("metric".to_string(), serde_json::json!(metric));
+    out.insert("curvature".to_string(), serde_json::json!(curvature));
+    out.insert("field".to_string(), serde_json::json!(field));
+    out.insert("causal".to_string(), serde_json::json!(causal));
+    let mut mode_list = Vec::new();
+    for m in modes { mode_list.push(serde_json::json!(m)); }
+    out.insert("modes".to_string(), serde_json::json!(mode_list));
+    out
+}
+
+pub fn structural_problem_dispatch(class: ProblemClass, metric: &Array4<f64>, curvature: &Array2<f64>, field: &Array2<f64>, causal: &Array2<f64>, modes: &Vec<Array2<f64>>) -> serde_json::Value {
+    match class {
+        ProblemClass::GeometricStructure => serde_json::json!(metric),
+        ProblemClass::CurvatureDistribution => serde_json::json!(curvature),
+        ProblemClass::FieldConfiguration => serde_json::json!(field),
+        ProblemClass::CausalStructure => serde_json::json!(causal),
+        ProblemClass::ModeFamily => { let mut out = Vec::new(); for m in modes { out.push(serde_json::json!(m)); } serde_json::json!(out) }
+        ProblemClass::PdeEvolution => serde_json::json!({ "metric": metric, "field": field, "curvature": curvature }),
+    }
+}
+
+pub fn structural_problem_engine(class: ProblemClass, metric: &Array4<f64>, curvature: &Array2<f64>, field: &Array2<f64>, causal: &Array2<f64>, modes: &Vec<Array2<f64>>) -> serde_json::Value {
+    let _compiled = structural_problem_compile(metric, curvature, field, causal, modes);
+    structural_problem_dispatch(class, metric, curvature, field, causal, modes)
+}
+
+// ========== WORKSPACE / UI ==========
+
+pub struct StructuralWorkspaceApp {
+    metric: Array4<f64>,
+    curvature: Array2<f64>,
+    field: Array2<f64>,
+    modes: Vec<Array2<f64>>,
+    causal: Array2<f64>,
+    mode_index: usize,
+    show_metric: bool,
+    show_curvature: bool,
+    show_field: bool,
+    show_modes: bool,
+    show_causal: bool,
+}
+
+impl eframe::App for StructuralWorkspaceApp {
+    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        egui::SidePanel::left("left_panel").show(ctx, |ui| {
+            ui.heading("Layers");
+            ui.checkbox(&mut self.show_metric, "Metric gᵢⱼ");
+            ui.checkbox(&mut self.show_curvature, "Curvature R");
+            ui.checkbox(&mut self.show_field, "Field φ");
+            ui.checkbox(&mut self.show_modes, "Modes");
+            ui.checkbox(&mut self.show_causal, "Causal Cone");
+            ui.separator();
+            ui.label("Mode Index:");
+            ui.add(egui::Slider::new(&mut self.mode_index, 0..=self.modes.len() - 1));
+        });
+        egui::CentralPanel::default().show(ctx, |ui| {
+            if self.show_metric {
+                ui.heading("Metric gᵢⱼ");
+                ui.add(egui::Slider::new(&mut self.metric[(64, 64, 1, 1)], -5.0..=5.0).text("g11(64,64)"));
+                ui.add(egui::Slider::new(&mut self.metric[(64, 64, 2, 2)], -5.0..=5.0).text("g22(64,64)"));
+                ui.separator();
+            }
+            if self.show_curvature {
+                ui.heading("Curvature R");
+                ui.add(egui::Slider::new(&mut self.curvature[(64, 64)], -10.0..=10.0).text("R(64,64)"));
+                ui.separator();
+            }
+            if self.show_field {
+                ui.heading("Field φ");
+                ui.add(egui::Slider::new(&mut self.field[(64, 64)], -5.0..=5.0).text("φ(64,64)"));
+                ui.separator();
+            }
+            if self.show_modes {
+                ui.heading("Mode Amplitude");
+                ui.add(egui::Slider::new(&mut self.modes[self.mode_index][(64, 64)], -5.0..=5.0).text("mode(64,64)"));
+                ui.separator();
+            }
+            if self.show_causal {
+                ui.heading("Causal Cone");
+                ui.add(egui::Slider::new(&mut self.causal[(64, 64)], -3.0..=3.0).text("cone(64,64)"));
+            }
+        });
+    }
+}
+
+pub fn launch_structural_workspace(metric: Array4<f64>, curvature: Array2<f64>, field: Array2<f64>, modes: Vec<Array2<f64>>, causal: Array2<f64>) {
+    let app = StructuralWorkspaceApp { metric, curvature, field, modes, causal, mode_index: 0, show_metric: true, show_curvature: true, show_field: true, show_modes: true, show_causal: true };
+    let native_options = eframe::NativeOptions { initial_window_size: Some(egui::vec2(1600.0, 900.0)), ..Default::default() };
+    eframe::run_native("Structural Kernel Workspace", native_options, Box::new(|_cc| Box::new(app)));
+}
+
+// ========== MAIN EXE KERNEL ==========
+
+fn build_grid(nx: usize, ny: usize, xmin: f64, xmax: f64, ymin: f64, ymax: f64) -> (Array1<f64>, Array1<f64>) {
+    let mut gx = Array1::<f64>::zeros(nx);
+    let mut gy = Array1::<f64>::zeros(ny);
+    let dx = (xmax - xmin) / (nx as f64 - 1.0);
+    let dy = (ymax - ymin) / (ny as f64 - 1.0);
+    for i in 0..nx { gx[i] = xmin + i as f64 * dx; }
+    for j in 0..ny { gy[j] = ymin + j as f64 * dy; }
+    (gx, gy)
+}
+
+fn build_initial_metric(nx: usize, ny: usize, gx: &Array1<f64>, gy: &Array1<f64>, t: f64) -> Array4<f64> {
+    let mut m = Array4::<f64>::zeros((ny, nx, 4, 4));
+    for j in 0..ny { for i in 0..nx {
+        let g = general_metric_tensor(gx[i], gy[j], t);
+        for a in 0..4 { for b in 0..4 { m[(j, i, a, b)] = g[(a, b)]; } }
+    }}
+    m
+}
+
+fn build_initial_field(nx: usize, ny: usize, gx: &Array1<f64>, gy: &Array1<f64>) -> Array2<f64> {
+    let mut f = Array2::<f64>::zeros((ny, nx));
+    for j in 0..ny { for i in 0..nx {
+        f[(j, i)] = (-((gx[i] * gx[i] + gy[j] * gy[j]) * 0.1)).exp();
+    }}
+    f
+}
+
+fn build_initial_curvature(ny: usize, nx: usize) -> Array2<f64> { Array2::<f64>::zeros((ny, nx)) }
+
+fn build_initial_modes(ny: usize, nx: usize, count: usize) -> Vec<Array2<f64>> {
+    let mut modes = Vec::new();
+    for k in 0..count {
+        let mut m = Array2::<f64>::zeros((ny, nx));
+        for j in 0..ny { for i in 0..nx {
+            m[(j, i)] = ((i as f64 * (k as f64 + 1.0)) * 0.01).sin() * ((j as f64 * (k as f64 + 1.0)) * 0.01).cos();
+        }}
+        modes.push(m);
+    }
+    modes
+}
+
+fn build_initial_causal(ny: usize, nx: usize) -> Array2<f64> {
+    let mut c = Array2::<f64>::zeros((ny, nx));
+    for j in 0..ny { for i in 0..nx {
+        c[(j, i)] = ((i as f64 - nx as f64 / 2.0).abs() + (j as f64 - ny as f64 / 2.0).abs()) * 0.01;
+    }}
+    c
+}
+
+fn structural_kernel_main() {
+    let nx = 128; let ny = 128;
+    let (gx, gy) = build_grid(nx, ny, -5.0, 5.0, -5.0, 5.0);
+    let metric0 = build_initial_metric(nx, ny, &gx, &gy, 0.0);
+    let field0 = build_initial_field(nx, ny, &gx, &gy);
+    let curvature0 = build_initial_curvature(ny, nx);
+    let modes0 = build_initial_modes(ny, nx, 6);
+    let causal0 = build_initial_causal(ny, nx);
+    launch_structural_workspace(metric0, curvature0, field0, modes0, causal0);
+}
+
+fn main() { structural_kernel_main(); }
+```
