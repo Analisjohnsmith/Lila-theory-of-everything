@@ -1,4 +1,4 @@
-currently fixing 7/2/26 
+this is finshed  i'm turning into a app in it's own repo 7/2/26 
 # =============================================================================
 #  Copyright (C) 2026  Darrell Lee (Līlā) Stiltner
 #
