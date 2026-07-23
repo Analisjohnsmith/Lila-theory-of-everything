@@ -13,6 +13,9 @@ currently fixing 7/2/26
 #
 #  This code is provided "AS IS", without warranties or conditions of any kind.
 # =============================================================================
+
+ CORE CODE:
+
 from enum import Enum
 from dataclasses import dataclass
 import numpy as np
@@ -224,4 +227,8 @@ if __name__ == "__main__":
         steps=20,
         dt=0.05
     )
-cc4.0 nc 
+
+
+
+
+EXPANDED :
