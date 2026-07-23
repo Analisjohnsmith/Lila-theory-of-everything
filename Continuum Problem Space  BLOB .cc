@@ -2630,3 +2630,188 @@ fn main() {
 **Compile and run:**
 ```bash
 cargo run
+```python
+# ============================================================
+# UNIFIED STRUCTURAL KERNEL
+# ============================================================
+
+import numpy as np
+
+# USO: Universal Structural Object
+class USO:
+    def __init__(self, tensors=None, graphs=None, constraints=None, meta=None):
+        self.tensors = tensors or {}
+        self.graphs = graphs or {}
+        self.constraints = constraints or {}
+        self.meta = meta or {}
+    
+    def add_tensor(self, name, arr): self.tensors[name] = arr
+    def add_graph(self, name, adj): self.graphs[name] = adj
+    def add_constraint(self, name, c): self.constraints[name] = c
+
+# Canonical Encoder
+class CanonicalEncoder:
+    def encode(self, obj):
+        uso = USO()
+        if isinstance(obj, np.ndarray):
+            uso.add_tensor("tensor", obj); uso.meta["type"] = "tensor"
+        elif isinstance(obj, dict) and "edges" in obj and "n" in obj:
+            n = obj["n"]; adj = np.zeros((n, n), dtype=int)
+            for u, v in obj["edges"]: adj[u, v] = adj[v, u] = 1
+            uso.add_graph("graph", adj); uso.meta["type"] = "graph"
+        elif isinstance(obj, dict) and "clauses" in obj and "vars" in obj:
+            uso.add_constraint("sat_clauses", obj["clauses"])
+            uso.meta["type"] = "sat"; uso.meta["vars"] = obj["vars"]
+        elif isinstance(obj, dict) and "points" in obj and "elements" in obj:
+            uso.add_tensor("points", np.array(obj["points"]))
+            uso.add_tensor("elements", np.array(obj["elements"]))
+            uso.meta["type"] = "mesh"
+        elif isinstance(obj, dict) and "structural" in obj:
+            for k, v in obj["structural"].items():
+                if isinstance(v, np.ndarray): uso.add_tensor(k, v)
+                elif isinstance(v, dict) and "adj" in v: uso.add_graph(k, v["adj"])
+            uso.meta["type"] = "structural"
+        else:
+            raw = np.frombuffer(str(obj).encode(), dtype=np.uint8)
+            uso.add_tensor("raw_bytes", raw); uso.meta["type"] = "raw"
+        return uso
+
+# Universal Solver
+class UniversalSolver:
+    def solve(self, uso):
+        t = uso.meta.get("type")
+        if t == "graph": return self._solve_graph(uso)
+        if t == "sat": return self._solve_sat(uso)
+        if t == "mesh": return self._solve_mesh(uso)
+        return uso
+    
+    def _solve_graph(self, uso):
+        adj = uso.graphs["graph"]; n = adj.shape[0]
+        dist = np.full(n, np.inf); dist[0] = 0; visited = np.zeros(n, bool)
+        for _ in range(n):
+            u = np.argmin(np.where(visited, np.inf, dist))
+            visited[u] = True
+            for v in range(n):
+                if adj[u, v] and not visited[v]:
+                    dist[v] = min(dist[v], dist[u] + 1)
+        out = USO(); out.add_tensor("graph_distances", dist)
+        out.meta["type"] = "graph_solution"; return out
+    
+    def _solve_sat(self, uso):
+        clauses = uso.constraints["sat_clauses"]; num_vars = uso.meta["vars"]
+        def dpll(clauses, assign):
+            if all(any(assign[abs(l)] == (l>0) if assign[abs(l)] is not None else False for l in c) for c in clauses):
+                return assign
+            v = next((i for i in range(1, num_vars+1) if assign[i] is None), None)
+            if v is None: return None
+            for val in [True, False]:
+                new_assign = assign.copy(); new_assign[v] = val
+                res = dpll(clauses, new_assign)
+                if res: return res
+            return None
+        sol = dpll(clauses, {i: None for i in range(1, num_vars+1)})
+        out = USO()
+        out.add_tensor("sat_solution", np.array([sol[i] for i in range(1, num_vars+1)]) if sol else np.array([]))
+        out.meta["type"] = "sat_solution"; return out
+    
+    def _solve_mesh(self, uso):
+        pts = uso.tensors["points"]; elems = uso.tensors["elements"]
+        centroids = [np.mean(pts[list(e)], axis=0) for e in elems]
+        out = USO(); out.add_tensor("mesh_centroids", np.array(centroids))
+        out.meta["type"] = "mesh_solution"; return out
+
+# Structural Algebra
+class StructuralAlgebra:
+    def compose(self, a, b):
+        return USO(tensors={**a.tensors, **b.tensors}, graphs={**a.graphs, **b.graphs},
+                   constraints={**a.constraints, **b.constraints}, meta={"type": "composition"})
+    def decompose(self, uso):
+        parts = []
+        for k, v in uso.tensors.items():
+            parts.append(USO(tensors={k: v}, meta={"type": "tensor_component"}))
+        for k, v in uso.graphs.items():
+            parts.append(USO(graphs={k: v}, meta={"type": "graph_component"}))
+        for k, v in uso.constraints.items():
+            parts.append(USO(constraints={k: v}, meta={"type": "constraint_component"}))
+        return parts
+    def equivalent(self, a, b):
+        if a.tensors.keys() != b.tensors.keys() or a.graphs.keys() != b.graphs.keys() or a.constraints.keys() != b.constraints.keys():
+            return False
+        for k in a.tensors:
+            if not np.array_equal(a.tensors[k], b.tensors[k]): return False
+        for k in a.graphs:
+            if not np.array_equal(a.graphs[k], b.graphs[k]): return False
+        for k in a.constraints:
+            if a.constraints[k] != b.constraints[k]: return False
+        return True
+
+# Formal Specification
+class FormalSpec:
+    def validate(self, problem_class, obj):
+        uso = CanonicalEncoder().encode(obj)
+        return {
+            "valid_structure": all(isinstance(x, dict) for x in [uso.tensors, uso.graphs, uso.constraints, uso.meta]),
+            "valid_problem": isinstance(problem_class, str),
+            "valid_invariants": all(isinstance(v, np.ndarray) for v in uso.tensors.values()) and
+                                all(isinstance(g, np.ndarray) and g.dtype == int and ((g==0)|(g==1)).all() for g in uso.graphs.values()) and
+                                all(isinstance(c, list) for c in uso.constraints.values())
+        }
+
+# Problem Classes
+class ProblemClass:
+    GRAPH, SAT, MESH, METRIC, FIELD, CURVATURE, CAUSAL, PDE, COUPLED, RAW = range(10)
+
+# Dispatch Table
+class SolverDispatch:
+    def __init__(self, solver):
+        self.solver = solver
+        self.table = {getattr(ProblemClass, attr): solver.solve for attr in dir(ProblemClass) if not attr.startswith("_")}
+    def solve(self, problem_class, uso):
+        return self.table.get(problem_class, self.solver.solve)(uso)
+
+# Universal Execution Layer
+class UEL:
+    def __init__(self):
+        self.encoder = CanonicalEncoder()
+        self.solver = UniversalSolver()
+        self.algebra = StructuralAlgebra()
+        self.spec = FormalSpec()
+        self.dispatch = SolverDispatch(self.solver)
+    
+    def execute(self, problem_class, obj):
+        uso = self.encoder.encode(obj)
+        sol = self.dispatch.solve(problem_class, uso)
+        return {
+            "input": uso,
+            "solution": sol,
+            "spec": self.spec.validate(problem_class, obj),
+            "closed": self.spec.validate(problem_class, obj)["valid_structure"]
+        }
+
+# Single Entrypoint
+def run(problem_class, obj):
+    return UEL().execute(problem_class, obj)
+
+# ============================================================
+# TEST
+# ============================================================
+def main():
+    # Graph
+    g = {"n": 4, "edges": [(0,1),(1,2),(2,3)]}
+    print("Graph:", run(ProblemClass.GRAPH, g)["solution"].tensors)
+    
+    # SAT
+    s = {"vars": 3, "clauses": [[1,-2],[2,3],[-1,3]]}
+    print("SAT:", run(ProblemClass.SAT, s)["solution"].tensors)
+    
+    # Mesh
+    m = {"points": [[0,0,0],[1,0,0],[0,1,0]], "elements": [(0,1,2)]}
+    print("Mesh:", run(ProblemClass.MESH, m)["solution"].tensors)
+    
+    # Structural
+    st = {"structural": {"metric": np.eye(4)}}
+    print("Structural:", run(ProblemClass.METRIC, st)["solution"].meta)
+
+if __name__ == "__main__":
+    main()
+```
