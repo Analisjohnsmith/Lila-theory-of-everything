@@ -903,3 +903,580 @@ No "Zhaived" anywhere.
 
 =================================================
 EXPANSION THREE:
+```rust
+// ============================================================
+//  SPACETIME ENGINE — RUST CORE WITH PYTHON BINDINGS
+//  (Single Package: Rust + PyO3 + Python Wrapper)
+// ============================================================
+
+// ============================================================
+//  Cargo.toml
+// ============================================================
+/*
+[package]
+name = "spacetime_engine"
+version = "1.0.0"
+edition = "2021"
+authors = ["Darrell Lee (Līlā) Stiltner"]
+license = "CC BY-NC 4.0"
+description = "Sovereign synthetic device kernel with Python bindings"
+repository = "https://github.com/darrell/spacetime-engine"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+ndarray = { version = "0.15", features = ["serde"] }
+ndarray-linalg = "0.16"
+num-complex = "0.4"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "1.0"
+rayon = "1.7"
+pyo3 = { version = "0.20", features = ["extension-module", "abi3-py38"] }
+numpy = "0.20"
+
+[build-dependencies]
+pyo3-build-config = "0.20"
+
+[features]
+default = ["python"]
+python = ["pyo3/extension-module"]
+wasm = []
+cuda = []
+*/
+
+// ============================================================
+//  src/lib.rs — Rust Core
+// ============================================================
+
+use ndarray::{Array1, Array2, Array4, Ix2, Ix4};
+use ndarray_linalg::Eigh;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use std::time::{Duration, Instant};
+
+// ------------------------------------------------------------
+//  CURVATURE ATOM
+// ------------------------------------------------------------
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CurvatureAtom {
+    pub params: HashMap<String, f64>,
+}
+
+impl CurvatureAtom {
+    pub fn new(params: HashMap<String, f64>) -> Self {
+        Self { params }
+    }
+
+    pub fn metric_tensor(&self, x: f64, y: f64, t: f64) -> Array4<f64> {
+        let g00 = -1.0;
+        let g11 = 1.0 + self.params.get("kappa").unwrap_or(&0.1) * x;
+        let g22 = 1.0 + self.params.get("lambda").unwrap_or(&-0.05) * y;
+        let g33 = 1.0 + self.params.get("sigma").unwrap_or(&0.02) * t;
+
+        let mut metric = Array4::zeros((1, 1, 4, 4));
+        metric[(0, 0, 0, 0)] = g00;
+        metric[(0, 0, 1, 1)] = g11;
+        metric[(0, 0, 2, 2)] = g22;
+        metric[(0, 0, 3, 3)] = g33;
+        metric
+    }
+}
+
+// ------------------------------------------------------------
+//  SPACETIME ENGINE
+// ------------------------------------------------------------
+pub struct SpacetimeEngine {
+    atom: CurvatureAtom,
+    clock: EngineClock,
+    machine: StateMachine,
+    integrator: TemporalIntegrator,
+    telemetry: Telemetry,
+}
+
+impl SpacetimeEngine {
+    pub fn new(atom: CurvatureAtom) -> Self {
+        let clock = EngineClock::new();
+        let machine = StateMachine::new(0.0);
+        let integrator = TemporalIntegrator::new(clock.clone(), machine.clone());
+        Self {
+            atom,
+            clock,
+            machine,
+            integrator,
+            telemetry: Telemetry::new(),
+        }
+    }
+
+    pub fn generate_metric_field(&self, grid_x: &Array1<f64>, grid_y: &Array1<f64>, t: f64) -> Array4<f64> {
+        let h = grid_y.len();
+        let w = grid_x.len();
+        let mut metric = Array4::zeros((h, w, 4, 4));
+
+        for (j, &y) in grid_y.iter().enumerate() {
+            for (i, &x) in grid_x.iter().enumerate() {
+                let m = self.atom.metric_tensor(x, y, t);
+                metric.slice_mut(s![j, i, .., ..]).assign(&m.slice(s![0, 0, .., ..]));
+            }
+        }
+        metric
+    }
+
+    pub fn compute_scalar_curvature(&self, metric: &Array4<f64>, grid_x: &Array1<f64>, grid_y: &Array1<f64>) -> Array2<f64> {
+        let h = metric.shape()[0];
+        let w = metric.shape()[1];
+        let dx = if grid_x.len() > 1 { grid_x[1] - grid_x[0] } else { 1.0 };
+        let dy = if grid_y.len() > 1 { grid_y[1] - grid_y[0] } else { 1.0 };
+
+        let mut curv = Array2::zeros((h, w));
+
+        let g11 = metric.slice(s![.., .., 1, 1]).to_owned();
+        let g22 = metric.slice(s![.., .., 2, 2]).to_owned();
+
+        // Simple finite difference (2nd order)
+        for j in 1..h - 1 {
+            for i in 1..w - 1 {
+                let d2g11_dx2 = (g11[(j, i + 1)] - 2.0 * g11[(j, i)] + g11[(j, i - 1)]) / (dx * dx);
+                let d2g22_dy2 = (g22[(j + 1, i)] - 2.0 * g22[(j, i)] + g22[(j - 1, i)]) / (dy * dy);
+                curv[(j, i)] = d2g11_dx2 / g11[(j, i)] + d2g22_dy2 / g22[(j, i)];
+            }
+        }
+        curv
+    }
+
+    pub fn eigenmode_family(&self, grid_x: &Array1<f64>, grid_y: &Array1<f64>, t: f64, k: usize) -> (Array1<f64>, Array4<f64>) {
+        let metric = self.generate_metric_field(grid_x, grid_y, t);
+        let h = metric.shape()[0];
+        let w = metric.shape()[1];
+        let dx = if grid_x.len() > 1 { grid_x[1] - grid_x[0] } else { 1.0 };
+        let dy = if grid_y.len() > 1 { grid_y[1] - grid_y[0] } else { 1.0 };
+
+        let n = h * w;
+        let mut laplacian = Array2::<f64>::zeros((n, n));
+
+        for j in 0..h {
+            for i in 0..w {
+                let idx = j * w + i;
+                laplacian[(idx, idx)] = -2.0 / (dx * dx) - 2.0 / (dy * dy);
+                if i > 0 { laplacian[(idx, idx - 1)] = 1.0 / (dx * dx); }
+                if i < w - 1 { laplacian[(idx, idx + 1)] = 1.0 / (dx * dx); }
+                if j > 0 { laplacian[(idx, idx - w)] = 1.0 / (dy * dy); }
+                if j < h - 1 { laplacian[(idx, idx + w)] = 1.0 / (dy * dy); }
+            }
+        }
+
+        let (eigenvalues, eigenvectors) = laplacian.eigh().unwrap();
+        let k_actual = k.min(eigenvalues.len());
+        let mut modes = Array4::zeros((h, w, k_actual, 1));
+        for idx in 0..k_actual {
+            let vec = eigenvectors.slice(s![.., idx]).to_owned();
+            let reshaped = vec.into_shape((h, w)).unwrap();
+            modes.slice_mut(s![.., .., idx, 0]).assign(&reshaped);
+        }
+        (eigenvalues.slice(s![0..k_actual]).to_owned(), modes)
+    }
+
+    pub fn evolve_wave(&self, initial: &Array2<f64>, grid_x: &Array1<f64>, grid_y: &Array1<f64>, steps: usize, dt: f64) -> Vec<Array2<f64>> {
+        let h = initial.shape()[0];
+        let w = initial.shape()[1];
+        let dx = if grid_x.len() > 1 { grid_x[1] - grid_x[0] } else { 1.0 };
+        let dy = if grid_y.len() > 1 { grid_y[1] - grid_y[0] } else { 1.0 };
+
+        let mut phi = initial.clone();
+        let mut phi_prev = initial.clone();
+        let mut history = Vec::new();
+
+        for _ in 0..steps {
+            let mut lap = Array2::zeros((h, w));
+            for j in 1..h - 1 {
+                for i in 1..w - 1 {
+                    lap[(j, i)] = (phi[(j, i + 1)] - 2.0 * phi[(j, i)] + phi[(j, i - 1)]) / (dx * dx)
+                        + (phi[(j + 1, i)] - 2.0 * phi[(j, i)] + phi[(j - 1, i)]) / (dy * dy);
+                }
+            }
+            let phi_next = 2.0 * &phi - &phi_prev + (dt * dt) * lap;
+            history.push(phi_next.clone());
+            phi_prev = phi;
+            phi = phi_next;
+        }
+        history
+    }
+
+    pub fn causal_cones(&self, metric: &Array4<f64>) -> (Array2<f64>, Array2<f64>) {
+        let h = metric.shape()[0];
+        let w = metric.shape()[1];
+        let mut angle = Array2::zeros((h, w));
+        let mut sign = Array2::zeros((h, w));
+
+        for j in 0..h {
+            for i in 0..w {
+                let g00 = metric[(j, i, 0, 0)];
+                let g11 = metric[(j, i, 1, 1)].abs().max(1e-9);
+                let g22 = metric[(j, i, 2, 2)].abs().max(1e-9);
+                let cx = (-g00 / g11).abs().sqrt();
+                let cy = (-g00 / g22).abs().sqrt();
+                angle[(j, i)] = cy.atan2(cx);
+                sign[(j, i)] = (-g00).signum();
+            }
+        }
+        (angle, sign)
+    }
+
+    pub fn step(&mut self) -> serde_json::Value {
+        let dt = self.clock.dt();
+        let state = self.integrator.step();
+        self.telemetry.push("state", serde_json::json!(state));
+        serde_json::json!({ "dt": dt, "state": state })
+    }
+}
+
+// ------------------------------------------------------------
+//  SUPPORTING MODULES (REUSED FROM EARLIER RUST PORT)
+// ------------------------------------------------------------
+
+#[derive(Clone)]
+pub struct EngineClock {
+    start: Instant,
+    last: Instant,
+}
+
+impl EngineClock {
+    pub fn new() -> Self {
+        let now = Instant::now();
+        Self { start: now, last: now }
+    }
+
+    pub fn now(&self) -> Duration {
+        self.start.elapsed()
+    }
+
+    pub fn dt(&mut self) -> f64 {
+        let now = Instant::now();
+        let d = now.duration_since(self.last).as_secs_f64();
+        self.last = now;
+        d
+    }
+}
+
+#[derive(Clone)]
+pub struct StateMachine {
+    pub state: f64,
+}
+
+impl StateMachine {
+    pub fn new(initial: f64) -> Self {
+        Self { state: initial }
+    }
+
+    pub fn evolve(&mut self, dt: f64) -> f64 {
+        self.state += dt;
+        self.state
+    }
+}
+
+#[derive(Clone)]
+pub struct TemporalIntegrator {
+    clock: EngineClock,
+    machine: StateMachine,
+}
+
+impl TemporalIntegrator {
+    pub fn new(clock: EngineClock, machine: StateMachine) -> Self {
+        Self { clock, machine }
+    }
+
+    pub fn step(&mut self) -> f64 {
+        let dt = self.clock.dt();
+        self.machine.evolve(dt)
+    }
+}
+
+pub struct Telemetry {
+    records: Vec<serde_json::Value>,
+    max_records: usize,
+}
+
+impl Telemetry {
+    pub fn new() -> Self {
+        Self { records: Vec::new(), max_records: 10000 }
+    }
+
+    pub fn push(&mut self, key: &str, value: serde_json::Value) {
+        self.records.push(serde_json::json!({ "key": key, "value": value }));
+        if self.records.len() > self.max_records {
+            self.records.remove(0);
+        }
+    }
+
+    pub fn pull_latest(&self, n: usize) -> Vec<serde_json::Value> {
+        if self.records.is_empty() { return Vec::new(); }
+        let start = self.records.len().saturating_sub(n);
+        self.records[start..].to_vec()
+    }
+}
+
+// ============================================================
+//  src/python/mod.rs — PyO3 Bindings
+// ============================================================
+
+use pyo3::prelude::*;
+use pyo3::types::PyDict;
+use numpy::{PyArray1, PyArray2, PyArray4, IntoPyArray};
+use std::collections::HashMap;
+
+#[pyclass]
+pub struct PyCurvatureAtom {
+    atom: CurvatureAtom,
+}
+
+#[pymethods]
+impl PyCurvatureAtom {
+    #[new]
+    fn new(params: Option<HashMap<String, f64>>) -> Self {
+        let params = params.unwrap_or_else(|| {
+            let mut p = HashMap::new();
+            p.insert("kappa".to_string(), 0.1);
+            p.insert("lambda".to_string(), -0.05);
+            p.insert("sigma".to_string(), 0.02);
+            p
+        });
+        Self { atom: CurvatureAtom::new(params) }
+    }
+}
+
+#[pyclass]
+pub struct PySpacetimeEngine {
+    engine: SpacetimeEngine,
+}
+
+#[pymethods]
+impl PySpacetimeEngine {
+    #[new]
+    fn new(atom: PyCurvatureAtom) -> Self {
+        Self { engine: SpacetimeEngine::new(atom.atom) }
+    }
+
+    fn generate_metric_field(&self, grid_x: Vec<f64>, grid_y: Vec<f64>, t: f64, py: Python) -> Py<PyArray4<f64>> {
+        let gx = Array1::from(grid_x);
+        let gy = Array1::from(grid_y);
+        let result = self.engine.generate_metric_field(&gx, &gy, t);
+        result.into_pyarray(py).to_owned()
+    }
+
+    fn compute_scalar_curvature(&self, metric: &PyArray4<f64>, grid_x: Vec<f64>, grid_y: Vec<f64>, py: Python) -> Py<PyArray2<f64>> {
+        let m = metric.readonly().as_array().to_owned();
+        let gx = Array1::from(grid_x);
+        let gy = Array1::from(grid_y);
+        let result = self.engine.compute_scalar_curvature(&m, &gx, &gy);
+        result.into_pyarray(py).to_owned()
+    }
+
+    fn eigenmode_family(&self, grid_x: Vec<f64>, grid_y: Vec<f64>, t: f64, k: usize, py: Python) -> (Py<PyArray1<f64>>, Py<PyArray4<f64>>) {
+        let gx = Array1::from(grid_x);
+        let gy = Array1::from(grid_y);
+        let (eigenvalues, modes) = self.engine.eigenmode_family(&gx, &gy, t, k);
+        (eigenvalues.into_pyarray(py).to_owned(), modes.into_pyarray(py).to_owned())
+    }
+
+    fn evolve_wave(&self, initial: Vec<Vec<f64>>, grid_x: Vec<f64>, grid_y: Vec<f64>, steps: usize, dt: f64, py: Python) -> Vec<Py<PyArray2<f64>>> {
+        let h = initial.len();
+        let w = if h > 0 { initial[0].len() } else { 0 };
+        let mut arr = Array2::zeros((h, w));
+        for (j, row) in initial.iter().enumerate() {
+            for (i, &val) in row.iter().enumerate() {
+                arr[(j, i)] = val;
+            }
+        }
+        let gx = Array1::from(grid_x);
+        let gy = Array1::from(grid_y);
+        let history = self.engine.evolve_wave(&arr, &gx, &gy, steps, dt);
+        history.into_iter().map(|frame| frame.into_pyarray(py).to_owned()).collect()
+    }
+
+    fn causal_cones(&self, metric: &PyArray4<f64>, py: Python) -> (Py<PyArray2<f64>>, Py<PyArray2<f64>>) {
+        let m = metric.readonly().as_array().to_owned();
+        let (angle, sign) = self.engine.causal_cones(&m);
+        (angle.into_pyarray(py).to_owned(), sign.into_pyarray(py).to_owned())
+    }
+
+    fn step(&mut self, py: Python) -> Py<PyDict> {
+        let result = self.engine.step();
+        let dict = PyDict::new(py);
+        if let Some(obj) = result.as_object() {
+            for (k, v) in obj {
+                dict.set_item(k, v.to_string()).unwrap();
+            }
+        }
+        dict.to_owned()
+    }
+}
+
+#[pymodule]
+fn spacetime_engine(_py: Python, m: &PyModule) -> PyResult<()> {
+    m.add_class::<PyCurvatureAtom>()?;
+    m.add_class::<PySpacetimeEngine>()?;
+    Ok(())
+}
+
+// ============================================================
+//  pyproject.toml
+// ============================================================
+/*
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "spacetime_engine"
+version = "1.0.0"
+authors = [{name = "Darrell Lee (Līlā) Stiltner"}]
+license = {text = "CC BY-NC 4.0"}
+requires-python = ">=3.8"
+dependencies = ["numpy>=1.24"]
+description = "Sovereign synthetic device kernel with Python bindings"
+readme = "README.md"
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0", "black", "mypy"]
+*/
+
+// ============================================================
+//  spacetime_engine/__init__.py — Python Wrapper
+// ============================================================
+/*
+from .spacetime_engine import PySpacetimeEngine, PyCurvatureAtom
+import numpy as np
+
+class CurvatureAtom:
+    def __init__(self, params=None):
+        if params is None:
+            params = {"kappa": 0.1, "lambda": -0.05, "sigma": 0.02}
+        self._atom = PyCurvatureAtom(params)
+
+class SpacetimeEngine:
+    def __init__(self, atom=None):
+        if atom is None:
+            atom = CurvatureAtom()
+        self._engine = PySpacetimeEngine(atom._atom)
+
+    def metric(self, grid_size=128, t=0.0):
+        grid = np.linspace(-1, 1, grid_size).tolist()
+        return np.array(self._engine.generate_metric_field(grid, grid, t))
+
+    def curvature(self, grid_size=128, t=0.0):
+        grid = np.linspace(-1, 1, grid_size).tolist()
+        metric = self._engine.generate_metric_field(grid, grid, t)
+        return np.array(self._engine.compute_scalar_curvature(metric, grid, grid))
+
+    def modes(self, grid_size=128, t=0.0, k=6):
+        grid = np.linspace(-1, 1, grid_size).tolist()
+        vals, modes = self._engine.eigenmode_family(grid, grid, t, k)
+        return np.array(vals), np.array(modes)
+
+    def evolve(self, grid_size=128, steps=40, dt=0.02):
+        grid = np.linspace(-1, 1, grid_size)
+        initial = np.sin(np.pi * grid)[None, :] * np.sin(np.pi * grid)[:, None]
+        return np.array(self._engine.evolve_wave(initial.tolist(), grid.tolist(), grid.tolist(), steps, dt))
+
+    def causal_cones(self, grid_size=128, t=0.0):
+        grid = np.linspace(-1, 1, grid_size).tolist()
+        metric = self._engine.generate_metric_field(grid, grid, t)
+        angle, sign = self._engine.causal_cones(metric)
+        return np.array(angle), np.array(sign)
+
+    def step(self):
+        return self._engine.step()
+
+__all__ = ["SpacetimeEngine", "CurvatureAtom"]
+*/
+
+// ============================================================
+//  tests/test_engine.py — Python Tests
+// ============================================================
+/*
+import pytest
+import numpy as np
+from spacetime_engine import SpacetimeEngine, CurvatureAtom
+
+def test_metric():
+    engine = SpacetimeEngine()
+    metric = engine.metric(grid_size=128)
+    assert metric.shape == (128, 128, 4, 4)
+    assert np.isfinite(metric).all()
+
+def test_curvature():
+    engine = SpacetimeEngine()
+    curv = engine.curvature(grid_size=128)
+    assert curv.shape == (128, 128)
+    assert np.isfinite(curv).all()
+
+def test_modes():
+    engine = SpacetimeEngine()
+    vals, modes = engine.modes(grid_size=128, k=4)
+    assert vals.shape == (4,)
+    assert modes.shape == (128, 128, 4, 1)
+
+def test_evolve():
+    engine = SpacetimeEngine()
+    history = engine.evolve(grid_size=128, steps=20)
+    assert history.shape == (20, 128, 128)
+
+def test_causal():
+    engine = SpacetimeEngine()
+    angle, sign = engine.causal_cones(grid_size=128)
+    assert angle.shape == (128, 128)
+    assert sign.shape == (128, 128)
+*/
+
+// ============================================================
+//  BUILD & INSTALL
+// ============================================================
+/*
+# Install maturin
+pip install maturin
+
+# Build and install
+maturin build --release
+pip install target/wheels/spacetime_engine-*.whl
+
+# Or develop mode
+maturin develop
+
+# Run tests
+pytest tests/
+*/
+
+// ============================================================
+//  USAGE EXAMPLE
+// ============================================================
+/*
+from spacetime_engine import SpacetimeEngine
+import numpy as np
+
+engine = SpacetimeEngine()
+
+# Generate metric
+metric = engine.metric(grid_size=128)
+print("Metric shape:", metric.shape)
+
+# Compute curvature
+curv = engine.curvature(grid_size=128)
+print("Curvature shape:", curv.shape)
+
+# Get eigenmodes
+vals, modes = engine.modes(grid_size=128, k=6)
+print("Eigenvalues:", vals[:3])
+
+# Evolve wave
+history = engine.evolve(grid_size=128, steps=40)
+print("Evolution frames:", history.shape)
+
+# Causal cones
+angle, sign = engine.causal_cones(grid_size=128)
+print("Cone angles shape:", angle.shape)
+
+# Step the kernel
+state = engine.step()
+print("Kernel state:", state)
+*/
