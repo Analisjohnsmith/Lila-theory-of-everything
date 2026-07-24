@@ -1,7 +1,7 @@
 this is a app  it's the space of all structural problems and solutions.
 A unified structural solver for geometric, analytic, causal, and combinatorial problems.
 NEARLY STILL WORKING on it...
-EXPASION 5  PROOF.
+EXPASION 3  PROOF.
  7/2/26 
  LICENSE → GPLv3
 Commercial licensing → "Commercial licenses are available from the copyright holder."
@@ -23,7 +23,7 @@ LICENSE-docs → CC BY-NC 4.0 for papers, diagrams, images, and documentation
 #
 #  This code is provided "AS IS", without warranties or conditions of any kind.
 # =============================================================================
-
+expansion0:
  CORE CODE:
 
 from enum import Enum
@@ -910,7 +910,7 @@ if __name__ == "__main__":
 
 
 =================================================
-EXPANSION THREE:
+EXPANSION Two:
 ```rust
 // ============================================================
 //  SPACETIME ENGINE — RUST CORE WITH PYTHON BINDINGS
@@ -2834,7 +2834,7 @@ if __name__ == "__main__":
 
 
 
-EXPANSION 4:
+EXPANSION 3:
 // ═══════════════════════════════════════════════════════════════════════════════
 // Super Problem Solver 3MAX3 — Unified Structural Kernel
 // Single condensed reference file: engine + geometry stack + PDE + graph + SAT + mesh + attack suite
@@ -4720,7 +4720,7 @@ def deploy_owned_engine(owner: str) -> OwnedStructuralEngine:
 
 
 =================================================================================================
-EXPANSION SIX:
+EXPANSION four:
 
  
     engine = OwnedStructuralEngine(owner)
