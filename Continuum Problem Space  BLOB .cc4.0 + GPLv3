@@ -5154,3 +5154,885 @@ All HSON references have been replaced with PERSONA. This is now a complete **Pe
 - `exit` - Shutdown
 
 The PERSONA is now fully sovereign, self-describing, and operational.
+
+
+
+
+
+
+
+
+
+EXAPNSION FIVE :
+
+# ============================================
+# COMPLETE UNIVERSAL STRUCTURAL COMPUTER
+# ============================================
+
+import numpy as np
+from scipy.sparse import diags
+from scipy.sparse.linalg import eigsh
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional, Callable
+from enum import Enum
+
+# ============================================
+# 1. CORE TYPES & ENUMS
+# ============================================
+
+class ProblemClass(Enum):
+    GEOMETRIC_STRUCTURE = "GEOMETRIC_STRUCTURE"
+    FIELD_CONFIGURATION = "FIELD_CONFIGURATION"
+    CURVATURE_DISTRIBUTION = "CURVATURE_DISTRIBUTION"
+    CAUSAL_STRUCTURE = "CAUSAL_STRUCTURE"
+    INTERFERENCE_PATTERN = "INTERFERENCE_PATTERN"
+    MODE_FAMILY = "MODE_FAMILY"
+    PDE_EVOLUTION = "PDE_EVOLUTION"
+
+@dataclass
+class CurvatureAtom:
+    """Diagonal metric generator."""
+    params: Dict[str, float]
+    
+    def generate(self, x: np.ndarray, y: np.ndarray, t: float = 0.0) -> np.ndarray:
+        kappa = self.params.get("kappa", 0.1)
+        lamb = self.params.get("lambda", -0.05)
+        sigma = self.params.get("sigma", 0.02)
+        
+        X, Y = np.meshgrid(x, y, indexing='ij')
+        r2 = X**2 + Y**2
+        
+        g00 = -1.0 + kappa * r2
+        g11 = 1.0 + lamb * np.exp(-r2 / (2*sigma**2))
+        g22 = 1.0 + lamb * np.exp(-r2 / (2*sigma**2))
+        g33 = 1.0 + lamb * np.exp(-r2 / (2*sigma**2))
+        
+        metric = np.zeros((*X.shape, 4, 4))
+        metric[..., 0, 0] = g00
+        metric[..., 1, 1] = g11
+        metric[..., 2, 2] = g22
+        metric[..., 3, 3] = g33
+        return metric
+
+# ============================================
+# 2. CORE DATA CONTAINERS
+# ============================================
+
+@dataclass
+class FieldMode:
+    amplitude: np.ndarray
+    metric: np.ndarray
+    metadata: dict = None
+
+@dataclass
+class CausalStructure:
+    adjacency: np.ndarray
+    cones: np.ndarray
+    metadata: dict = None
+
+@dataclass
+class CurvatureField:
+    scalar: np.ndarray
+    metadata: dict = None
+
+@dataclass
+class InteractionField:
+    amplitude: np.ndarray
+    metric: np.ndarray
+    metadata: dict = None
+
+@dataclass
+class GaugeField:
+    A: np.ndarray
+    group: str
+    metadata: dict = None
+
+@dataclass
+class MetricEigenMode:
+    amplitude: np.ndarray
+    eigenvalue: float
+    metric: np.ndarray
+    metadata: dict = None
+
+@dataclass
+class StructuralState:
+    metric: np.ndarray = None
+    curvature: CurvatureField = None
+    modes: list = None
+    causal: CausalStructure = None
+    interaction: InteractionField = None
+    pde_history: list = None
+    collapsed: Any = None
+    metadata: dict = None
+
+@dataclass
+class UnifiedField:
+    metric: np.ndarray
+    curvature: Optional[CurvatureField] = None
+    modes: Optional[list] = None
+    causal: Optional[CausalStructure] = None
+    interaction: Optional[InteractionField] = None
+    gauge: Optional[GaugeField] = None
+    pde_history: Optional[list] = None
+    rg_flow: Optional[list] = None
+    metadata: Dict[str, Any] = None
+
+@dataclass
+class RGState:
+    scale: float
+    metric: np.ndarray
+    curvature: Optional[CurvatureField] = None
+    modes: Optional[list] = None
+    metadata: dict = None
+
+@dataclass
+class PLangSpec:
+    problem_class: ProblemClass
+    params: Dict[str, Any]
+    raw_text: Optional[str] = None
+
+@dataclass
+class CodexRule:
+    name: str
+    apply: Callable[[UnifiedField], Dict[str, Any]]
+
+# ============================================
+# 3. UTILITY FUNCTIONS
+# ============================================
+
+def numerical_derivative(field: np.ndarray, axis: int, dx: float) -> np.ndarray:
+    der = np.zeros_like(field)
+    if axis == 0:
+        der[1:-1, :] = (field[2:, :] - field[:-2, :]) / (2*dx)
+    else:
+        der[:, 1:-1] = (field[:, 2:] - field[:, :-2]) / (2*dx)
+    return der
+
+# ============================================
+# 4. VALIDATION FUNCTIONS
+# ============================================
+
+def validate_metric(metric: np.ndarray) -> bool:
+    return not np.any(np.isnan(metric)) and not np.any(np.isinf(metric))
+
+def validate_curvature(curvature: np.ndarray) -> bool:
+    return not np.any(np.isnan(curvature)) and not np.any(np.isinf(curvature))
+
+def validate_pde_stability(dx: float, dy: float, dt: float, c: float) -> bool:
+    return c * dt / min(dx, dy) < 1.0
+
+# ============================================
+# 5. FALLBACK FUNCTIONS
+# ============================================
+
+def fallback_metric(grid_x: np.ndarray, grid_y: np.ndarray) -> np.ndarray:
+    H, W = len(grid_x), len(grid_y)
+    metric = np.zeros((H, W, 4, 4))
+    metric[..., 0, 0] = -1.0
+    metric[..., 1, 1] = 1.0
+    metric[..., 2, 2] = 1.0
+    metric[..., 3, 3] = 1.0
+    return metric
+
+def fallback_curvature(H: int, W: int) -> np.ndarray:
+    return np.zeros((H, W))
+
+def fallback_pde(H: int, W: int, steps: int) -> list:
+    return [np.zeros((H, W)) for _ in range(steps)]
+
+# ============================================
+# 6. SPACETIME ENGINE — CORE
+# ============================================
+
+class SpacetimeEngineError(Exception):
+    pass
+
+class SpacetimeEngine:
+    def __init__(self, curvature_atom: CurvatureAtom = None):
+        self.curvature_atom = curvature_atom or CurvatureAtom(params={"kappa": 0.1, "lambda": -0.05, "sigma": 0.02})
+    
+    def generate_metric_field(self, grid_x: np.ndarray, grid_y: np.ndarray, t: float = 0.0) -> np.ndarray:
+        return self.curvature_atom.generate(grid_x, grid_y, t)
+    
+    def generate_field_mode(self, metric_field: np.ndarray, freq: float) -> FieldMode:
+        H, W, _, _ = metric_field.shape
+        x = np.linspace(-1, 1, W)
+        y = np.linspace(-1, 1, H)
+        X, Y = np.meshgrid(x, y, indexing='ij')
+        amplitude = np.exp(1j * 2 * np.pi * freq * X) * np.exp(1j * 2 * np.pi * freq * Y)
+        return FieldMode(amplitude=amplitude, metric=metric_field, metadata={"freq": freq})
+    
+    def generate_eigenmodes(self, grid_x: np.ndarray, grid_y: np.ndarray, k: int = 6) -> list:
+        H, W = len(grid_x), len(grid_y)
+        dx = grid_x[1] - grid_x[0]
+        dy = grid_y[1] - grid_y[0]
+        
+        # Build flat Laplacian
+        N = H * W
+        main = -2.0 * (1.0/(dx*dx) + 1.0/(dy*dy))
+        off_x = 1.0/(dx*dx)
+        off_y = 1.0/(dy*dy)
+        offsets = [0, -1, 1, -W, W]
+        data = [np.full(N, main), np.full(N-1, off_x), np.full(N-1, off_x),
+                np.full(N-W, off_y), np.full(N-W, off_y)]
+        L = diags(data, offsets, shape=(N, N), format="csr")
+        
+        vals, vecs = eigsh(L, k=min(k, N-1), which="SM")
+        
+        modes = []
+        for i in range(len(vals)):
+            amp = vecs[:, i].reshape(H, W)
+            modes.append(FieldMode(amplitude=amp, metric=None, metadata={"eigenvalue": float(vals[i])}))
+        return modes
+    
+    def compute_scalar_curvature(self, metric_field: np.ndarray, grid_x: np.ndarray, grid_y: np.ndarray) -> CurvatureField:
+        H, W, _, _ = metric_field.shape
+        g11 = metric_field[..., 1, 1]
+        g22 = metric_field[..., 2, 2]
+        
+        dx = grid_x[1] - grid_x[0] if len(grid_x) > 1 else 1.0
+        dy = grid_y[1] - grid_y[0] if len(grid_y) > 1 else 1.0
+        
+        dg11_dx = numerical_derivative(g11, axis=1, dx=dx)
+        dg22_dy = numerical_derivative(g22, axis=0, dx=dy)
+        d2g11_dx2 = numerical_derivative(dg11_dx, axis=1, dx=dx)
+        d2g22_dy2 = numerical_derivative(dg22_dy, axis=0, dx=dy)
+        
+        scalar = (1.0/g11) * d2g11_dx2 + (1.0/g22) * d2g22_dy2
+        
+        return CurvatureField(scalar=scalar, metadata={"method": "finite_difference_diagonal", "dx": dx, "dy": dy})
+    
+    def evolve_wave_equation(self, initial_field: np.ndarray, grid_x: np.ndarray, grid_y: np.ndarray,
+                             steps: int, dt: float, c: float = 1.0) -> List[np.ndarray]:
+        H, W = initial_field.shape
+        dx = grid_x[1] - grid_x[0]
+        dy = grid_y[1] - grid_y[0]
+        
+        if not validate_pde_stability(dx, dy, dt, c):
+            raise SpacetimeEngineError("PDE stability condition violated")
+        
+        phi = initial_field.copy()
+        phi_prev = initial_field.copy()
+        history = []
+        
+        for _ in range(steps):
+            lap = np.zeros_like(phi)
+            lap[1:-1, :] += (phi[2:, :] - 2*phi[1:-1, :] + phi[:-2, :]) / (dy*dy)
+            lap[:, 1:-1] += (phi[:, 2:] - 2*phi[:, 1:-1] + phi[:, :-2]) / (dx*dx)
+            phi_next = 2*phi - phi_prev + (c*c)*(dt*dt)*lap
+            history.append(phi_next.copy())
+            phi_prev, phi = phi, phi_next
+        
+        return history
+    
+    def solve_structural_problem(self, problem_class: ProblemClass, **kwargs) -> Any:
+        grid_x = kwargs.get("grid_x", np.linspace(-1, 1, 128))
+        grid_y = kwargs.get("grid_y", np.linspace(-1, 1, 128))
+        t = kwargs.get("t", 0.0)
+        freq = kwargs.get("freq", 1.0)
+        
+        metric_field = self.generate_metric_field(grid_x, grid_y, t)
+        
+        if not validate_metric(metric_field):
+            metric_field = fallback_metric(grid_x, grid_y)
+        
+        if problem_class == ProblemClass.GEOMETRIC_STRUCTURE:
+            return metric_field
+        
+        elif problem_class == ProblemClass.FIELD_CONFIGURATION:
+            return self.generate_field_mode(metric_field, freq)
+        
+        elif problem_class == ProblemClass.CURVATURE_DISTRIBUTION:
+            return self.compute_scalar_curvature(metric_field, grid_x, grid_y)
+        
+        elif problem_class == ProblemClass.CAUSAL_STRUCTURE:
+            H, W, _, _ = metric_field.shape
+            cones = np.ones((H, W, 2))
+            adjacency = np.zeros((H*W, H*W), dtype=int)
+            for j in range(H):
+                for i in range(W):
+                    k = j*W + i
+                    if j > 0: adjacency[k, (j-1)*W + i] = 1
+                    if j < H-1: adjacency[k, (j+1)*W + i] = 1
+                    if i > 0: adjacency[k, j*W + (i-1)] = 1
+                    if i < W-1: adjacency[k, j*W + (i+1)] = 1
+            return CausalStructure(adjacency=adjacency, cones=cones)
+        
+        elif problem_class == ProblemClass.INTERFERENCE_PATTERN:
+            mode1 = self.generate_field_mode(metric_field, freq)
+            mode2 = self.generate_field_mode(metric_field, freq * 1.5)
+            return InteractionField(amplitude=mode1.amplitude + mode2.amplitude, metric=metric_field)
+        
+        elif problem_class == ProblemClass.MODE_FAMILY:
+            return self.generate_eigenmodes(grid_x, grid_y, k=kwargs.get("k", 6))
+        
+        elif problem_class == ProblemClass.PDE_EVOLUTION:
+            initial = self.generate_field_mode(metric_field, freq).amplitude.real
+            steps = kwargs.get("steps", 10)
+            dt = kwargs.get("dt", 0.05)
+            return self.evolve_wave_equation(initial, grid_x, grid_y, steps, dt)
+        
+        raise SpacetimeEngineError(f"Unsupported problem class: {problem_class}")
+
+# ============================================
+# 7. GAUGE FIELD GENERATORS
+# ============================================
+
+def generate_u1_field(metric_field: np.ndarray, strength: float = 0.1) -> GaugeField:
+    g11 = metric_field[..., 1, 1]
+    dx, dy = 1.0, 1.0
+    Ax = numerical_derivative(g11, axis=1, dx=dx)
+    Ay = numerical_derivative(g11, axis=0, dx=dy)
+    return GaugeField(A=np.stack([Ax, Ay], axis=-1), group="U1", metadata={"strength": strength})
+
+def generate_su2_field(metric_field: np.ndarray, strength: float = 0.05) -> GaugeField:
+    g22 = metric_field[..., 2, 2]
+    dx, dy = 1.0, 1.0
+    comp1 = numerical_derivative(g22, axis=1, dx=dx)
+    comp2 = numerical_derivative(g22, axis=0, dx=dy)
+    comp3 = comp1 - comp2
+    return GaugeField(A=np.stack([comp1, comp2, comp3], axis=-1), group="SU2", metadata={"strength": strength})
+
+def generate_su3_field(metric_field: np.ndarray, strength: float = 0.02) -> GaugeField:
+    g33 = metric_field[..., 3, 3]
+    dx, dy = 1.0, 1.0
+    comps = [numerical_derivative(g33, axis=i%2, dx=dx if i%2 else dy) for i in range(8)]
+    return GaugeField(A=np.stack(comps, axis=-1), group="SU3", metadata={"strength": strength})
+
+# ============================================
+# 8. METRIC-COUPLED PDE
+# ============================================
+
+def laplacian_metric_weighted(field: np.ndarray, metric_field: np.ndarray, dx: float, dy: float) -> np.ndarray:
+    g11 = metric_field[..., 1, 1]
+    g22 = metric_field[..., 2, 2]
+    lap = np.zeros_like(field)
+    lap[:, 1:-1] += g11[:, 1:-1] * (field[:, 2:] - 2*field[:, 1:-1] + field[:, :-2]) / (dx*dx)
+    lap[1:-1, :] += g22[1:-1, :] * (field[2:, :] - 2*field[1:-1, :] + field[:-2, :]) / (dy*dy)
+    return lap
+
+# ============================================
+# 9. RENORMALIZER
+# ============================================
+
+class Renormalizer:
+    def __init__(self, step_factor: float = 1.1):
+        self.step_factor = step_factor
+    
+    def flow_metric(self, metric: np.ndarray, scale: float) -> np.ndarray:
+        g = metric / (1.0 + 0.01 * scale)
+        return np.clip(g, -20.0, 20.0)
+    
+    def flow_curvature(self, curvature: CurvatureField, scale: float) -> CurvatureField:
+        R = curvature.scalar / (1.0 + 0.05 * scale)
+        return CurvatureField(scalar=R, metadata={"scale": scale})
+    
+    def flow_modes(self, modes: list, scale: float) -> list:
+        new_modes = []
+        for m in modes:
+            amp = m.amplitude / (1.0 + 0.02 * scale)
+            ev = m.metadata.get("eigenvalue", 0.0) / (1.0 + 0.03 * scale)
+            new_modes.append(MetricEigenMode(amplitude=amp, eigenvalue=ev, metric=m.metric, metadata={"scale": scale}))
+        return new_modes
+    
+    def step(self, state: StructuralState, scale: float) -> RGState:
+        return RGState(
+            scale=scale,
+            metric=self.flow_metric(state.metric, scale),
+            curvature=self.flow_curvature(state.curvature, scale) if state.curvature else None,
+            modes=self.flow_modes(state.modes, scale) if state.modes else None,
+            metadata={"step_factor": self.step_factor}
+        )
+    
+    def run(self, state: StructuralState, steps: int = 5) -> list:
+        results = []
+        scale = 1.0
+        for _ in range(steps):
+            results.append(self.step(state, scale))
+            scale *= self.step_factor
+        return results
+
+# ============================================
+# 10. STRUCTURAL STATE BUILDER
+# ============================================
+
+class StructuralStateBuilder:
+    def build(self, metric=None, curvature=None, modes=None, causal=None,
+              interaction=None, pde_history=None, collapsed=None) -> StructuralState:
+        return StructuralState(
+            metric=metric,
+            curvature=curvature,
+            modes=modes,
+            causal=causal,
+            interaction=interaction,
+            pde_history=pde_history,
+            collapsed=collapsed,
+            metadata={
+                "layers": {
+                    "metric": metric is not None,
+                    "curvature": curvature is not None,
+                    "modes": modes is not None,
+                    "causal": causal is not None,
+                    "interaction": interaction is not None,
+                    "pde_history": pde_history is not None,
+                    "collapsed": collapsed is not None
+                }
+            }
+        )
+
+# ============================================
+# 11. UNIFICATION ENGINE
+# ============================================
+
+class UnificationEngine:
+    def unify(self, state: StructuralState, gauge: Optional[GaugeField] = None,
+              rg_flow: Optional[list] = None) -> UnifiedField:
+        return UnifiedField(
+            metric=state.metric,
+            curvature=state.curvature,
+            modes=state.modes,
+            causal=state.causal,
+            interaction=state.interaction,
+            gauge=gauge,
+            pde_history=state.pde_history,
+            rg_flow=rg_flow,
+            metadata={"layers_present": state.metadata["layers"]}
+        )
+
+# ============================================
+# 12. CODEX (STRUCTURAL LOGIC)
+# ============================================
+
+class StructuralCodex:
+    def __init__(self, rules: List[CodexRule] = None):
+        self.rules = rules or []
+    
+    def add_rule(self, rule: CodexRule):
+        self.rules.append(rule)
+    
+    def evaluate(self, uf: UnifiedField) -> Dict[str, Any]:
+        results = {}
+        for rule in self.rules:
+            results[rule.name] = rule.apply(uf)
+        return results
+
+def rule_metric_signature(uf: UnifiedField) -> Dict[str, Any]:
+    g00, g11, g22, g33 = uf.metric[..., 0, 0], uf.metric[..., 1, 1], uf.metric[..., 2, 2], uf.metric[..., 3, 3]
+    ok = bool((g00 < 0).all() and (g11 > 0).all() and (g22 > 0).all() and (g33 > 0).all())
+    return {"valid_lorentzian": ok, "g00_range": (float(g00.min()), float(g00.max()))}
+
+def rule_curvature_bounds(uf: UnifiedField) -> Dict[str, Any]:
+    if uf.curvature is None:
+        return {"has_curvature": False}
+    R = uf.curvature.scalar
+    return {"has_curvature": True, "bounded": bool((abs(R) < 1e6).all())}
+
+def rule_causal_consistency(uf: UnifiedField) -> Dict[str, Any]:
+    if uf.causal is None:
+        return {"has_causal": False}
+    return {"has_causal": True, "ctc_admissible": uf.causal.metadata.get("ctc_admissible", False)}
+
+def rule_gauge_presence(uf: UnifiedField) -> Dict[str, Any]:
+    if uf.gauge is None:
+        return {"has_gauge": False}
+    return {"has_gauge": True, "group": uf.gauge.group}
+
+# ============================================
+# 13. COLLAPSE OPERATOR
+# ============================================
+
+@dataclass
+class CollapseResult:
+    resolved: Any
+    metadata: dict = None
+
+class CollapseOperator:
+    def __init__(self, mode: str = "stabilize"):
+        self.mode = mode
+    
+    def collapse_metric(self, metric_field: np.ndarray) -> np.ndarray:
+        return np.clip(metric_field, -10.0, 10.0)
+    
+    def collapse_modes(self, modes: list) -> list:
+        if len(modes) == 0:
+            return modes
+        modes_sorted = sorted(modes, key=lambda m: m.metadata.get("eigenvalue", 0.0))
+        base = modes_sorted[0]
+        base.amplitude = base.amplitude / (1.0 + np.abs(base.amplitude))
+        return [base]
+    
+    def collapse_causal(self, causal: CausalStructure) -> CausalStructure:
+        cones = np.clip(causal.cones, 0.0, 5.0)
+        return CausalStructure(adjacency=causal.adjacency, cones=cones, metadata={"collapsed": True})
+    
+    def collapse(self, obj: Any) -> CollapseResult:
+        if isinstance(obj, np.ndarray):
+            return CollapseResult(resolved=self.collapse_metric(obj), metadata={"type": "metric"})
+        if isinstance(obj, list):
+            return CollapseResult(resolved=self.collapse_modes(obj), metadata={"type": "modes"})
+        if isinstance(obj, CausalStructure):
+            return CollapseResult(resolved=self.collapse_causal(obj), metadata={"type": "causal"})
+        return CollapseResult(resolved=obj, metadata={"type": "unknown"})
+
+# ============================================
+# 14. PROBLEM LANGUAGE (PLang)
+# ============================================
+
+class PLangParser:
+    def parse(self, text: str) -> PLangSpec:
+        t = text.lower()
+        
+        if any(w in t for w in ["metric", "geometry", "space"]):
+            pc = ProblemClass.GEOMETRIC_STRUCTURE
+        elif any(w in t for w in ["curvature", "gravity"]):
+            pc = ProblemClass.CURVATURE_DISTRIBUTION
+        elif any(w in t for w in ["mode", "field"]):
+            pc = ProblemClass.FIELD_CONFIGURATION
+        elif any(w in t for w in ["causal", "cone", "time"]):
+            pc = ProblemClass.CAUSAL_STRUCTURE
+        elif any(w in t for w in ["interference", "interaction"]):
+            pc = ProblemClass.INTERFERENCE_PATTERN
+        elif any(w in t for w in ["eigen", "spectrum"]):
+            pc = ProblemClass.MODE_FAMILY
+        elif any(w in t for w in ["evolve", "pde", "dynamic"]):
+            pc = ProblemClass.PDE_EVOLUTION
+        else:
+            pc = ProblemClass.GEOMETRIC_STRUCTURE
+        
+        params = {}
+        for w in t.split():
+            if w.startswith("freq="): params["freq"] = float(w.split("=")[1])
+            if w.startswith("steps="): params["steps"] = int(w.split("=")[1])
+            if w.startswith("dt="): params["dt"] = float(w.split("=")[1])
+            if w.startswith("k="): params["k"] = int(w.split("=")[1])
+        
+        return PLangSpec(problem_class=pc, params=params, raw_text=text)
+
+# ============================================
+# 15. PROBLEM GRAPH
+# ============================================
+
+@dataclass
+class PGNode:
+    spec: PLangSpec
+    unified: UnifiedField
+    codex: Dict[str, Any]
+    edges: List[int] = None
+
+class ProblemGraph:
+    def __init__(self):
+        self.nodes: List[PGNode] = []
+    
+    def add(self, spec: PLangSpec, unified: UnifiedField, codex: Dict[str, Any]) -> int:
+        node = PGNode(spec=spec, unified=unified, codex=codex, edges=[])
+        self.nodes.append(node)
+        return len(self.nodes) - 1
+    
+    def connect(self, a: int, b: int):
+        self.nodes[a].edges.append(b)
+        self.nodes[b].edges.append(a)
+    
+    def summary(self) -> Dict[str, Any]:
+        return {"nodes": len(self.nodes), "edges": sum(len(n.edges) for n in self.nodes)}
+
+# ============================================
+# 16. STRUCTURAL DYNAMICS GRAPH
+# ============================================
+
+@dataclass
+class SDGEvent:
+    event_type: str
+    data: Dict[str, Any]
+
+@dataclass
+class SDGNode:
+    unified: UnifiedField
+    codex: Dict[str, Any]
+    events: List[SDGEvent]
+
+class StructuralDynamicsGraph:
+    def __init__(self):
+        self.nodes: List[SDGNode] = []
+        self.edges: List[List[int]] = []
+    
+    def add(self, unified: UnifiedField, codex: Dict[str, Any]) -> int:
+        node = SDGNode(unified=unified, codex=codex, events=[])
+        self.nodes.append(node)
+        self.edges.append([])
+        return len(self.nodes) - 1
+    
+    def connect(self, a: int, b: int):
+        self.edges[a].append(b)
+        self.edges[b].append(a)
+    
+    def apply_event(self, idx: int, event: SDGEvent):
+        self.nodes[idx].events.append(event)
+    
+    def summary(self) -> Dict[str, Any]:
+        return {
+            "nodes": len(self.nodes),
+            "edges": sum(len(e) for e in self.edges),
+            "events": sum(len(n.events) for n in self.nodes)
+        }
+
+# ============================================
+# 17. SOLUTION EXTRACTION ENGINE
+# ============================================
+
+@dataclass
+class Solution:
+    node_id: int
+    invariants: Dict[str, Any]
+    stable: bool
+    summary: Dict[str, Any]
+
+class SolutionExtractionEngine:
+    def extract_invariants(self, unified: UnifiedField, codex: Dict[str, Any]) -> Dict[str, Any]:
+        inv = {}
+        ms = codex.get("metric_signature", {})
+        inv["lorentzian"] = ms.get("valid_lorentzian", False)
+        cb = codex.get("curvature_bounds", {})
+        inv["curvature_bounded"] = cb.get("bounded", True)
+        cc = codex.get("causal_consistency", {})
+        inv["ctc_free"] = not cc.get("ctc_admissible", False)
+        gp = codex.get("gauge_presence", {})
+        inv["has_gauge"] = gp.get("has_gauge", False)
+        return inv
+    
+    def is_stable(self, invariants: Dict[str, Any]) -> bool:
+        return all(invariants.values())
+    
+    def summarize(self, unified: UnifiedField, invariants: Dict[str, Any]) -> Dict[str, Any]:
+        return {"metric_shape": unified.metric.shape, "invariants": invariants}
+    
+    def extract(self, idx: int, sdg: StructuralDynamicsGraph) -> Solution:
+        node = sdg.nodes[idx]
+        inv = self.extract_invariants(node.unified, node.codex)
+        stable = self.is_stable(inv)
+        return Solution(node_id=idx, invariants=inv, stable=stable, summary=self.summarize(node.unified, inv))
+
+# ============================================
+# 18. PERSONA KERNEL
+# ============================================
+
+@dataclass
+class PersonaState:
+    spec: Optional[PLangSpec] = None
+    structural: Optional[StructuralState] = None
+    unified: Optional[UnifiedField] = None
+    solution: Optional[Dict[str, Any]] = None
+
+class PersonaKernel:
+    def __init__(self, api: 'SpacetimeAPI', pg: ProblemGraph, sdg: StructuralDynamicsGraph):
+        self.api = api
+        self.pg = pg
+        self.sdg = sdg
+        self.state = PersonaState()
+        self.see = SolutionExtractionEngine()
+    
+    def process(self, text: str, **kwargs) -> Dict[str, Any]:
+        parser = PLangParser()
+        spec = parser.parse(text)
+        
+        # Solve structural problem
+        structural = self.api.engine.solve_structural_problem(spec.problem_class, **kwargs, **spec.params)
+        
+        # Build unified state
+        builder = StructuralStateBuilder()
+        state = builder.build(
+            metric=self.api.metric(**kwargs),
+            curvature=structural if isinstance(structural, CurvatureField) else None,
+            modes=structural if isinstance(structural, list) and all(isinstance(m, FieldMode) for m in structural) else None,
+            causal=structural if isinstance(structural, CausalStructure) else None,
+            interaction=structural if isinstance(structural, InteractionField) else None,
+            pde_history=structural if isinstance(structural, list) and all(isinstance(m, np.ndarray) for m in structural) else None
+        )
+        
+        # Handle gauge if requested
+        gauge = None
+        if "gauge" in text.lower() or "u1" in text.lower() or "su" in text.lower():
+            group = "U1"
+            if "su2" in text.lower(): group = "SU2"
+            if "su3" in text.lower(): group = "SU3"
+            metric_field = self.api.metric(**kwargs)
+            gauge = self.api.gauge(metric_field=metric_field, group=group)
+        
+        # Unify
+        ue = UnificationEngine()
+        unified = ue.unify(state, gauge=gauge)
+        
+        # Codex evaluation
+        codex = self.api.codex()
+        codex_results = codex.evaluate(unified)
+        
+        # Add to graphs
+        pg_id = self.pg.add(spec, unified, codex_results)
+        sdg_id = self.sdg.add(unified, codex_results)
+        self.sdg.apply_event(sdg_id, SDGEvent("create", {"spec": spec.raw_text}))
+        
+        # Extract solution
+        sol = self.see.extract(sdg_id, self.sdg)
+        
+        # Update persona state
+        self.state.spec = spec
+        self.state.structural = state
+        self.state.unified = unified
+        self.state.solution = sol.summary
+        
+        return {
+            "pg_id": pg_id,
+            "sdg_id": sdg_id,
+            "solution": sol.summary,
+            "stable": sol.stable,
+            "codex": codex_results
+        }
+
+# ============================================
+# 19. SPACETIME API
+# ============================================
+
+class SpacetimeAPI:
+    def __init__(self, engine: SpacetimeEngine):
+        self.engine = engine
+    
+    def metric(self, **kwargs) -> np.ndarray:
+        grid_x = kwargs.get("grid_x", np.linspace(-1, 1, 128))
+        grid_y = kwargs.get("grid_y", np.linspace(-1, 1, 128))
+        t = kwargs.get("t", 0.0)
+        return self.engine.generate_metric_field(grid_x, grid_y, t)
+    
+    def field(self, **kwargs):
+        metric = self.metric(**kwargs)
+        freq = kwargs.get("freq", 1.0)
+        return self.engine.generate_field_mode(metric, freq)
+    
+    def curvature(self, **kwargs):
+        metric = self.metric(**kwargs)
+        grid_x = kwargs.get("grid_x", np.linspace(-1, 1, 128))
+        grid_y = kwargs.get("grid_y", np.linspace(-1, 1, 128))
+        return self.engine.compute_scalar_curvature(metric, grid_x, grid_y)
+    
+    def causal(self, **kwargs):
+        metric = self.metric(**kwargs)
+        grid_x = kwargs.get("grid_x", np.linspace(-1, 1, 128))
+        grid_y = kwargs.get("grid_y", np.linspace(-1, 1, 128))
+        return self.engine.solve_structural_problem(ProblemClass.CAUSAL_STRUCTURE, grid_x=grid_x, grid_y=grid_y)
+    
+    def modes(self, **kwargs):
+        grid_x = kwargs.get("grid_x", np.linspace(-1, 1, 128))
+        grid_y = kwargs.get("grid_y", np.linspace(-1, 1, 128))
+        k = kwargs.get("k", 6)
+        return self.engine.generate_eigenmodes(grid_x, grid_y, k=k)
+    
+    def evolve(self, **kwargs):
+        grid_x = kwargs.get("grid_x", np.linspace(-1, 1, 128))
+        grid_y = kwargs.get("grid_y", np.linspace(-1, 1, 128))
+        steps = kwargs.get("steps", 10)
+        dt = kwargs.get("dt", 0.05)
+        freq = kwargs.get("freq", 1.0)
+        metric = self.metric(grid_x=grid_x, grid_y=grid_y)
+        initial = self.engine.generate_field_mode(metric, freq).amplitude.real
+        return self.engine.evolve_wave_equation(initial, grid_x, grid_y, steps, dt)
+    
+    def interference(self, **kwargs):
+        grid_x = kwargs.get("grid_x", np.linspace(-1, 1, 128))
+        grid_y = kwargs.get("grid_y", np.linspace(-1, 1, 128))
+        freq = kwargs.get("freq", 1.0)
+        metric = self.metric(grid_x=grid_x, grid_y=grid_y)
+        mode1 = self.engine.generate_field_mode(metric, freq)
+        mode2 = self.engine.generate_field_mode(metric, freq * 1.5)
+        return InteractionField(amplitude=mode1.amplitude + mode2.amplitude, metric=metric)
+    
+    def gauge(self, **kwargs):
+        metric_field = kwargs.get("metric_field", self.metric(**kwargs))
+        group = kwargs.get("group", "U1")
+        strength = kwargs.get("strength", 0.1)
+        if group.upper() == "U1":
+            return generate_u1_field(metric_field, strength)
+        if group.upper() == "SU2":
+            return generate_su2_field(metric_field, strength)
+        if group.upper() == "SU3":
+            return generate_su3_field(metric_field, strength)
+        raise ValueError(f"Unknown gauge group: {group}")
+    
+    def renormalize(self, state: StructuralState, **kwargs):
+        steps = kwargs.get("steps", 5)
+        step_factor = kwargs.get("step_factor", 1.1)
+        renorm = Renormalizer(step_factor=step_factor)
+        return renorm.run(state, steps=steps)
+    
+    def collapse(self, obj: Any, **kwargs):
+        mode = kwargs.get("mode", "stabilize")
+        op = CollapseOperator(mode=mode)
+        return op.collapse(obj)
+    
+    def codex(self) -> StructuralCodex:
+        codex = StructuralCodex()
+        codex.add_rule(CodexRule("metric_signature", rule_metric_signature))
+        codex.add_rule(CodexRule("curvature_bounds", rule_curvature_bounds))
+        codex.add_rule(CodexRule("causal_consistency", rule_causal_consistency))
+        codex.add_rule(CodexRule("gauge_presence", rule_gauge_presence))
+        return codex
+    
+    def evaluate(self, unified: UnifiedField) -> Dict[str, Any]:
+        return self.codex().evaluate(unified)
+
+# ============================================
+# 20. UNIVERSAL STRUCTURAL COMPUTER
+# ============================================
+
+class UniversalStructuralComputer:
+    """Complete integrated system."""
+    
+    def __init__(self):
+        atom = CurvatureAtom(params={"kappa": 0.1, "lambda": -0.05, "sigma": 0.02})
+        self.engine = SpacetimeEngine(curvature_atom=atom)
+        self.api = SpacetimeAPI(self.engine)
+        self.pg = ProblemGraph()
+        self.sdg = StructuralDynamicsGraph()
+        self.pk = PersonaKernel(self.api, self.pg, self.sdg)
+        self.see = SolutionExtractionEngine()
+    
+    def run(self, text: str, **kwargs) -> Dict[str, Any]:
+        return self.pk.process(text, **kwargs)
+    
+    def solve(self, text: str) -> Dict[str, Any]:
+        idx = len(self.sdg.nodes) - 1
+        sol = self.see.extract(idx, self.sdg)
+        return sol.summary
+
+# ============================================
+# 21. SYMBOLIC PERSONA COMPUTER (FINAL)
+# ============================================
+
+class SymbolicPersonaComputer:
+    """The complete symbolic interface."""
+    
+    def __init__(self):
+        self.usc = UniversalStructuralComputer()
+    
+    def interact(self, text: str, **kwargs) -> Dict[str, Any]:
+        return self.usc.run(text, **kwargs)
+    
+    def solve(self, text: str) -> Dict[str, Any]:
+        return self.usc.solve(text)
+
+# ============================================
+# 22. USAGE EXAMPLE
+# ============================================
+
+if __name__ == "__main__":
+    persona = SymbolicPersonaComputer()
+    grid_x = np.linspace(-1, 1, 128)
+    grid_y = np.linspace(-1, 1, 128)
+    
+    # Example interactions
+    out1 = persona.interact("show me the curvature", grid_x=grid_x, grid_y=grid_y)
+    print("Curvature:", out1)
+    
+    out2 = persona.interact("compute modes with k=8 and gauge SU2", grid_x=grid_x, grid_y=grid_y)
+    print("Modes with gauge:", out2)
+    
+    out3 = persona.interact("unify everything with RG flow", grid_x=grid_x, grid_y=grid_y)
+    print("Unified:", out3)
+
