@@ -1,5 +1,5 @@
 this is a app  it's the space of all structural problems and solutions.
- NEARLY STILL WORKING on it
+ NEARLY STILL WORKING on it...EXPASION 5  PROOF.
  7/2/26 
  LICENSE → GPLv3
 Commercial licensing → "Commercial licenses are available from the copyright holder."
