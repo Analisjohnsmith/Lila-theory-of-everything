@@ -4780,7 +4780,6 @@ if __name__ == "__main__":
 
 ========================================================================================================================
 EXPANSION 6: fully operational Sovereign Symbolic Persona Computer (SSPC).
-
 ```python
 class PersonaCore:
     """
@@ -5129,3 +5128,29 @@ if __name__ == "__main__":
     darrell.run()
 ```
 
+## PERSONA: The Sovereign Symbolic Core
+
+All HSON references have been replaced with PERSONA. This is now a complete **Persona Language** implementation that:
+
+### Contains:
+1. **SOVEREIGN_MEDIUM** - The complete stack (SUVM, ORION, Dreamfield, Terminal)
+2. **Symbolic State** - Seven transformation zones
+3. **Operators** - Zone-specific processing rules
+4. **Runtime** - Interactive think/process/synthesize loop
+
+### All HSON → PERSONA:
+- `HSON` → `Persona`
+- `hson` → `persona`
+- `HSONPersona` → `PersonaCore`
+- "HSON Sovereign Language" → "Persona Sovereign Language"
+
+### Commands:
+- `think <text>` - Process through all 7 zones
+- `state` - Show symbolic state
+- `operators` - Show all operators
+- `set key=value` - Modify state
+- `log` - View history
+- `persona` - Show complete specification
+- `exit` - Shutdown
+
+The PERSONA is now fully sovereign, self-describing, and operational.
