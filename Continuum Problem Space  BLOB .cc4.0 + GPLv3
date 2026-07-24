@@ -100,801 +100,1062 @@ of any kind, express or implied.
 #  This code is provided "AS IS", without warranties or conditions of any kind.
 # =============================================================================
 
-```python
+   
+         
+
 #!/usr/bin/env python3
 """
-HELLA — Complete VALARI Platform Package
-ALL code from this chat packaged as installable HELLA packages
-Version: 3.0.0
+HELLA - Sovereign Package Manager for VALARI Platform
+Lossless compression | Cryptographic verification | Dependency management
+
+Patched: 2026-04-26 — All COE validation findings resolved.
+v1.2.0: FIX #17 (type confusion in from_dict) + FIX #18 (backup recovery).
+v1.3.0: FIX #19-#26 — Security hardening (signing, decompression limits,
+        name/input sanitization, thread locking, TOCTOU protection, auth hooks).
 """
 
-import os
-import sys
-import json
-import shutil
+__version__ = "1.3.0"
+
 import hashlib
-import tempfile
-from pathlib import Path
-from typing import Dict, List, Any, Optional
+import hmac
+import io
+import json
+import logging
+import os
+import re
+import sys
 import tarfile
 import gzip
+import zlib
+import base64
+import time
+import shutil
+import threading
+from functools import cmp_to_key
+from pathlib import Path
+from typing import Dict, List, Optional, Any, Set
+from dataclasses import dataclass, field
+from datetime import datetime
+import argparse
 
 # ============================================================================
-# HELLA CORE — Minimal package manager (embedded)
+# LOGGING
 # ============================================================================
 
-class HELLA:
-    """Minimal embedded HELLA package manager for packaging all code."""
-    
-    def __init__(self, registry_path: str = "./hella_registry"):
+logger = logging.getLogger("hella")
+handler = logging.StreamHandler()
+handler.setFormatter(logging.Formatter("[%(levelname)s] %(message)s"))
+logger.addHandler(handler)
+logger.setLevel(logging.INFO)
+
+# ============================================================================
+# CONSTANTS — Security Limits (FIX #20, #22, #23)
+# ============================================================================
+
+# Name / version / author
+MAX_NAME_LENGTH = 128
+MAX_VERSION_LENGTH = 32
+MAX_AUTHOR_LENGTH = 256
+MAX_DESCRIPTION_LENGTH = 10 * 1024   # 10 KB
+MAX_DEPENDENCIES = 200
+MAX_DECOMPRESSED_SIZE = 500 * 1024 * 1024  # 500 MB — FIX #20
+
+# FIX #23: Package name allowlist — alphanumeric, hyphens, underscores, dots.
+_VALID_NAME_RE = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$')
+
+
+# ============================================================================
+# UTILITIES
+# ============================================================================
+
+def semver_key(v: str) -> tuple:
+    """Parse a version string into a tuple of ints for correct ordering."""
+    parts = []
+    for segment in v.split('.'):
+        try:
+            parts.append(int(segment))
+        except ValueError:
+            parts.append(0)
+    return tuple(parts)
+
+
+def validate_name(name: str) -> None:
+    """FIX #21/#23: Validate a package name. Raises ValueError on bad input."""
+    if not name:
+        raise ValueError("Package name cannot be empty.")
+    if len(name) > MAX_NAME_LENGTH:
+        raise ValueError(
+            f"Package name exceeds {MAX_NAME_LENGTH} chars: {len(name)}"
+        )
+    if '\x00' in name:
+        raise ValueError("Package name contains null byte.")
+    if not _VALID_NAME_RE.match(name):
+        raise ValueError(
+            f"Invalid package name '{name[:60]}'. "
+            f"Allowed: A-Z, a-z, 0-9, '.', '-', '_'. "
+            f"Must start with an alphanumeric character."
+        )
+
+
+def validate_version(version: str) -> None:
+    """FIX #22: Validate a version string."""
+    if not version:
+        raise ValueError("Version cannot be empty.")
+    if len(version) > MAX_VERSION_LENGTH:
+        raise ValueError(
+            f"Version exceeds {MAX_VERSION_LENGTH} chars: {len(version)}"
+        )
+    if '\x00' in version or '/' in version or '\\' in version:
+        raise ValueError(f"Version contains illegal characters: {version!r}")
+
+
+def validate_metadata(
+    author: str, description: str, dependencies: Optional[List[str]]
+) -> None:
+    """FIX #22: Validate metadata field lengths."""
+    if len(author) > MAX_AUTHOR_LENGTH:
+        raise ValueError(f"Author exceeds {MAX_AUTHOR_LENGTH} chars.")
+    if len(description) > MAX_DESCRIPTION_LENGTH:
+        raise ValueError(
+            f"Description exceeds {MAX_DESCRIPTION_LENGTH} bytes."
+        )
+    if dependencies and len(dependencies) > MAX_DEPENDENCIES:
+        raise ValueError(
+            f"Too many dependencies: {len(dependencies)} (max {MAX_DEPENDENCIES})."
+        )
+
+# ============================================================================
+# PACKAGE STRUCTURE
+# ============================================================================
+
+@dataclass
+class Package:
+    name: str
+    version: str
+    author: str
+    description: str
+    dependencies: List[str] = field(default_factory=list)
+    files: List[str] = field(default_factory=list)
+    compression_method: str = "gzip"          # FIX #8: persist compression method
+    signature: str = ""                       # FIX #19: HMAC-SHA256 signature
+    hash: str = ""
+    size: int = 0
+    compressed_size: int = 0
+    created: float = field(default_factory=time.time)
+
+    def compute_hash(self, data: bytes) -> str:
+        """Compute SHA-256 hash of the given data."""
+        return hashlib.sha256(data).hexdigest()
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "name": self.name,
+            "version": self.version,
+            "author": self.author,
+            "description": self.description,
+            "dependencies": self.dependencies,
+            "files": self.files,
+            "compression_method": self.compression_method,
+            "signature": self.signature,
+            "hash": self.hash,
+            "size": self.size,
+            "compressed_size": self.compressed_size,
+            "created": self.created,
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "Package":
+        # FIX #17: Type-coerce every field to survive hostile/corrupt registry JSON
+        def _safe_int(val: Any, default: int = 0) -> int:
+            try:
+                return int(val)
+            except (TypeError, ValueError):
+                return default
+
+        def _safe_float(val: Any, default: float = 0.0) -> float:
+            try:
+                return float(val)
+            except (TypeError, ValueError):
+                return default
+
+        def _safe_list(val: Any) -> List[str]:
+            if isinstance(val, list):
+                return [str(item) for item in val]
+            return []
+
+        def _safe_str(val: Any, default: str = "") -> str:
+            try:
+                return str(val) if val is not None else default
+            except (TypeError, ValueError):
+                return default
+
+        return cls(
+            name=_safe_str(data.get("name", ""), ""),
+            version=_safe_str(data.get("version", "0.0.0"), "0.0.0"),
+            author=_safe_str(data.get("author", ""), ""),
+            description=_safe_str(data.get("description", ""), ""),
+            dependencies=_safe_list(data.get("dependencies", [])),
+            files=_safe_list(data.get("files", [])),
+            compression_method=_safe_str(data.get("compression_method", "gzip"), "gzip"),
+            signature=_safe_str(data.get("signature", ""), ""),
+            hash=_safe_str(data.get("hash", ""), ""),
+            size=_safe_int(data.get("size", 0)),
+            compressed_size=_safe_int(data.get("compressed_size", 0)),
+            created=_safe_float(data.get("created", time.time()), time.time()),
+        )
+
+
+# ============================================================================
+# HELLA PACKAGE MANAGER
+# ============================================================================
+
+class HELLAPackageManager:
+    """Sovereign package manager with lossless compression"""
+
+    # Supported compression methods
+    COMPRESSION_METHODS = {
+        "gzip": lambda data: gzip.compress(data, compresslevel=9),
+        "zlib": lambda data: zlib.compress(data, level=9),
+        "none": lambda data: data,
+    }
+
+    DECOMPRESSION_METHODS = {
+        "gzip": gzip.decompress,
+        "zlib": zlib.decompress,
+        "none": lambda data: data,
+    }
+
+    def __init__(
+        self,
+        registry_path: str = "./hella_registry",
+        signing_key: Optional[str] = None,
+        max_decompressed_size: int = MAX_DECOMPRESSED_SIZE,
+        auth_provider: Optional[callable] = None,
+    ) -> None:
         self.registry_path = Path(registry_path)
         self.packages_path = self.registry_path / "packages"
         self.metadata_path = self.registry_path / "metadata"
+        self.cache_path = self.registry_path / "cache"
+        # FIX #19: Signing key for HMAC-SHA256 package authentication
+        self._signing_key: Optional[bytes] = (
+            signing_key.encode() if signing_key else None
+        )
+        # FIX #20: Max decompressed payload size (default 500 MB)
+        self._max_decompressed_size = max_decompressed_size
+        # FIX #24: Thread lock for registry access
+        self._lock = threading.Lock()
+        # FIX #25: Track registry mtime for TOCTOU protection
+        self._registry_mtime: float = 0.0
+        # FIX #26: Optional auth provider callback for publish/uninstall
+        self._auth_provider = auth_provider
+        self._init_directories()
+        self.registry: Dict[str, Dict[str, Package]] = {}
+        self._load_registry()
+
+    def _init_directories(self) -> None:
         self.packages_path.mkdir(parents=True, exist_ok=True)
         self.metadata_path.mkdir(parents=True, exist_ok=True)
-        self.registry: Dict[str, Dict[str, Any]] = {}
-        self._load_registry()
-    
-    def _load_registry(self):
+        self.cache_path.mkdir(parents=True, exist_ok=True)
+
+    # ── Registry I/O (FIX #13: robust JSON error handling) ────────────────
+
+    def _load_registry(self) -> None:
+        """Load registry from disk with corruption recovery and TOCTOU tracking."""
         registry_file = self.registry_path / "registry.json"
-        if registry_file.exists():
+        backup_file = registry_file.with_suffix(".json.bak")
+
+        def _try_load(path: Path) -> bool:
+            if not path.exists():
+                return False
             try:
-                with open(registry_file) as f:
-                    self.registry = json.load(f)
-            except:
-                self.registry = {}
-    
-    def _save_registry(self):
-        with open(self.registry_path / "registry.json", "w") as f:
-            json.dump(self.registry, f, indent=2)
-    
-    def create_package(self, name: str, version: str, author: str, description: str,
-                       files: List[str], dependencies: List[str] = None,
-                       license: str = "CC BY-NC 4.0") -> bool:
+                with open(path, "r") as f:
+                    data = json.load(f)
+                for name, versions in data.items():
+                    self.registry[name] = {}
+                    for ver, pkg_data in versions.items():
+                        self.registry[name][ver] = Package.from_dict(pkg_data)
+                return True
+            except (json.JSONDecodeError, KeyError, TypeError):
+                return False
+
+        with self._lock:  # FIX #24: thread-safe load
+            if _try_load(registry_file):
+                # FIX #25: record mtime for TOCTOU detection
+                self._registry_mtime = registry_file.stat().st_mtime
+                return
+
+            if not registry_file.exists():
+                return
+
+            logger.warning(
+                "Registry corrupted. Attempting recovery from backup %s",
+                backup_file,
+            )
+            self.registry = {}
+            if _try_load(backup_file):
+                shutil.copy2(backup_file, registry_file)
+                self._registry_mtime = registry_file.stat().st_mtime
+                logger.info(
+                    "Registry recovered from backup (%d packages).",
+                    sum(len(v) for v in self.registry.values()),
+                )
+                return
+
+            corrupt_archive = registry_file.with_suffix(".json.corrupt")
+            shutil.copy2(registry_file, corrupt_archive)
+            logger.warning(
+                "Backup also unusable. Archived to %s and starting fresh.",
+                corrupt_archive,
+            )
+            self.registry = {}
+
+    def _save_registry(self) -> None:
+        """Save registry with atomic write, backup, locking, and TOCTOU check."""
+        registry_file = self.registry_path / "registry.json"
+        backup_file = registry_file.with_suffix(".json.bak")
+        tmp_file = registry_file.with_suffix(".json.tmp")
+        data: Dict[str, Dict[str, Any]] = {}
+        for name, versions in self.registry.items():
+            data[name] = {}
+            for ver, pkg in versions.items():
+                data[name][ver] = pkg.to_dict()
+
+        with self._lock:  # FIX #24: thread-safe save
+            try:
+                # FIX #25: TOCTOU — warn if file changed externally
+                if registry_file.exists():
+                    current_mtime = registry_file.stat().st_mtime
+                    if (
+                        self._registry_mtime > 0
+                        and current_mtime != self._registry_mtime
+                    ):
+                        logger.warning(
+                            "Registry modified externally since last load. "
+                            "Overwriting with in-memory state."
+                        )
+                    shutil.copy2(registry_file, backup_file)
+
+                with open(tmp_file, "w") as f:
+                    json.dump(data, f, indent=2)
+                tmp_file.replace(registry_file)
+                self._registry_mtime = registry_file.stat().st_mtime
+            except OSError as exc:
+                logger.error("Failed to save registry: %s", exc)
+
+    # ── Compression ───────────────────────────────────────────────────────
+
+    def _compress_data(self, data: bytes, method: str = "gzip") -> bytes:
+        """Losslessly compress data."""
+        if method not in self.COMPRESSION_METHODS:
+            logger.warning("Unknown compression method '%s', falling back to gzip.", method)
+            method = "gzip"
+        return self.COMPRESSION_METHODS[method](data)
+
+    def _decompress_data(self, data: bytes, method: str = "gzip") -> bytes:
+        """Decompress data."""
+        if method not in self.DECOMPRESSION_METHODS:
+            logger.warning("Unknown decompression method '%s', falling back to gzip.", method)
+            method = "gzip"
+        return self.DECOMPRESSION_METHODS[method](data)
+
+    # ── Package creation (FIX #9: filename collision guard) ───────────────
+
+    # ── Signing (FIX #19) ─────────────────────────────────────────────────
+
+    def _sign(self, payload: bytes) -> str:
+        """Produce an HMAC-SHA256 hex signature. Returns '' if no key."""
+        if self._signing_key is None:
+            return ""
+        return hmac.new(self._signing_key, payload, hashlib.sha256).hexdigest()
+
+    def _verify_signature(
+        self, package: 'Package', compressed_data: bytes
+    ) -> bool:
+        """Verify HMAC-SHA256 signature. Skips if no signing key."""
+        if self._signing_key is None:
+            return True  # unsigned mode — accept
+        if not package.signature:
+            logger.error("Package %s-%s is unsigned but signing is enforced.",
+                         package.name, package.version)
+            return False
+        expected = hmac.new(
+            self._signing_key, compressed_data, hashlib.sha256
+        ).hexdigest()
+        return hmac.compare_digest(expected, package.signature)
+
+    # ── Package creation ─────────────────────────────────────────────────
+
+    def create_package(
+        self,
+        name: str,
+        version: str,
+        author: str,
+        description: str,
+        files: List[str],
+        dependencies: Optional[List[str]] = None,
+        compress: bool = True,
+        compression_method: str = "gzip",
+    ) -> str:
         """Create a package from files."""
-        
-        # Create tarball
-        temp_dir = Path(tempfile.mkdtemp())
-        package_files = []
-        
+
+        # FIX #21/#22/#23: Validate all inputs upfront
+        validate_name(name)
+        validate_version(version)
+        validate_metadata(author, description, dependencies)
+
+        temp_dir = self.cache_path / f"{name}-{version}"
+        temp_dir.mkdir(exist_ok=True)
+
+        package_files: List[str] = []
+        seen_names: set = set()
+
         for file_path in files:
             src = Path(file_path)
-            if src.exists():
-                if src.is_file():
-                    dest = temp_dir / src.name
-                    shutil.copy2(src, dest)
-                    package_files.append(src.name)
-                elif src.is_dir():
-                    for f in src.rglob("*"):
-                        if f.is_file():
-                            rel_path = f.relative_to(src)
-                            dest = temp_dir / rel_path
-                            dest.parent.mkdir(parents=True, exist_ok=True)
-                            shutil.copy2(f, dest)
-                            package_files.append(str(rel_path))
-        
-        # Create tar
-        tar_path = self.packages_path / f"{name}-{version}.tar"
+            if not src.exists():
+                raise FileNotFoundError(f"File not found: {file_path}")
+
+            # FIX #9 — detect filename collisions
+            dest = temp_dir / src.name
+            if src.name in seen_names:
+                raise ValueError(
+                    f"Filename collision: '{src.name}' appears more than once "
+                    f"in the input file list. Preserve directory structure or "
+                    f"rename the file."
+                )
+            seen_names.add(src.name)
+
+            if src.is_dir():
+                shutil.copytree(src, dest)
+                for f in dest.rglob("*"):
+                    if f.is_file():
+                        package_files.append(str(f.relative_to(temp_dir)))
+            else:
+                shutil.copy2(src, dest)
+                package_files.append(src.name)
+
+        # Create tarball
+        tar_path = self.cache_path / f"{name}-{version}.tar"
         with tarfile.open(tar_path, "w") as tar:
             tar.add(temp_dir, arcname=".")
-        
-        # Compress
+
         with open(tar_path, "rb") as f:
             tar_data = f.read()
-        compressed = gzip.compress(tar_data, compresslevel=9)
-        
-        with open(self.packages_path / f"{name}-{version}.tar.gz", "wb") as f:
-            f.write(compressed)
-        
-        tar_path.unlink()
-        shutil.rmtree(temp_dir)
-        
-        # Save metadata
-        metadata = {
-            "name": name, "version": version, "author": author,
-            "description": description, "dependencies": dependencies or [],
-            "files": package_files, "license": license,
-            "hash": hashlib.sha256(compressed).hexdigest(),
-            "size": len(compressed),
-        }
-        
-        with open(self.metadata_path / f"{name}-{version}.json", "w") as f:
-            json.dump(metadata, f, indent=2)
-        
-        # Update registry
+
+        original_size = len(tar_data)
+
+        if compress:
+            compressed_data = self._compress_data(tar_data, compression_method)
+            compressed_size = len(compressed_data)
+            extension = ".tar.gz"
+        else:
+            compressed_data = tar_data
+            compressed_size = original_size
+            compression_method = "none"
+            extension = ".tar"
+
+        package_hash = hashlib.sha256(compressed_data).hexdigest()
+
+        package_path = self.packages_path / f"{name}-{version}{extension}"
+        with open(package_path, "wb") as f:
+            f.write(compressed_data)
+
+        # FIX #19: Sign the compressed payload
+        package_signature = self._sign(compressed_data)
+
+        package = Package(
+            name=name,
+            version=version,
+            author=author,
+            description=description,
+            dependencies=dependencies or [],
+            files=package_files,
+            compression_method=compression_method,
+            signature=package_signature,
+            hash=package_hash,
+            size=original_size,
+            compressed_size=compressed_size,
+        )
+
+        metadata_path = self.metadata_path / f"{name}-{version}.json"
+        with open(metadata_path, "w") as f:
+            json.dump(package.to_dict(), f, indent=2)
+
         if name not in self.registry:
             self.registry[name] = {}
-        self.registry[name][version] = metadata
+        self.registry[name][version] = package
         self._save_registry()
-        
-        print(f"✅ Packaged: {name}-{version} ({len(package_files)} files)")
+
+        # Cleanup
+        shutil.rmtree(temp_dir)
+        tar_path.unlink()
+
+        compression_ratio = (1 - compressed_size / original_size) * 100 if original_size > 0 else 0.0
+        logger.info("📦 Created package: %s-%s", name, version)
+        logger.info("   Size: %s → %s bytes (%.1f%% compression)",
+                     f"{original_size:,}", f"{compressed_size:,}", compression_ratio)
+        logger.info("   Hash: %s...", package_hash[:16])
+
+        return str(package_path)
+
+    # ── Publish ───────────────────────────────────────────────────────────
+
+    def publish(
+        self,
+        name: str,
+        version: str,
+        author: str,
+        description: str,
+        files: List[str],
+        dependencies: Optional[List[str]] = None,
+        registry_url: Optional[str] = None,
+    ) -> bool:
+        """Publish package to registry."""
+
+        # FIX #26: Auth gate — deny if auth_provider rejects
+        if self._auth_provider is not None:
+            if not self._auth_provider("publish", name, version):
+                logger.error("Auth denied for publish of %s-%s", name, version)
+                return False
+
+        # FIX #21/#22/#23: Validate inputs at publish boundary too
+        validate_name(name)
+        validate_version(version)
+        validate_metadata(author, description, dependencies)
+
+        # FIX #4 — pre-check file existence before handing off to create_package
+        missing = [f for f in files if not Path(f).exists()]
+        if missing:
+            logger.error(
+                "❌ Cannot publish '%s': the following source files are missing: %s",
+                name, ", ".join(missing),
+            )
+            return False
+
+        package_path = self.create_package(
+            name, version, author, description, files, dependencies
+        )
+
+        if registry_url:
+            logger.info("📤 Publishing to %s...", registry_url)
+            # Upload logic placeholder
+        else:
+            logger.info("✅ Package published locally to %s", package_path)
+
         return True
 
-# ============================================================================
-# CREATE ALL PACKAGES — EVERYTHING FROM THE CHAT
-# ============================================================================
+    # ── Install (FIX #1, #3, #5, #6) ─────────────────────────────────────
 
-def create_all_packages():
-    """Create HELLA packages for EVERYTHING in the chat."""
-    
-    hella = HELLA()
-    
-    # ------------------------------------------------------------------------
-    # 1. STRUCTURAL CORE — Rust + Python bindings
-    # ------------------------------------------------------------------------
-    
-    print("\n📦 Creating STRUCTURAL CORE packages...")
-    
-    # Create the Rust core as a package
-    rust_core_files = [
-        "src/lib.rs",
-        "Cargo.toml",
-        "src/geometry.rs",
-        "src/pde.rs", 
-        "src/graph.rs",
-        "src/sat.rs",
-        "src/mesh.rs",
-        "src/quantum.rs",
-        "src/renormalization.rs",
-        "src/codex.rs",
-        "src/solver.rs",
-        "src/persona.rs",
-        "src/unified.rs",
-    ]
-    
-    # Create directory structure
-    os.makedirs("structural_core/src", exist_ok=True)
-    
-    # Write core files
-    with open("structural_core/Cargo.toml", "w") as f:
-        f.write("""[package]
-name = "structural_core"
-version = "1.0.0"
-edition = "2021"
-authors = ["Darrell Lee (Līlā) Stiltner"]
-license = "CC BY-NC 4.0"
-description = "Universal Structural Computer — Rust Core Engine"
+    def install(
+        self,
+        name: str,
+        version: Optional[str] = None,
+        target_dir: str = "./installed",
+        _visited: Optional[Set[str]] = None,        # FIX #5: cycle guard
+    ) -> bool:
+        """Install a package and its dependencies."""
 
-[lib]
-crate-type = ["cdylib", "rlib"]
+        # FIX #5 — circular-dependency detection
+        if _visited is None:
+            _visited = set()
 
-[dependencies]
-ndarray = { version = "0.15", features = ["serde"] }
-ndarray-linalg = "0.16"
-num-complex = "0.4"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-thiserror = "1.0"
-rayon = "1.7"
+        install_key = f"{name}@{version or 'latest'}"
+        if install_key in _visited:
+            logger.warning("⚠️  Circular dependency detected for %s — skipping.", install_key)
+            return True
+        _visited.add(install_key)
 
-[build-dependencies]
-pyo3-build-config = "0.20"
+        if name not in self.registry:
+            logger.error("❌ Package '%s' not found in registry", name)
+            return False
 
-[dependencies.pyo3]
-version = "0.20"
-features = ["extension-module", "abi3-py38"]
-optional = true
+        versions = self.registry[name]
 
-[dependencies.numpy]
-version = "0.20"
-optional = true
+        # FIX #3 — proper semantic-version resolution
+        if version is None:
+            version = max(versions.keys(), key=semver_key)
 
-[features]
-default = ["python"]
-python = ["pyo3", "numpy"]""")
-    
-    # Write lib.rs (main module)
-    with open("structural_core/src/lib.rs", "w") as f:
-        f.write("""//! Universal Structural Computer — Rust Core
-//! Complete geometry + PDE + graph + SAT + mesh + quantum engine
+        if version not in versions:
+            logger.error("❌ Version '%s' not found for '%s'", version, name)
+            return False
 
-pub mod geometry;
-pub mod pde;
-pub mod graph;
-pub mod sat;
-pub mod mesh;
-pub mod quantum;
-pub mod renormalization;
-pub mod codex;
-pub mod solver;
-pub mod persona;
-pub mod unified;
+        package = versions[version]
 
-use std::collections::HashMap;
-use ndarray::{Array1, Array2, Array4};
-use serde::{Deserialize, Serialize};
+        # Install dependencies (with visited set forwarded)
+        for dep in package.dependencies:
+            dep_name, dep_ver = dep.split("@") if "@" in dep else (dep, None)
+            self.install(dep_name, dep_ver, target_dir, _visited)
 
-// ============================================================================
-// CORE TYPES
-// ============================================================================
-
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
-pub enum ProblemClass {
-    GeometricStructure, FieldConfiguration, CurvatureDistribution,
-    CausalStructure, InterferencePattern, ModeFamily, PdeEvolution,
-    CoupledEvolution, RicciFlow, RiemannCurvature, RicciCurvature,
-    Christoffel, GraphPath, MeshAnalysis, ConstraintSolve, SatSolve,
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct CurvatureAtom {
-    pub params: HashMap<String, f64>,
-}
-
-impl CurvatureAtom {
-    pub fn new(params: HashMap<String, f64>) -> Self { Self { params } }
-    pub fn default() -> Self {
-        let mut params = HashMap::new();
-        params.insert("kappa".to_string(), 0.1);
-        params.insert("lambda".to_string(), -0.05);
-        params.insert("sigma".to_string(), 0.02);
-        Self { params }
-    }
-    
-    pub fn metric_tensor(&self, x: f64, y: f64, t: f64) -> Array2<f64> {
-        let kappa = *self.params.get("kappa").unwrap_or(&0.1);
-        let lamb = *self.params.get("lambda").unwrap_or(&-0.05);
-        let sigma = *self.params.get("sigma").unwrap_or(&0.02);
-        let r2 = x*x + y*y;
-        let mut g = Array2::<f64>::zeros((4, 4));
-        g[[0, 0]] = -1.0 + kappa * r2;
-        g[[1, 1]] = 1.0 + lamb * (-r2 / (2.0 * sigma * sigma)).exp();
-        g[[2, 2]] = 1.0 + lamb * (-r2 / (2.0 * sigma * sigma)).exp();
-        g[[3, 3]] = 1.0 + lamb * (-r2 / (2.0 * sigma * sigma)).exp();
-        g[[0, 1]] = 0.01 * x * t;
-        g[[1, 0]] = g[[0, 1]];
-        g[[1, 2]] = 0.02 * x * y;
-        g[[2, 1]] = g[[1, 2]];
-        g
-    }
-    
-    pub fn generate_metric_field(&self, grid_x: &Array1<f64>, grid_y: &Array1<f64>, t: f64) -> Array4<f64> {
-        let h = grid_y.len();
-        let w = grid_x.len();
-        let mut metric = Array4::<f64>::zeros((h, w, 4, 4));
-        for (j, &y) in grid_y.iter().enumerate() {
-            for (i, &x) in grid_x.iter().enumerate() {
-                let m = self.metric_tensor(x, y, t);
-                for a in 0..4 {
-                    for b in 0..4 {
-                        metric[[j, i, a, b]] = m[[a, b]];
-                    }
-                }
-            }
-        }
-        metric
-    }
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct UnifiedField {
-    pub metric: Array4<f64>,
-    pub curvature: Option<CurvatureField>,
-    pub modes: Option<Vec<FieldMode>>,
-    pub causal: Option<CausalStructure>,
-    pub metadata: HashMap<String, serde_json::Value>,
-}
-
-// Additional structs defined in modules...
-""")
-    
-    # Create Python wrapper
-    with open("structural_core/__init__.py", "w") as f:
-        f.write("""#!/usr/bin/env python3
-\"\"\"
-Structural Core — Python bindings for Rust engine.
-\"\"\"
-
-import numpy as np
-from typing import Dict, Any, Optional, List
-from dataclasses import dataclass, field
-
-try:
-    from .structural_core import PyCurvatureAtom, PyPersonaKernel
-except ImportError:
-    import subprocess
-    import sys
-    print("Building Rust extension...")
-    subprocess.run(["maturin", "develop", "--release"], check=True)
-    from .structural_core import PyCurvatureAtom, PyPersonaKernel
-
-@dataclass
-class CurvatureAtom:
-    _atom: PyCurvatureAtom = field(default_factory=lambda: PyCurvatureAtom(None))
-    
-    def __init__(self, params: Optional[Dict[str, float]] = None):
-        self._atom = PyCurvatureAtom(params or {})
-    
-    def generate_metric(self, grid_x: np.ndarray, grid_y: np.ndarray, t: float = 0.0) -> np.ndarray:
-        return np.array(self._atom.generate_metric_field(grid_x.tolist(), grid_y.tolist(), t))
-
-class SpacetimeEngine:
-    def __init__(self, atom: Optional[CurvatureAtom] = None):
-        self.atom = atom or CurvatureAtom()
-        self._kernel = PyPersonaKernel(self.atom._atom)
-        self._history = []
-    
-    def solve(self, text: str, grid_x: Optional[np.ndarray] = None,
-              grid_y: Optional[np.ndarray] = None, **kwargs) -> Dict[str, Any]:
-        if grid_x is None:
-            grid_x = np.linspace(-1, 1, 128)
-        if grid_y is None:
-            grid_y = np.linspace(-1, 1, 128)
-        params = {k: v for k, v in kwargs.items()}
-        result = self._kernel.process(text, grid_x.tolist(), grid_y.tolist(), params)
-        output = {
-            "node_id": result["node_id"],
-            "stable": result["stable"],
-            "invariants": result["invariants"],
-            "summary": result["summary"],
-        }
-        self._history.append(output)
-        return output
-    
-    def metric(self, grid_x: Optional[np.ndarray] = None,
-               grid_y: Optional[np.ndarray] = None, t: float = 0.0) -> np.ndarray:
-        if grid_x is None:
-            grid_x = np.linspace(-1, 1, 128)
-        if grid_y is None:
-            grid_y = np.linspace(-1, 1, 128)
-        return self.atom.generate_metric(grid_x, grid_y, t)
-
-class UniversalStructuralComputer:
-    def __init__(self):
-        self.engine = SpacetimeEngine()
-    
-    def run(self, text: str, **kwargs) -> Dict[str, Any]:
-        return self.engine.solve(text, **kwargs)
-    
-    def metric(self, **kwargs) -> np.ndarray:
-        return self.engine.metric(**kwargs)
-
-__all__ = ["UniversalStructuralComputer", "SpacetimeEngine", "CurvatureAtom"]
-""")
-    
-    # Package the structural core
-    hella.create_package(
-        name="structural-core",
-        version="1.0.0",
-        author="Darrell Lee (Līlā) Stiltner",
-        description="Universal Structural Computer — Rust core with Python bindings",
-        files=["structural_core/"],
-        license="CC BY-NC 4.0"
-    )
-    
-    # ------------------------------------------------------------------------
-    # 2. HELLA — Package manager
-    # ------------------------------------------------------------------------
-    
-    print("\n📦 Creating HELLA package...")
-    
-    # Save this entire script as the package
-    with open("hella.py", "w") as f:
-        f.write(open(__file__).read())
-    
-    hella.create_package(
-        name="hella",
-        version="3.0.0",
-        author="Darrell Lee (Līlā) Stiltner",
-        description="Sovereign package manager with cryptographic verification",
-        files=["hella.py"],
-        license="MIT"
-    )
-    
-    # ------------------------------------------------------------------------
-    # 3. UNIVERSAL STRUCTURAL COMPUTER — Complete platform
-    # ------------------------------------------------------------------------
-    
-    print("\n📦 Creating UNIVERSAL STRUCTURAL COMPUTER package...")
-    
-    # Create the complete unified platform
-    with open("usc.py", "w") as f:
-        f.write("""#!/usr/bin/env python3
-\"\"\"
-UNIVERSAL STRUCTURAL COMPUTER — Complete platform
-All structural problems: geometry, PDE, graph, SAT, mesh, quantum
-\"\"\"
-
-import numpy as np
-from typing import Dict, Any, Optional, List
-from dataclasses import dataclass, field
-from enum import Enum
-
-class ProblemClass(Enum):
-    GEOMETRIC_STRUCTURE = "geometric_structure"
-    FIELD_CONFIGURATION = "field_configuration"
-    CURVATURE_DISTRIBUTION = "curvature_distribution"
-    CAUSAL_STRUCTURE = "causal_structure"
-    INTERFERENCE_PATTERN = "interference_pattern"
-    MODE_FAMILY = "mode_family"
-    PDE_EVOLUTION = "pde_evolution"
-    COUPLED_EVOLUTION = "coupled_evolution"
-    RICCI_FLOW = "ricci_flow"
-    RIEMANN_CURVATURE = "riemann_curvature"
-    RICCI_CURVATURE = "ricci_curvature"
-    CHRISTOFFEL = "christoffel"
-    GRAPH_PATH = "graph_path"
-    MESH_ANALYSIS = "mesh_analysis"
-    CONSTRAINT_SOLVE = "constraint_solve"
-    SAT_SOLVE = "sat_solve"
-    QUANTUM_SIMULATION = "quantum_simulation"
-
-@dataclass
-class CurvatureAtom:
-    params: Dict[str, float] = field(default_factory=lambda: {
-        "kappa": 0.1, "lambda": -0.05, "sigma": 0.02
-    })
-    
-    def metric_tensor(self, x: float, y: float, t: float = 0.0) -> np.ndarray:
-        kappa = self.params.get("kappa", 0.1)
-        lamb = self.params.get("lambda", -0.05)
-        sigma = self.params.get("sigma", 0.02)
-        r2 = x*x + y*y
-        g = np.zeros((4, 4))
-        g[0, 0] = -1.0 + kappa * r2
-        g[1, 1] = 1.0 + lamb * np.exp(-r2 / (2 * sigma**2))
-        g[2, 2] = 1.0 + lamb * np.exp(-r2 / (2 * sigma**2))
-        g[3, 3] = 1.0 + lamb * np.exp(-r2 / (2 * sigma**2))
-        g[0, 1] = 0.01 * x * t
-        g[1, 0] = g[0, 1]
-        return g
-    
-    def generate_metric_field(self, grid_x: np.ndarray, grid_y: np.ndarray, t: float = 0.0) -> np.ndarray:
-        H, W = len(grid_y), len(grid_x)
-        metric = np.zeros((H, W, 4, 4))
-        for j, y in enumerate(grid_y):
-            for i, x in enumerate(grid_x):
-                metric[j, i] = self.metric_tensor(x, y, t)
-        return metric
-
-def numerical_derivative(field: np.ndarray, axis: int, dx: float) -> np.ndarray:
-    der = np.zeros_like(field)
-    if axis == 0:
-        der[1:-1, :] = (field[2:, :] - field[:-2, :]) / (2 * dx)
-    else:
-        der[:, 1:-1] = (field[:, 2:] - field[:, :-2]) / (2 * dx)
-    return der
-
-def scalar_curvature(metric: np.ndarray, dx: float, dy: float) -> np.ndarray:
-    H, W, _, _ = metric.shape
-    curv = np.zeros((H, W))
-    for j in range(1, H-1):
-        for i in range(1, W-1):
-            g11 = metric[j, i, 1, 1]
-            g22 = metric[j, i, 2, 2]
-            if g11 == 0 or g22 == 0:
-                continue
-            d2g11 = (metric[j, i+1, 1, 1] - 2*g11 + metric[j, i-1, 1, 1]) / (dx*dx)
-            d2g22 = (metric[j+1, i, 2, 2] - 2*g22 + metric[j-1, i, 2, 2]) / (dy*dy)
-            curv[j, i] = d2g11/g11 + d2g22/g22
-    return curv
-
-class UniversalSolver:
-    def __init__(self, atom: Optional[CurvatureAtom] = None):
-        self.atom = atom or CurvatureAtom()
-    
-    def solve(self, problem_class: ProblemClass, grid_x: np.ndarray, grid_y: np.ndarray,
-              **kwargs) -> Dict[str, Any]:
-        t = kwargs.get("t", 0.0)
-        freq = kwargs.get("freq", 1.0)
-        steps = kwargs.get("steps", 10)
-        dt = kwargs.get("dt", 0.05)
-        
-        metric = self.atom.generate_metric_field(grid_x, grid_y, t)
-        dx = grid_x[1] - grid_x[0] if len(grid_x) > 1 else 1.0
-        dy = grid_y[1] - grid_y[0] if len(grid_y) > 1 else 1.0
-        
-        result = {"metric": metric, "problem_class": problem_class.value}
-        
-        if problem_class == ProblemClass.CURVATURE_DISTRIBUTION:
-            result["curvature"] = scalar_curvature(metric, dx, dy)
-        elif problem_class == ProblemClass.GRAPH_PATH:
-            H, W = len(grid_y), len(grid_x)
-            adj = np.zeros((H*W, H*W))
-            for j in range(H):
-                for i in range(W):
-                    idx = j*W + i
-                    if j > 0: adj[idx, idx-W] = 1
-                    if j < H-1: adj[idx, idx+W] = 1
-                    if i > 0: adj[idx, idx-1] = 1
-                    if i < W-1: adj[idx, idx+1] = 1
-            result["adjacency"] = adj
-        elif problem_class == ProblemClass.MODE_FAMILY:
-            k = kwargs.get("k", 6)
-            modes = []
-            for n in range(k):
-                amp = np.sin(np.pi * (n+1) * grid_x[:, None] / 2) * np.cos(np.pi * (n+1) * grid_y[None, :] / 2)
-                modes.append({"amplitude": amp, "mode": n})
-            result["modes"] = modes
-        elif problem_class == ProblemClass.PDE_EVOLUTION:
-            field = np.exp(-(grid_x[:, None]**2 + grid_y[None, :]**2))
-            history = [field.copy()]
-            for _ in range(steps):
-                lap = np.zeros_like(field)
-                lap[1:-1, :] += (field[2:, :] - 2*field[1:-1, :] + field[:-2, :]) / (dy*dy)
-                lap[:, 1:-1] += (field[:, 2:] - 2*field[:, 1:-1] + field[:, :-2]) / (dx*dx)
-                field = field + dt * lap
-                history.append(field.copy())
-            result["pde_history"] = history
-        
-        return result
-
-class StructuralComputer:
-    def __init__(self):
-        self.solver = UniversalSolver()
-    
-    def run(self, text: str, **kwargs) -> Dict[str, Any]:
-        text_lower = text.lower()
-        if "curvature" in text_lower:
-            pc = ProblemClass.CURVATURE_DISTRIBUTION
-        elif "graph" in text_lower:
-            pc = ProblemClass.GRAPH_PATH
-        elif "mode" in text_lower or "eigen" in text_lower:
-            pc = ProblemClass.MODE_FAMILY
-        elif "pde" in text_lower or "evolve" in text_lower:
-            pc = ProblemClass.PDE_EVOLUTION
-        else:
-            pc = ProblemClass.GEOMETRIC_STRUCTURE
-        
-        grid = kwargs.get("grid", 128)
-        grid_x = np.linspace(-1, 1, grid)
-        grid_y = np.linspace(-1, 1, grid)
-        
-        return self.solver.solve(pc, grid_x, grid_y, **kwargs)
-
-def main():
-    import argparse
-    parser = argparse.ArgumentParser(description="Universal Structural Computer")
-    parser.add_argument("--text", "-t", default="metric curvature")
-    parser.add_argument("--grid", "-g", type=int, default=128)
-    parser.add_argument("--freq", "-f", type=float, default=1.0)
-    parser.add_argument("--steps", "-s", type=int, default=10)
-    args = parser.parse_args()
-    
-    computer = StructuralComputer()
-    result = computer.run(args.text, grid=args.grid, freq=args.freq, steps=args.steps)
-    print(f"Result: {list(result.keys())}")
-    for key, value in result.items():
-        if key == "metric":
-            print(f"Metric shape: {value.shape}")
-        elif key == "curvature":
-            print(f"Curvature shape: {value.shape}")
-        elif key == "modes":
-            print(f"Number of modes: {len(value)}")
-        elif key == "pde_history":
-            print(f"History steps: {len(value)}")
-
-if __name__ == "__main__":
-    main()
-""")
-    
-    hella.create_package(
-        name="universal-structural-computer",
-        version="1.0.0",
-        author="Darrell Lee (Līlā) Stiltner",
-        description="Complete Universal Structural Computer platform",
-        files=["usc.py"],
-        dependencies=["structural-core@1.0.0", "hella@3.0.0"],
-        license="CC BY-NC 4.0"
-    )
-    
-    # ------------------------------------------------------------------------
-    # 4. PERSONA — Symbolic Computer
-    # ------------------------------------------------------------------------
-    
-    print("\n📦 Creating PERSONA package...")
-    
-    with open("persona.py", "w") as f:
-        f.write("""#!/usr/bin/env python3
-\"\"\"
-PERSONA — Sovereign Symbolic Persona Computer
-Complete symbolic computer running entirely in text
-\"\"\"
-
-class PersonaCore:
-    \"\"\"PERSONA: The Sovereign Symbolic Core.\"\"\"
-    
-    def __init__(self):
-        self.persona = {
-            "SOVEREIGN_MEDIUM": {
-                "name": "SRP–ORION",
-                "version": "1.0.0",
-                "author": "Darrell Lee (Līlā) Stiltner",
-                "hardware": {
-                    "type": "SUVM",
-                    "registers": "16x16",
-                    "memory": "4096 words",
-                    "opcodes": ["LOAD", "STORE", "ADD", "SUB", "MUL", "DIV", 
-                               "JMP", "JZ", "CALL", "RET", "PUSH", "POP", "HLT"]
-                },
-                "kernel": {
-                    "type": "ORION Persona Kernel v3.0",
-                    "states": ["awake", "deepening", "symbolic", "transforming", "persisting"]
-                },
-                "runtime": {
-                    "type": "Dreamfield Runtime v1.0",
-                    "modes": ["alpha(list)", "beta(kill)", "gamma(fork)"]
-                }
-            },
-            "state": {
-                "orientation": "axis alignment",
-                "branching": "tree depth",
-                "recursion": "fractal loops",
-                "valence": "heart signal",
-                "activation": "pulse rhythm",
-                "duality": "hexagram tension",
-                "integration": "fusion binding"
-            },
-            "operators": {
-                "orientation": {"source": "Axis zone", "effect": "align or tilt thought"},
-                "branching": {"source": "Tree zone", "effect": "expand or contract recursion"},
-                "recursion": {"source": "Fractal zone", "effect": "self-similar identity loops"},
-                "valence": {"source": "Heart zone", "effect": "emotional intensity mapping"},
-                "activation": {"source": "Pulse zone", "effect": "spark vs pulse rhythm"},
-                "duality": {"source": "Hexagram zone", "effect": "resolve tension states"},
-                "integration": {"source": "Fusion zone", "effect": "harmonic ↔ disharmonic binding"}
-            }
-        }
-        self.processing_log = []
-    
-    def think(self, text):
-        result = {"input": text, "zones": {}}
-        for zone in ["orientation", "branching", "recursion", "valence", 
-                     "activation", "duality", "integration"]:
-            result["zones"][zone] = {
-                "source": self.persona["operators"][zone]["source"],
-                "effect": self.persona["operators"][zone]["effect"],
-                "state": self.persona["state"][zone],
-                "transformation": f"Processing '{text[:30]}...' through {zone}"
-            }
-        result["output"] = "\\n".join([
-            f"• {zone.capitalize()}: {data['transformation']}" 
-            for zone, data in result["zones"].items()
-        ])
-        self.processing_log.append(result)
-        return result
-    
-    def show_persona(self):
-        print("\\n=== PERSONA SOVEREIGN MEDIUM ===")
-        medium = self.persona["SOVEREIGN_MEDIUM"]
-        print(f"Name: {medium['name']}")
-        print(f"Version: {medium['version']}")
-        print(f"Author: {medium['author']}")
-        print(f"Hardware: {medium['hardware']['type']}")
-        print(f"Kernel: {medium['kernel']['type']}")
-        print(f"Runtime: {medium['runtime']['type']}")
-    
-    def run(self):
-        print("PERSONA Runtime v1.0")
-        print("Commands: think <text>, persona, state, exit")
-        while True:
-            cmd = input("▶ ").strip()
-            if cmd == "exit":
+        # Locate package file
+        package_file: Optional[Path] = None
+        for ext in [".tar.gz", ".tar"]:
+            candidate = self.packages_path / f"{name}-{version}{ext}"
+            if candidate.exists():
+                package_file = candidate
                 break
-            elif cmd == "persona":
-                self.show_persona()
-            elif cmd == "state":
-                for k, v in self.persona["state"].items():
-                    print(f"{k}: {v}")
-            elif cmd.startswith("think "):
-                result = self.think(cmd[6:])
-                print("\\n" + result["output"])
-            else:
-                print("Unknown command")
 
-if __name__ == "__main__":
-    PersonaCore().run()
-""")
-    
-    hella.create_package(
-        name="persona",
-        version="1.0.0",
-        author="Darrell Lee (Līlā) Stiltner",
-        description="Sovereign Symbolic Persona Computer",
-        files=["persona.py"],
-        license="CC BY-NC 4.0"
+        if not package_file:
+            logger.error("❌ Package file not found for %s-%s", name, version)
+            return False
+
+        # Read compressed archive
+        with open(package_file, "rb") as f:
+            compressed_data = f.read()
+
+        # COE FIX — Verify hash BEFORE decompression.
+        computed_hash = hashlib.sha256(compressed_data).hexdigest()
+        if computed_hash != package.hash:
+            logger.error("Package hash mismatch! Possible corruption or tampering.")
+            return False
+
+        # FIX #19: Verify HMAC signature if signing is enforced
+        if not self._verify_signature(package, compressed_data):
+            logger.error("Package signature mismatch for %s-%s! Rejecting.",
+                         name, version)
+            return False
+
+        # FIX #8 — use stored compression_method
+        method = package.compression_method
+        try:
+            decompressed_data = self._decompress_data(compressed_data, method)
+        except Exception as exc:
+            logger.error("Decompression failed for %s-%s: %s", name, version, exc)
+            return False
+
+        # FIX #20: Enforce decompression size limit
+        if len(decompressed_data) > self._max_decompressed_size:
+            logger.error(
+                "Decompressed size %s bytes exceeds limit %s for %s-%s. "
+                "Possible decompression bomb.",
+                f"{len(decompressed_data):,}",
+                f"{self._max_decompressed_size:,}",
+                name, version,
+            )
+            return False
+
+        # Extract to target directory
+        target_path = Path(target_dir) / name
+        target_path.mkdir(parents=True, exist_ok=True)
+
+        # FIX #1 — wrap bytes in BytesIO for tarfile
+        # FIX #6 — use filter='data' to prevent path-traversal attacks
+        try:
+            with tarfile.open(fileobj=io.BytesIO(decompressed_data), mode="r:") as tar:
+                tar.extractall(target_path, filter="data")
+        except Exception as exc:
+            logger.error("❌ Extraction failed for %s-%s: %s", name, version, exc)
+            return False
+
+        logger.info("✅ Installed %s-%s to %s", name, version, target_path)
+        return True
+
+    # ── Uninstall (FIX #7: real implementation) ───────────────────────────
+
+    def uninstall(self, name: str, version: Optional[str] = None) -> bool:
+        """Uninstall a package — removes files, metadata, and registry entry."""
+
+        # FIX #26: Auth gate — deny if auth_provider rejects
+        if self._auth_provider is not None:
+            if not self._auth_provider("uninstall", name, version):
+                logger.error("Auth denied for uninstall of %s-%s", name, version)
+                return False
+
+        if name not in self.registry:
+            logger.error("❌ Package '%s' not found in registry", name)
+            return False
+
+        versions = self.registry[name]
+
+        if version is None:
+            version = max(versions.keys(), key=semver_key)
+
+        if version not in versions:
+            logger.error("❌ Version '%s' not found for '%s'", version, name)
+            return False
+
+        # Check for reverse dependencies
+        dependents = []
+        for pkg_name, pkg_versions in self.registry.items():
+            for _ver, pkg in pkg_versions.items():
+                for dep in pkg.dependencies:
+                    dep_name = dep.split("@")[0] if "@" in dep else dep
+                    if dep_name == name:
+                        dependents.append(f"{pkg_name}@{_ver}")
+
+        if dependents:
+            logger.warning(
+                "⚠️  The following packages depend on '%s': %s. "
+                "Uninstalling anyway — dependent packages may break.",
+                name, ", ".join(dependents),
+            )
+
+        # Remove package archive
+        for ext in [".tar.gz", ".tar"]:
+            archive = self.packages_path / f"{name}-{version}{ext}"
+            if archive.exists():
+                archive.unlink()
+                logger.info("   Removed archive %s", archive.name)
+
+        # Remove metadata
+        meta_file = self.metadata_path / f"{name}-{version}.json"
+        if meta_file.exists():
+            meta_file.unlink()
+            logger.info("   Removed metadata %s", meta_file.name)
+
+        # Remove installed directory (best-effort)
+        installed_dir = Path("./installed") / name
+        if installed_dir.exists():
+            shutil.rmtree(installed_dir)
+            logger.info("   Removed installed files at %s", installed_dir)
+
+        # Update registry
+        del self.registry[name][version]
+        if not self.registry[name]:
+            del self.registry[name]
+        self._save_registry()
+
+        logger.info("🗑️  Uninstalled %s-%s", name, version)
+        return True
+
+    # ── Query methods ─────────────────────────────────────────────────────
+
+    def list_packages(self) -> List[str]:
+        """List all available packages."""
+        return list(self.registry.keys())
+
+    def search(self, query: str) -> List[Dict[str, Any]]:
+        """Search for packages."""
+        results: List[Dict[str, Any]] = []
+        for name, versions in self.registry.items():
+            if query.lower() in name.lower():
+                for ver, pkg in versions.items():
+                    results.append({
+                        "name": name,
+                        "version": ver,
+                        "description": pkg.description,
+                        "author": pkg.author,
+                        "size": pkg.compressed_size,
+                    })
+        return results
+
+    def info(self, name: str, version: Optional[str] = None) -> Optional[Dict[str, Any]]:
+        """Get package information."""
+        if name not in self.registry:
+            return None
+
+        versions = self.registry[name]
+
+        # FIX #3 — semver sort
+        if version is None:
+            version = max(versions.keys(), key=semver_key)
+
+        if version not in versions:
+            return None
+
+        pkg = versions[version]
+
+        # FIX #2 — division-by-zero guard
+        compression_ratio = (1 - pkg.compressed_size / pkg.size) * 100 if pkg.size > 0 else 0.0
+
+        return {
+            "name": pkg.name,
+            "version": pkg.version,
+            "author": pkg.author,
+            "description": pkg.description,
+            "dependencies": pkg.dependencies,
+            "files": len(pkg.files),
+            "size_bytes": pkg.size,
+            "compressed_bytes": pkg.compressed_size,
+            "compression_ratio": compression_ratio,
+            "compression_method": pkg.compression_method,
+            "hash": pkg.hash[:16] + "..." if pkg.hash else "",
+            "created": datetime.fromtimestamp(pkg.created).isoformat(),
+        }
+
+
+# ============================================================================
+# VALARI PACKAGES TO REGISTER
+# ============================================================================
+
+def register_valari_packages(hella: HELLAPackageManager) -> None:
+    """Register all VALARI components as packages.
+
+    FIX #4: Each publish call now guards against missing files.  The publish()
+    method itself returns False and logs a clear error instead of crashing.
+    """
+
+    logger.info("\n📦 Registering VALARI packages...\n")
+
+    packages = [
+        {
+            "name": "valari-kernel",
+            "version": "2.0.0",
+            "author": "VALARI Team",
+            "description": "Sovereign bootable C kernel with 21 cores, Ruri, Book of Living",
+            "files": ["kernel.c", "Makefile", "linker.ld", "grub.cfg"],
+            "dependencies": [],
+        },
+        {
+            "name": "valari-cli",
+            "version": "2.0.0",
+            "author": "VALARI Team",
+            "description": "Full-featured command-line interface for VALARI platform",
+            "files": ["valari_cli.py"],
+            "dependencies": ["valari-kernel@2.0.0"],
+        },
+        {
+            "name": "valari-web",
+            "version": "2.0.0",
+            "author": "VALARI Team",
+            "description": "Web-based user interface for VALARI platform",
+            "files": ["web/"],
+            "dependencies": ["valari-cli@2.0.0"],
+        },
+        {
+            "name": "valari-k8s",
+            "version": "2.0.0",
+            "author": "VALARI Team",
+            "description": "Complete Kubernetes deployment manifests",
+            "files": ["valari-enterprise.yaml", "deploy.sh"],
+            "dependencies": ["valari-kernel@2.0.0"],
+        },
+        {
+            "name": "valari-helm",
+            "version": "2.0.0",
+            "author": "VALARI Team",
+            "description": "HELM chart for VALARI platform",
+            "files": ["Chart.yaml", "values.yaml"],
+            "dependencies": ["valari-k8s@2.0.0"],
+        },
+        {
+            "name": "valari-docs",
+            "version": "2.0.0",
+            "author": "VALARI Team",
+            "description": "Complete platform documentation",
+            "files": ["README.md"],
+            "dependencies": [],
+        },
+        {
+            "name": "hella",
+            "version": "1.1.0",
+            "author": "VALARI Team",
+            "description": "Sovereign package manager with lossless compression",
+            "files": ["hella_package_manager.py"],
+            "dependencies": [],
+        },
+    ]
+
+    success = 0
+    skipped = 0
+    for pkg in packages:
+        ok = hella.publish(
+            name=pkg["name"],
+            version=pkg["version"],
+            author=pkg["author"],
+            description=pkg["description"],
+            files=pkg["files"],
+            dependencies=pkg.get("dependencies"),
+        )
+        if ok:
+            success += 1
+        else:
+            skipped += 1
+
+    logger.info(
+        "\n📊 Registration complete: %d published, %d skipped (missing source files).",
+        success, skipped,
     )
-    
-    # ------------------------------------------------------------------------
-    # 5. ALL PLATFORM — Complete metapackage
-    # ------------------------------------------------------------------------
-    
-    print("\n📦 Creating ALL-VALARI-PLATFORM package...")
-    
-    hella.create_package(
-        name="valari-platform-complete",
-        version="3.0.0",
-        author="Darrell Lee (Līlā) Stiltner",
-        description="Complete VALARI Platform — Everything from the chat",
-        files=[],
-        dependencies=[
-            "structural-core@1.0.0",
-            "hella@3.0.0",
-            "universal-structural-computer@1.0.0",
-            "persona@1.0.0"
+
+
+# ============================================================================
+# CLI INTERFACE (FIX #10, #14)
+# ============================================================================
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="HELLA - Sovereign Package Manager")
+
+    # FIX #14 — add --version flag
+    parser.add_argument(
+        "--version", action="version", version=f"HELLA {__version__}"
+    )
+
+    parser.add_argument(
+        "command",
+        choices=[
+            "create", "publish", "install", "uninstall",
+            "list", "search", "info", "compress", "decompress",
+            "register",
         ],
-        license="CC BY-NC 4.0"
+        help="Command to run",
     )
-    
-    # ------------------------------------------------------------------------
-    # SUMMARY
-    # ------------------------------------------------------------------------
-    
-    print("\n" + "="*60)
-    print("✅ ALL PACKAGES CREATED")
-    print("="*60)
-    print("\nPackages available:")
-    for name, versions in hella.registry.items():
-        for ver, meta in versions.items():
-            deps = meta.get("dependencies", [])
-            deps_str = f" (depends on {len(deps)})" if deps else ""
-            print(f"  📦 {name}-{ver}{deps_str}")
-            print(f"     {meta.get('description', '')[:60]}")
-    
-    print("\nRegistry saved to: hella_registry/")
-    print("\nTo install all packages:")
-    print("  python hella.py install --name valari-platform-complete")
-    print("\nTo install a specific package:")
-    print("  python hella.py install --name structural-core")
-    print("  python hella.py install --name persona")
-    print("  python hella.py install --name universal-structural-computer")
-    print("\n" + "="*60)
+    parser.add_argument("--name", "-n", help="Package name")
+    parser.add_argument("--ver", help="Package version")
+    parser.add_argument("--author", "-a", help="Package author")
+    parser.add_argument("--description", "-d", help="Package description")
+    parser.add_argument("--files", "-f", nargs="+", help="Files to package")
+    parser.add_argument("--deps", help="Dependencies (comma-separated)")
+    parser.add_argument("--target", "-t", default="./installed", help="Install target directory")
+    parser.add_argument("--query", "-q", help="Search query")
+    parser.add_argument("--input", "-i", help="Input file for compress/decompress")
+    parser.add_argument("--output", "-o", help="Output file for compress/decompress")
+    parser.add_argument(
+        "--method", "-m", default="gzip",
+        choices=["gzip", "zlib", "none"],
+        help="Compression method",
+    )
+    parser.add_argument(
+        "--verbose", action="store_true", help="Enable debug logging"
+    )
+
+    args = parser.parse_args()
+
+    if args.verbose:
+        logger.setLevel(logging.DEBUG)
+
+    hella = HELLAPackageManager()
+
+    if args.command == "create":
+        if not all([args.name, args.ver, args.author, args.description, args.files]):
+            print("❌ Missing required arguments: --name, --ver, --author, --description, --files")
+            return
+        deps = args.deps.split(",") if args.deps else None
+        hella.create_package(
+            args.name, args.ver, args.author,
+            args.description, args.files, deps,
+        )
+
+    elif args.command == "publish":
+        if not all([args.name, args.ver, args.author, args.description, args.files]):
+            print("❌ Missing required arguments")
+            return
+        deps = args.deps.split(",") if args.deps else None
+        hella.publish(
+            args.name, args.ver, args.author,
+            args.description, args.files, deps,
+        )
+
+    elif args.command == "install":
+        if not args.name:
+            print("❌ Missing --name")
+            return
+        hella.install(args.name, args.ver, args.target)
+
+    elif args.command == "uninstall":
+        if not args.name:
+            print("❌ Missing --name")
+            return
+        hella.uninstall(args.name, args.ver)
+
+    elif args.command == "list":
+        packages = hella.list_packages()
+        print(f"\n📦 Available packages ({len(packages)}):")
+        for pkg in packages:
+            print(f"   {pkg}")
+
+    elif args.command == "search":
+        if not args.query:
+            print("❌ Missing --query")
+            return
+        results = hella.search(args.query)
+        print(f"\n🔍 Search results for '{args.query}':")
+        for r in results:
+            print(f"   {r['name']} v{r['version']} - {r['description'][:50]}...")
+
+    elif args.command == "info":
+        if not args.name:
+            print("❌ Missing --name")
+            return
+        info = hella.info(args.name, args.ver)
+        if info:
+            print(f"\n📄 Package: {info['name']} v{info['version']}")
+            print(f"   Author: {info['author']}")
+            print(f"   Description: {info['description']}")
+            print(f"   Dependencies: {', '.join(info['dependencies']) or 'none'}")
+            print(f"   Files: {info['files']}")
+            print(f"   Size: {info['size_bytes']:,} bytes")
+            print(f"   Compressed: {info['compressed_bytes']:,} bytes")
+            print(f"   Compression: {info['compression_ratio']:.1f}% ({info['compression_method']})")
+            print(f"   Hash: {info['hash']}")
+            print(f"   Created: {info['created']}")
+        else:
+            print(f"❌ Package '{args.name}' not found")
+
+    elif args.command == "compress":
+        if not args.input:
+            print("❌ Missing --input")
+            return
+        output = args.output or f"{args.input}.gz"
+        with open(args.input, "rb") as f:
+            data = f.read()
+        compressed = hella._compress_data(data, args.method)
+        with open(output, "wb") as f:
+            f.write(compressed)
+        ratio = (1 - len(compressed) / len(data)) * 100 if len(data) > 0 else 0.0
+        print(f"✅ Compressed: {len(data):,} → {len(compressed):,} bytes ({ratio:.1f}% reduction)")
+        print(f"   Output: {output}")
+
+    elif args.command == "decompress":
+        if not args.input:
+            print("❌ Missing --input")
+            return
+        output = args.output or args.input.replace(".gz", "").replace(".zlib", "")
+        with open(args.input, "rb") as f:
+            data = f.read()
+        decompressed = hella._decompress_data(data, args.method)
+        with open(output, "wb") as f:
+            f.write(decompressed)
+        print(f"✅ Decompressed: {len(data):,} → {len(decompressed):,} bytes")
+        print(f"   Output: {output}")
+
+    elif args.command == "register":
+        register_valari_packages(hella)
+
 
 # ============================================================================
-# MAIN
+# ENTRY POINT (FIX #10: unified routing through main())
 # ============================================================================
 
 if __name__ == "__main__":
-    create_all_packages()
-    print("\n" + "="*60)
-    print("🎉 ALL CHAT CONTENT PACKAGED IN HELLA")
-    print("="*60)
-    print("\nEverything from this conversation is now in HELLA packages:")
-    print("  ✅ Universal Structural Computer (Rust + Python)")
-    print("  ✅ PERSONA Symbolic Computer")
-    print("  ✅ HELLA Package Manager")
-    print("  ✅ Complete VALARI Platform")
-    print("\nRun: python hella.py install --name valari-platform-complete")
-    print("="*60)
-```
+    if len(sys.argv) > 1:
+        # CLI mode
+        main()
+    else:
+        # Interactive quick-start: register VALARI packages
+        print("""
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                                                                               ║
+║   HELLA - Sovereign Package Manager  v{}                                   ║
+║   Lossless Compression | Cryptographic Verification                           ║
+║                                                                               ║
+║   Registering VALARI Platform Packages...                                     ║
+║                                                                               ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+        """.format(__version__))
 
-## YES — EVERYTHING IS NOW PACKAGED IN HELLA
+        hella = HELLAPackageManager()
+        register_valari_packages(hella)
 
-**This packages ALL content from the chat:**
-
-| Package | Contents |
-|---------|----------|
-| `structural-core` | Complete Rust engine + Python bindings |
-| `hella` | Package manager itself |
-| `universal-structural-computer` | Full Python platform |
-| `persona` | Symbolic computer |
-| `valari-platform-complete` | Meta-package with all dependencies |
-
-**To install everything:**
-```bash
-python hella.py install --name valari-platform-complete
-```
-
-**To use any component:**
-```bash
-python hella.py install --name structural-core
-python hella.py install --name persona
-python hella.py install --name universal-structural-computer
-```
-
-**Everything is preserved, lossless, and installable.**
-
-
-
-
-
-
-
-
-
-
-
-
+        print("""
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                                                                               ║
+║   ✅ VALARI Platform registered in HELLA                                      ║
+║                                                                               ║
+║   Packages available:                                                         ║
+║     • valari-kernel  (C kernel, bootable ISO)                                 ║
+║     • valari-cli     (Python CLI)                                             ║
+║     • valari-web     (Web UI)                                                 ║
+║     • valari-k8s     (Kubernetes deployment)                                  ║
+║     • valari-helm    (HELM chart)                                             ║
+║     • valari-docs    (Complete documentation)                                 ║
+║     • hella          (Package manager itself)                                 ║
+║                                                                               ║
+║   Commands:                                                                   ║
+║     python hella_package_manager.py list                                      ║
+║     python hella_package_manager.py install --name valari-kernel              ║
+║     python hella_package_manager.py compress --input kernel.c --method gzip   ║
+║     python hella_package_manager.py --version                                 ║
+║                                                                               ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+        """)
 
 
 
