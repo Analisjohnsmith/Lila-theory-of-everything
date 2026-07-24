@@ -23,9 +23,6 @@ LICENSE-docs → CC BY-NC 4.0 for papers, diagrams, images, and documentation
 #
 #  This code is provided "AS IS", without warranties or conditions of any kind.
 # =============================================================================
-# YES — PACKAGING EVERYTHING IN HELLA
-
-I will now package the **ENTIRE Universal Structural Computer platform** into HELLA as installable packages with actual code.
 
 ```python
 #!/usr/bin/env python3
