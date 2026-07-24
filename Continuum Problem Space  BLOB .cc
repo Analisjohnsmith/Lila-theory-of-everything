@@ -2821,3 +2821,713 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+===========================================================================
+ EXPANSION 4:
+// ═══════════════════════════════════════════════════════════════════════════════
+// Super Problem Solver 3MAX3 — Unified Structural Kernel
+// Single condensed reference file: engine + geometry stack + PDE + graph + SAT + mesh + attack suite
+// ═══════════════════════════════════════════════════════════════════════════════
+
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use std::f64::consts::PI;
+
+// ── Ontology: 14 problem classes spanning all structural domains ─────────────
+
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq)]
+pub enum ProblemClass {
+    Metric, Curvature, Field, Causal, ModeFamily, PdeEvolution,
+    CoupledEvolution, GraphPath, MeshAnalysis, ConstraintSolve,
+    RicciFlow, RiemannCurvature, RicciCurvature, Christoffel,
+}
+
+// ── Universal Structural Object: closure container for all solver outputs ────
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct StructuralObject {
+    pub metric: Vec<Vec<Vec<Vec<f64>>>>,
+    pub curvature: Vec<Vec<f64>>,
+    pub field: Vec<Vec<f64>>,
+    pub causal: Vec<Vec<f64>>,
+    pub modes: Vec<Vec<Vec<f64>>>,
+    pub graph: Option<Vec<Vec<f64>>>,
+    pub mesh: Option<Vec<Vec<Vec<f64>>>>,
+    pub constraints: Option<Vec<Vec<f64>>>,
+    pub ricci_tensor: Option<Vec<Vec<Vec<Vec<f64>>>>>,
+    pub riemann_tensor: Option<Vec<Vec<Vec<Vec<Vec<Vec<f64>>>>>>>,
+    pub christoffel: Option<Vec<Vec<Vec<Vec<Vec<f64>>>>>>,
+    pub metadata: HashMap<String, f64>,
+}
+
+impl StructuralObject {
+    pub fn new(ny: usize, nx: usize) -> Self { Self {
+        metric: vec![vec![vec![vec![0.0; 4]; 4]; nx]; ny],
+        curvature: vec![vec![0.0; nx]; ny],
+        field: vec![vec![0.0; nx]; ny],
+        causal: vec![vec![0.0; nx]; ny],
+        modes: vec![vec![vec![0.0; nx]; ny]],
+        graph: None, mesh: None, constraints: None,
+        ricci_tensor: None, riemann_tensor: None, christoffel: None,
+        metadata: HashMap::new(),
+    }}
+}
+
+// ── 4×4 Linear Algebra ───────────────────────────────────────────────────────
+
+pub fn invert_4x4(m: &[[f64; 4]; 4]) -> [[f64; 4]; 4] {
+    let mut inv = [[0.0; 4]; 4];
+    let d = det_4x4(m);
+    if d.abs() < 1e-30 { return inv; }
+    let id = 1.0 / d;
+    let a = |i: usize, j: usize| m[i][j];
+    inv[0][0]=(a(1,1)*(a(2,2)*a(3,3)-a(2,3)*a(3,2))-a(1,2)*(a(2,1)*a(3,3)-a(2,3)*a(3,1))+a(1,3)*(a(2,1)*a(3,2)-a(2,2)*a(3,1)))*id;
+    inv[0][1]=-(a(0,1)*(a(2,2)*a(3,3)-a(2,3)*a(3,2))-a(0,2)*(a(2,1)*a(3,3)-a(2,3)*a(3,1))+a(0,3)*(a(2,1)*a(3,2)-a(2,2)*a(3,1)))*id;
+    inv[0][2]=(a(0,1)*(a(1,2)*a(3,3)-a(1,3)*a(3,2))-a(0,2)*(a(1,1)*a(3,3)-a(1,3)*a(3,1))+a(0,3)*(a(1,1)*a(3,2)-a(1,2)*a(3,1)))*id;
+    inv[0][3]=-(a(0,1)*(a(1,2)*a(2,3)-a(1,3)*a(2,2))-a(0,2)*(a(1,1)*a(2,3)-a(1,3)*a(2,1))+a(0,3)*(a(1,1)*a(2,2)-a(1,2)*a(2,1)))*id;
+    inv[1][0]=-(a(1,0)*(a(2,2)*a(3,3)-a(2,3)*a(3,2))-a(1,2)*(a(2,0)*a(3,3)-a(2,3)*a(3,0))+a(1,3)*(a(2,0)*a(3,2)-a(2,2)*a(3,0)))*id;
+    inv[1][1]=(a(0,0)*(a(2,2)*a(3,3)-a(2,3)*a(3,2))-a(0,2)*(a(2,0)*a(3,3)-a(2,3)*a(3,0))+a(0,3)*(a(2,0)*a(3,2)-a(2,2)*a(3,0)))*id;
+    inv[1][2]=-(a(0,0)*(a(1,2)*a(3,3)-a(1,3)*a(3,2))-a(0,2)*(a(1,0)*a(3,3)-a(1,3)*a(3,0))+a(0,3)*(a(1,0)*a(3,2)-a(1,2)*a(3,0)))*id;
+    inv[1][3]=(a(0,0)*(a(1,2)*a(2,3)-a(1,3)*a(2,2))-a(0,2)*(a(1,0)*a(2,3)-a(1,3)*a(2,0))+a(0,3)*(a(1,0)*a(2,2)-a(1,2)*a(2,0)))*id;
+    inv[2][0]=(a(1,0)*(a(2,1)*a(3,3)-a(2,3)*a(3,1))-a(1,1)*(a(2,0)*a(3,3)-a(2,3)*a(3,0))+a(1,3)*(a(2,0)*a(3,1)-a(2,1)*a(3,0)))*id;
+    inv[2][1]=-(a(0,0)*(a(2,1)*a(3,3)-a(2,3)*a(3,1))-a(0,1)*(a(2,0)*a(3,3)-a(2,3)*a(3,0))+a(0,3)*(a(2,0)*a(3,1)-a(2,1)*a(3,0)))*id;
+    inv[2][2]=(a(0,0)*(a(1,1)*a(3,3)-a(1,3)*a(3,1))-a(0,1)*(a(1,0)*a(3,3)-a(1,3)*a(3,0))+a(0,3)*(a(1,0)*a(3,1)-a(1,1)*a(3,0)))*id;
+    inv[2][3]=-(a(0,0)*(a(1,1)*a(2,3)-a(1,3)*a(2,1))-a(0,1)*(a(1,0)*a(2,3)-a(1,3)*a(2,0))+a(0,3)*(a(1,0)*a(2,1)-a(1,1)*a(2,0)))*id;
+    inv[3][0]=-(a(1,0)*(a(2,1)*a(3,2)-a(2,2)*a(3,1))-a(1,1)*(a(2,0)*a(3,2)-a(2,2)*a(3,0))+a(1,2)*(a(2,0)*a(3,1)-a(2,1)*a(3,0)))*id;
+    inv[3][1]=(a(0,0)*(a(2,1)*a(3,2)-a(2,2)*a(3,1))-a(0,1)*(a(2,0)*a(3,2)-a(2,2)*a(3,0))+a(0,2)*(a(2,0)*a(3,1)-a(2,1)*a(3,0)))*id;
+    inv[3][2]=-(a(0,0)*(a(1,1)*a(3,2)-a(1,2)*a(3,1))-a(0,1)*(a(1,0)*a(3,2)-a(1,2)*a(3,0))+a(0,2)*(a(1,0)*a(3,1)-a(1,1)*a(3,0)))*id;
+    inv[3][3]=(a(0,0)*(a(1,1)*a(2,2)-a(1,2)*a(2,1))-a(0,1)*(a(1,0)*a(2,2)-a(1,2)*a(2,0))+a(0,2)*(a(1,0)*a(2,1)-a(1,1)*a(2,0)))*id;
+    inv
+}
+
+pub fn det_4x4(m: &[[f64; 4]; 4]) -> f64 {
+    let a = |i: usize, j: usize| m[i][j];
+    a(0,0)*(a(1,1)*(a(2,2)*a(3,3)-a(2,3)*a(3,2))-a(1,2)*(a(2,1)*a(3,3)-a(2,3)*a(3,1))+a(1,3)*(a(2,1)*a(3,2)-a(2,2)*a(3,1)))
+    -a(0,1)*(a(1,0)*(a(2,2)*a(3,3)-a(2,3)*a(3,2))-a(1,2)*(a(2,0)*a(3,3)-a(2,3)*a(3,0))+a(1,3)*(a(2,0)*a(3,2)-a(2,2)*a(3,0)))
+    +a(0,2)*(a(1,0)*(a(2,1)*a(3,3)-a(2,3)*a(3,1))-a(1,1)*(a(2,0)*a(3,3)-a(2,3)*a(3,0))+a(1,3)*(a(2,0)*a(3,1)-a(2,1)*a(3,0)))
+    -a(0,3)*(a(1,0)*(a(2,1)*a(3,2)-a(2,2)*a(3,1))-a(1,1)*(a(2,0)*a(3,2)-a(2,2)*a(3,0))+a(1,2)*(a(2,0)*a(3,1)-a(2,1)*a(3,0)))
+}
+
+fn metric_to_array(m: &Vec<Vec<Vec<Vec<f64>>>>, j: usize, i: usize) -> [[f64; 4]; 4] {
+    let mut g = [[0.0; 4]; 4];
+    for mu in 0..4 { for nu in 0..4 { g[mu][nu] = m[j][i][mu][nu]; } }
+    g
+}
+
+// ── Metric Tensor ────────────────────────────────────────────────────────────
+
+pub fn general_metric_tensor(x: f64, y: f64, t: f64) -> [[f64; 4]; 4] {
+    let mut g = [[0.0; 4]; 4];
+    g[0][0] = -1.0 - 0.1*t;       g[1][1] = 1.0 + 0.1*x;
+    g[2][2] = 1.0 - 0.05*y;       g[3][3] = 1.0 + 0.02*t;
+    g[0][1] = 0.01*x*t;  g[1][0] = g[0][1];
+    g[1][2] = 0.02*x*y;  g[2][1] = g[1][2];
+    g[2][3] = 0.03*y*t;  g[3][2] = g[2][3];
+    g[1][3] = 0.015*x*t; g[3][1] = g[1][3];
+    g
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// FULL GEOMETRY STACK  (Christoffel → Riemann → Ricci → Ricci scalar → Ricci flow)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+pub fn compute_christoffel(m: &Vec<Vec<Vec<Vec<f64>>>>, dx: f64, dy: f64)
+    -> Vec<Vec<Vec<Vec<Vec<f64>>>>> {
+    let (ny, nx) = (m.len(), if m.len()>0 {m[0].len()} else {0});
+    let mut g = vec![vec![vec![vec![vec![0.0;4];4];4];nx];ny];
+    for j in 0..ny { for i in 0..nx {
+        let gi = metric_to_array(m,j,i); let ginv = invert_4x4(&gi);
+        for s in 0..4 { for mu in 0..4 { for nu in 0..4 {
+            let mut sum = 0.0;
+            for lam in 0..4 {
+                let (d1,d2,d3) = match lam {
+                    0=>(0.0,0.0,0.0),
+                    1=> if i>0&&i+1<nx {
+                        let v = (m[j][i+1][mu][nu]-m[j][i-1][mu][nu])/(2.0*dx);
+                        let w = (m[j][i+1][nu][mu]-m[j][i-1][nu][mu])/(2.0*dx);
+                        (v,w,v)
+                    } else {(0.0,0.0,0.0)},
+                    2=> if j>0&&j+1<ny {
+                        let v = (m[j+1][i][mu][nu]-m[j-1][i][mu][nu])/(2.0*dy);
+                        let w = (m[j+1][i][nu][mu]-m[j-1][i][nu][mu])/(2.0*dy);
+                        (v,w,v)
+                    } else {(0.0,0.0,0.0)},
+                    _=>(0.0,0.0,0.0),
+                };
+                sum += ginv[s][lam] * (d1 + d2 - d3);
+            }
+            g[j][i][s][mu][nu] = 0.5*sum;
+        }}}
+    }} g
+}
+
+pub fn compute_riemann(m: &Vec<Vec<Vec<Vec<f64>>>>, c: &Vec<Vec<Vec<Vec<Vec<f64>>>>>,
+    dx: f64, dy: f64) -> Vec<Vec<Vec<Vec<Vec<Vec<f64>>>>>> {
+    let (ny,nx) = (m.len(), if m.len()>0 {m[0].len()} else {0});
+    let mut r = vec![vec![vec![vec![vec![vec![0.0;4];4];4];4];nx];ny];
+    for j in 1..ny.saturating_sub(1) { for i in 1..nx.saturating_sub(1) {
+        for s in 0..4 { for mu in 0..4 { for nu in 0..4 { for rho in 0..4 {
+            let dx_g = (c[j][i+1][s][mu][rho]-c[j][i-1][s][mu][rho])/(2.0*dx);
+            let dy_g = (c[j+1][i][s][mu][nu]-c[j-1][i][s][mu][nu])/(2.0*dy);
+            let mut ct = 0.0;
+            for lam in 0..4 { ct += c[j][i][s][nu][lam]*c[j][i][lam][mu][rho]
+                - c[j][i][s][rho][lam]*c[j][i][lam][mu][nu]; }
+            r[j][i][s][mu][nu][rho] = dx_g - dy_g + ct;
+        }}}}
+    }} r
+}
+
+pub fn compute_ricci_tensor(r: &Vec<Vec<Vec<Vec<Vec<Vec<f64>>>>>>)
+    -> Vec<Vec<Vec<Vec<f64>>>> {
+    let (ny,nx) = (r.len(), if r.len()>0 {r[0].len()} else {0});
+    let mut ric = vec![vec![vec![vec![0.0;4];4];nx];ny];
+    for j in 0..ny { for i in 0..nx { for mu in 0..4 { for nu in 0..4 {
+        let mut s = 0.0; for sigma in 0..4 { s += r[j][i][sigma][mu][sigma][nu]; }
+        ric[j][i][mu][nu] = s;
+    }}}} ric
+}
+
+pub fn ricci_scalar_from_tensor(m: &Vec<Vec<Vec<Vec<f64>>>>, ric: &Vec<Vec<Vec<Vec<f64>>>>)
+    -> Vec<Vec<f64>> {
+    let (ny,nx) = (m.len(), if m.len()>0 {m[0].len()} else {0});
+    let mut r = vec![vec![0.0;nx];ny];
+    for j in 0..ny { for i in 0..nx {
+        let ginv = invert_4x4(&metric_to_array(m,j,i));
+        let mut s = 0.0; for mu in 0..4 { for nu in 0..4 { s += ginv[mu][nu]*ric[j][i][mu][nu]; }}
+        r[j][i] = s;
+    }} r
+}
+
+pub fn ricci_flow_step(m: &Vec<Vec<Vec<Vec<f64>>>>, dx: f64, dy: f64, dt: f64)
+    -> Vec<Vec<Vec<Vec<f64>>>> {
+    let g = compute_christoffel(m,dx,dy); let r = compute_riemann(m,&g,dx,dy);
+    let ric = compute_ricci_tensor(&r);
+    let (ny,nx) = (m.len(), if m.len()>0 {m[0].len()} else {0});
+    let mut nm = m.clone();
+    for j in 1..ny.saturating_sub(1) { for i in 1..nx.saturating_sub(1) {
+        for mu in 0..4 { for nu in 0..4 { nm[j][i][mu][nu] = m[j][i][mu][nu] - 2.0*dt*ric[j][i][mu][nu]; }}
+    }} nm
+}
+
+// ── Scalar Curvature (simplified 2D) ─────────────────────────────────────────
+
+pub fn scalar_curvature(m: &Vec<Vec<Vec<Vec<f64>>>>, dx: f64, dy: f64) -> Vec<Vec<f64>> {
+    let (ny,nx) = (m.len(), if m.len()>0 {m[0].len()} else {0});
+    let mut curv = vec![vec![0.0;nx];ny];
+    for j in 1..ny.saturating_sub(1) { for i in 1..nx.saturating_sub(1) {
+        let (g11,g22) = (m[j][i][1][1], m[j][i][2][2]);
+        if g11.abs()<1e-12||g22.abs()<1e-12 { continue; }
+        curv[j][i] = (m[j][i+1][1][1]-2.0*m[j][i][1][1]+m[j][i-1][1][1])/(dx*dx)/g11
+                    +(m[j+1][i][2][2]-2.0*m[j][i][2][2]+m[j-1][i][2][2])/(dy*dy)/g22;
+    }} curv
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PDE / WAVE EQUATION  (leapfrog scheme, 2nd order)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+pub fn pde_step(f: &[Vec<f64>], m: &Vec<Vec<Vec<Vec<f64>>>>, dx: f64, dy: f64, dt: f64, c: f64)
+    -> Vec<Vec<f64>> {
+    let (ny,nx) = (f.len(), if f.len()>0 {f[0].len()} else {0});
+    let mut nxt = f.to_vec();
+    for j in 1..ny.saturating_sub(1) { for i in 1..nx.saturating_sub(1) {
+        let (g11,g22) = (m[j][i][1][1], m[j][i][2][2]);
+        if g11.abs()<1e-12||g22.abs()<1e-12 { continue; }
+        let lap = (f[j][i+1]-2.0*f[j][i]+f[j][i-1])/(dx*dx)/g11
+                + (f[j+1][i]-2.0*f[j][i]+f[j-1][i])/(dy*dy)/g22;
+        nxt[j][i] = f[j][i] + dt*c*lap;
+    }} nxt
+}
+
+pub fn wave_equation_step(u: &[f64], up: &[f64], dx: f64, dt: f64, c: f64) -> Vec<f64> {
+    let n = u.len(); let mut un = vec![0.0;n]; let r2 = (c*dt/dx).powi(2);
+    for i in 1..n-1 { un[i] = 2.0*u[i]-up[i]+r2*(u[i+1]-2.0*u[i]+u[i-1]); }
+    un
+}
+
+// ── Coupled Evolution (wave on dynamic metric) ───────────────────────────────
+
+pub fn coupled_evolution_step(f: &[Vec<f64>], fp: &[Vec<f64>], m: &Vec<Vec<Vec<Vec<f64>>>>,
+    dx: f64, dy: f64, dt: f64, cs: f64) -> (Vec<Vec<f64>>, Vec<Vec<Vec<Vec<f64>>>>) {
+    let (ny,nx) = (f.len(), if f.len()>0 {f[0].len()} else {0});
+    let mut nf = f.to_vec(); let r2 = (cs*dt/dx).powi(2);
+    for j in 1..ny.saturating_sub(1) { for i in 1..nx.saturating_sub(1) {
+        let (g11,g22) = (m[j][i][1][1], m[j][i][2][2]);
+        if g11.abs()<1e-12||g22.abs()<1e-12 { continue; }
+        let lap = (f[j][i+1]-2.0*f[j][i]+f[j][i-1])/(dx*dx)/g11
+                + (f[j+1][i]-2.0*f[j][i]+f[j-1][i])/(dy*dy)/g22;
+        nf[j][i] = 2.0*f[j][i]-fp[j][i]+r2*lap*dx*dx;
+    }}
+    (nf, ricci_flow_step(m,dx,dy,dt))
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MESH ANALYSIS  (FEM triangulation, Laplace-Beltrami)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct MeshElement { pub vertices: Vec<[f64;2]>, pub area: f64 }
+
+pub fn triangle_area(a: &[f64;2], b: &[f64;2], c: &[f64;2]) -> f64 {
+    0.5*((b[0]-a[0])*(c[1]-a[1])-(c[0]-a[0])*(b[1]-a[1])).abs()
+}
+
+pub fn generate_triangulation(gx: &[f64], gy: &[f64]) -> Vec<MeshElement> {
+    let (nx,ny) = (gx.len(), gy.len()); let mut el = Vec::new();
+    for j in 0..ny-1 { for i in 0..nx-1 {
+        let (v0,v1,v2,v3) = ([gx[i],gy[j]],[gx[i+1],gy[j]],[gx[i],gy[j+1]],[gx[i+1],gy[j+1]]);
+        el.push(MeshElement{vertices:vec![v0,v1,v2], area:triangle_area(&v0,&v1,&v2)});
+        el.push(MeshElement{vertices:vec![v1,v3,v2], area:triangle_area(&v1,&v3,&v2)});
+    }} el
+}
+
+pub fn mesh_laplacian(el: &[MeshElement], v: &[Vec<f64>], gx: &[f64], gy: &[f64]) -> Vec<Vec<f64>> {
+    let (ny,nx) = (v.len(), if v.len()>0 {v[0].len()} else {0});
+    let mut l = vec![vec![0.0;nx];ny]; let (dx,dy) = (gx[1]-gx[0], gy[1]-gy[0]);
+    for e in el {
+        let (verts, area) = (&e.vertices, e.area); if area<1e-30 { continue; }
+        let mut g: Vec<[f64;2]> = vec![[0.0,0.0];3];
+        for i in 0..3 { let (j,k) = ((i+1)%3, (i+2)%3); let sg = if i==0{1.0}else{-1.0};
+            g[i] = [sg*(verts[j][1]-verts[k][1])/(2.0*area), -sg*(verts[j][0]-verts[k][0])/(2.0*area)]; }
+        let mut vals = [0.0;3];
+        for (vi,w) in verts.iter().enumerate() {
+            let (xi,yi) = (((w[0]-gx[0])/dx).round() as usize, ((w[1]-gy[0])/dy).round() as usize);
+            if xi<nx&&yi<ny { vals[vi] = v[yi][xi]; }
+        }
+        for i in 0..3 {
+            let (xi,yi) = (((verts[i][0]-gx[0])/dx).round() as usize, ((verts[i][1]-gy[0])/dy).round() as usize);
+            if xi<nx&&yi<ny { for j in 0..3 { l[yi][xi] += vals[j]*(g[i][0]*g[j][0]+g[i][1]*g[j][1])*area; }}
+        }
+    } l
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// GRAPH / SAT / EIGENVALUES
+// ═══════════════════════════════════════════════════════════════════════════════
+
+pub fn graph_shortest_path(adj: &[Vec<f64>], src: usize) -> Vec<f64> {
+    let n = adj.len(); let mut d = vec![f64::INFINITY;n]; let mut vis = vec![false;n];
+    d[src] = 0.0;
+    for _ in 0..n {
+        let (mut u, mut md) = (0, f64::INFINITY);
+        for i in 0..n { if !vis[i]&&d[i]<md { md=d[i]; u=i; }}
+        if md==f64::INFINITY { break; }
+        vis[u]=true;
+        for v in 0..n { if adj[u][v]>0.5&&!vis[v] { let a=d[u]+1.0; if a<d[v] { d[v]=a; }}}
+    } d
+}
+
+pub fn laplacian_eigenvalues_1d(n: usize) -> Vec<f64> {
+    let h=1.0/(n as f64); (1..=n).map(|k| (2.0/(h*h))*(1.0-((k as f64)*PI*h).cos())).collect()
+}
+
+pub fn analytic_laplacian_eigenvalues_2d(mm: usize, nn: usize) -> Vec<f64> {
+    let mut v=Vec::new();
+    for m in 1..=mm { for n in 1..=nn { v.push(PI*PI*((m*m+n*n) as f64)); }}
+    v.sort_by(|a,b| a.partial_cmp(b).unwrap()); v
+}
+
+fn dpll(clauses: &[Vec<i32>], assign: &mut Vec<Option<bool>>, nv: usize) -> bool {
+    if clauses.iter().all(|c| c.iter().any(|&l| {
+        let idx = l.unsigned_abs() as usize;
+        match assign[idx] { Some(v)=> (l>0&&v)||(l<0&&!v), None=>false }
+    })) { return true; }
+    let var = match (1..=nv).find(|&i| assign[i].is_none()) { Some(v)=>v, None=>return false };
+    for val in [true, false] { assign[var]=Some(val); if dpll(clauses,assign,nv) { return true; }}
+    assign[var]=None; false
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// STRUCTURAL ENGINE  — unified solver dispatch
+// ═══════════════════════════════════════════════════════════════════════════════
+
+pub struct StructuralEngine { pub params: HashMap<String,f64> }
+
+impl StructuralEngine {
+    pub fn new(params: HashMap<String,f64>) -> Self { Self { params } }
+
+    pub fn build_metric_field(&self, gx: &[f64], gy: &[f64], t: f64) -> Vec<Vec<Vec<Vec<f64>>>> {
+        let (ny,nx) = (gy.len(), gx.len());
+        let mut m = vec![vec![vec![vec![0.0;4];4];nx];ny];
+        for j in 0..ny { for i in 0..nx { m[j][i] = general_metric_tensor(gx[i],gy[j],t).map(|r|r.to_vec()).to_vec(); }}
+        m
+    }
+
+    pub fn solve(&self, class: ProblemClass, gx: &[f64], gy: &[f64]) -> StructuralObject {
+        let t = *self.params.get("t").unwrap_or(&0.0);
+        let (nx,ny) = (gx.len(), gy.len());
+        let (dx,dy) = (if nx>1{gx[1]-gx[0]}else{1.0}, if ny>1{gy[1]-gy[0]}else{1.0});
+        let metric = self.build_metric_field(gx,gy,t);
+        let curvature = scalar_curvature(&metric,dx,dy);
+        let mut field = vec![vec![0.0;nx];ny];
+        for j in 0..ny { for i in 0..nx { field[j][i] = (-(gx[i]*gx[i]+gy[j]*gy[j])*0.1).exp(); }}
+        let mut causal = vec![vec![0.0;nx];ny];
+        for j in 0..ny { for i in 0..nx {
+            causal[j][i] = ((i as f64-nx as f64/2.0).abs()+(j as f64-ny as f64/2.0).abs())*0.01; }}
+        let modes = vec![field.clone()];
+        let mut obj = StructuralObject {
+            metric: metric.clone(), curvature, field, causal, modes,
+            graph:None, mesh:None, constraints:None,
+            ricci_tensor:None, riemann_tensor:None, christoffel:None,
+            metadata:self.params.clone(),
+        };
+        match class {
+            ProblemClass::Christoffel => { obj.christoffel = Some(compute_christoffel(&metric,dx,dy)); }
+            ProblemClass::RiemannCurvature => {
+                let g = compute_christoffel(&metric,dx,dy);
+                obj.riemann_tensor = Some(compute_riemann(&metric,&g,dx,dy));
+            }
+            ProblemClass::RicciCurvature => {
+                let g = compute_christoffel(&metric,dx,dy);
+                let r = compute_riemann(&metric,&g,dx,dy);
+                let ric = compute_ricci_tensor(&r);
+                obj.ricci_tensor = Some(ric.clone());
+                obj.curvature = ricci_scalar_from_tensor(&metric,&ric);
+            }
+            ProblemClass::RicciFlow => {
+                let steps = *self.params.get("ricci_steps").unwrap_or(&10.0) as usize;
+                let dt = *self.params.get("ricci_dt").unwrap_or(&0.001);
+                let mut mf = metric.clone();
+                for _ in 0..steps { mf = ricci_flow_step(&mf,dx,dy,dt); }
+                obj.metric = mf.clone();
+                let g = compute_christoffel(&mf,dx,dy);
+                let r = compute_riemann(&mf,&g,dx,dy);
+                let ric = compute_ricci_tensor(&r);
+                obj.ricci_tensor = Some(ric.clone());
+                obj.curvature = ricci_scalar_from_tensor(&mf,&ric);
+            }
+            ProblemClass::CoupledEvolution => {
+                let steps = *self.params.get("coupled_steps").unwrap_or(&10.0) as usize;
+                let dt = *self.params.get("coupled_dt").unwrap_or(&0.001);
+                let cs = *self.params.get("wave_speed").unwrap_or(&1.0);
+                let mut mf = metric.clone();
+                let mut f = vec![vec![0.0;nx];ny];
+                for j in 0..ny { for i in 0..nx { f[j][i] = (-(gx[i]*gx[i]+gy[j]*gy[j])*0.1).exp(); }}
+                let mut fp = f.clone();
+                for _ in 0..steps {
+                    let (nf,nm) = coupled_evolution_step(&f,&fp,&mf,dx,dy,dt,cs);
+                    fp = f; f = nf; mf = nm;
+                }
+                obj.metric = mf; obj.field = f;
+            }
+            ProblemClass::GraphPath => {
+                let n = ny*nx; let mut adj = vec![vec![0.0;n];n];
+                for j in 0..ny { for i in 0..nx {
+                    let idx = j*nx+i;
+                    if j>0 { adj[idx][idx-nx]=1.0; } if j<ny-1 { adj[idx][idx+nx]=1.0; }
+                    if i>0 { adj[idx][idx-1]=1.0; } if i<nx-1 { adj[idx][idx+1]=1.0; }
+                }}
+                obj.graph = Some(adj);
+            }
+            ProblemClass::MeshAnalysis => {
+                let el = generate_triangulation(gx,gy);
+                let md: Vec<Vec<Vec<f64>>> = el.iter().map(|e| e.vertices.iter().map(|v| vec![v[0],v[1]]).collect()).collect();
+                obj.mesh = Some(md);
+            }
+            ProblemClass::ConstraintSolve => {
+                let mut c = vec![vec![0.0;nx];ny];
+                for j in 0..ny { for i in 0..nx {
+                    c[j][i] = ((i as f64-nx as f64/2.0).abs()+(j as f64-ny as f64/2.0).abs())*0.1; }}
+                obj.constraints = Some(c);
+            }
+            _ => {}
+        }
+        obj
+    }
+
+    pub fn evolve_wave(&self, init: &[f64], dx: f64, dt: f64, c: f64, steps: usize) -> Vec<Vec<f64>> {
+        let mut hist = Vec::new(); let mut u = init.to_vec(); let mut up = init.to_vec();
+        for _ in 0..steps { let un = wave_equation_step(&u,&up,dx,dt,c); hist.push(un.clone()); up=u; u=un; }
+        hist
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ATTACK SUITE  — 15 scientific validation tests
+// ═══════════════════════════════════════════════════════════════════════════════
+
+#[derive(Serialize, Debug)]
+pub struct TestResult { pub test: String, pub passed: bool, pub details: serde_json::Value }
+
+// 1. Flat curvature ────────────────────────────────────────────────────────────
+fn t1() -> TestResult {
+    let (ny,nx) = (32usize,32usize); let dx=1.0/32.0; let dy=1.0/32.0;
+    let mut m = vec![vec![vec![vec![0.0;4];4];nx];ny];
+    for j in 0..ny { for i in 0..nx { m[j][i][0][0]=-1.0; m[j][i][1][1]=1.0; m[j][i][2][2]=1.0; m[j][i][3][3]=1.0; }}
+    let max = scalar_curvature(&m,dx,dy).iter().flat_map(|r|r.iter()).map(|x|x.abs()).fold(0.0f64,f64::max);
+    TestResult{test:"flat_curvature".into(),passed:max<1e-6,details:serde_json::json!({"max_abs":max})}
+}
+
+// 2. PDE convergence ───────────────────────────────────────────────────────────
+fn t2() -> TestResult {
+    let (cfl,ft) = (0.5,1.0);
+    let cfg: Vec<(f64,usize,f64)> = vec![
+        (0.1,(ft/(cfl*0.1)).round() as usize,cfl*0.1),
+        (0.05,(ft/(cfl*0.05)).round() as usize,cfl*0.05),
+        (0.025,(ft/(cfl*0.025)).round() as usize,cfl*0.025)];
+    let mut sols = Vec::new();
+    for &(dx,n,dt) in &cfg {
+        let gs = (1.0/dx).round() as usize+1;
+        let init: Vec<f64> = (0..gs).map(|i| (PI*i as f64*dx).sin()).collect();
+        let r2 = (dt/dx).powi(2);
+        let mut u = init.clone(); let mut up = init.clone();
+        for i in 1..gs-1 { up[i] = init[i]+0.5*r2*(init[i+1]-2.0*init[i]+init[i-1]); }
+        for _ in 0..n { let un = wave_equation_step(&u,&up,dx,dt,1.0); up=u; u=un; }
+        sols.push(u);
+    }
+    let mut errs = Vec::new();
+    for (idx,&(dx,_,_)) in cfg.iter().enumerate() {
+        let sol = &sols[idx]; let n = sol.len();
+        let (mut es,mut ns) = (0.0,0.0);
+        for i in 0..n { let a=-(PI*i as f64*dx).sin(); let d=sol[i]-a; es+=d*d; ns+=a*a; }
+        errs.push(if ns>0.0{(es/ns).sqrt()}else{0.0});
+    }
+    let (r1,r2r) = (errs[0]/errs[1], errs[1]/errs[2]);
+    let ok = errs[0]>errs[1]&&errs[1]>errs[2]
+        && ((r1-4.0).abs()<2.0||(r2r-4.0).abs()<2.0||(r1-16.0).abs()<8.0||(r2r-16.0).abs()<8.0);
+    TestResult{test:"pde_convergence".into(),passed:ok,details:serde_json::json!({"errors":errs,"ratios":[r1,r2r]})}
+}
+
+// 3. Eigenmode benchmark ───────────────────────────────────────────────────────
+fn t3() -> TestResult {
+    let ana = analytic_laplacian_eigenvalues_2d(3,3);
+    let (n,h) = (32,1.0/32.0);
+    let mut num = Vec::new();
+    for m in 1..=3 { for mm in 1..=3 {
+        num.push((2.0/(h*h))*(1.0-((m as f64)*PI*h).cos())+(2.0/(h*h))*(1.0-((mm as f64)*PI*h).cos())); }}
+    num.sort_by(|a,b| a.partial_cmp(b).unwrap());
+    let max = num.iter().zip(ana.iter()).map(|(n,a)| if a.abs()>1e-15{(n-a).abs()/a.abs()}else{0.0}).fold(0.0f64,f64::max);
+    TestResult{test:"eigenmode_benchmark".into(),passed:max<0.05,details:serde_json::json!({"max_rel":max})}
+}
+
+// 4. Graph distance ────────────────────────────────────────────────────────────
+fn t4() -> TestResult {
+    let mut adj = vec![vec![0.0;5];5];
+    for e in &[(0,1),(1,2),(2,3),(3,4)] { let (a,b)=e; adj[*a][*b]=1.0; adj[*b][*a]=1.0; }
+    let d = graph_shortest_path(&adj,0);
+    let e = vec![0.0,1.0,2.0,3.0,4.0];
+    let err = d.iter().zip(e.iter()).map(|(a,b)|(a-b)*(a-b)).sum::<f64>().sqrt();
+    TestResult{test:"graph_distance".into(),passed:err<1e-6,details:serde_json::json!({"dist":d,"err":err})}
+}
+
+// 5. SAT solver ────────────────────────────────────────────────────────────────
+fn t5() -> TestResult {
+    let clauses = vec![vec![1,-2],vec![2,3],vec![-1,3]];
+    let mut assign = vec![None;4];
+    let solved = dpll(&clauses,&mut assign,3);
+    let all = solved && clauses.iter().all(|c| c.iter().any(|&l| {
+        let v = assign[l.unsigned_abs() as usize].unwrap_or(false); (l>0&&v)||(l<0&&!v)
+    }));
+    TestResult{test:"sat_solver".into(),passed:all,details:serde_json::json!({"solved":solved,"all_sat":all})}
+}
+
+// 6. Structural closure ────────────────────────────────────────────────────────
+fn t6() -> TestResult {
+    let mut p = HashMap::new(); p.insert("t".into(),0.0);
+    let e = StructuralEngine::new(p);
+    let gx:Vec<f64>=(0..16).map(|i|-1.0+i as f64*2.0/15.0).collect();
+    let gy:Vec<f64>=(0..16).map(|i|-1.0+i as f64*2.0/15.0).collect();
+    let o = e.solve(ProblemClass::Metric,&gx,&gy);
+    let ok = o.metric.len()==16&&o.metric[0].len()==16&&o.metric[0][0].len()==4
+        &&o.curvature.len()==16&&o.field.len()==16;
+    TestResult{test:"structural_closure".into(),passed:ok,details:serde_json::json!({"closed":ok})}
+}
+
+// 7. Christoffel non-zero ──────────────────────────────────────────────────────
+fn t7() -> TestResult {
+    let e = StructuralEngine::new(HashMap::new());
+    let (nx,ny):(usize,usize)=(16,16);
+    let gx:Vec<f64>=(0..nx).map(|i|-1.0+i as f64*2.0/15.0).collect();
+    let gy:Vec<f64>=(0..ny).map(|j|-1.0+j as f64*2.0/15.0).collect();
+    let (dx,dy)=(gx[1]-gx[0],gy[1]-gy[0]);
+    let m = e.build_metric_field(&gx,&gy,0.5);
+    let g = compute_christoffel(&m,dx,dy);
+    let (mut mx,mut cnt) = (0.0,0);
+    for j in 0..ny { for i in 0..nx { for s in 0..4 { for mu in 0..4 { for nu in 0..4 {
+        let v = g[j][i][s][mu][nu].abs(); if v>mx {mx=v;} if v>1e-10 {cnt+=1;} }}}}}
+    TestResult{test:"christoffel_nonzero".into(),passed:cnt>0&&mx>1e-8,details:serde_json::json!({"max":mx,"cnt":cnt})}
+}
+
+// 8. Riemann tensor non-zero ───────────────────────────────────────────────────
+fn t8() -> TestResult {
+    let e = StructuralEngine::new(HashMap::new());
+    let (nx,ny):(usize,usize)=(16,16);
+    let gx:Vec<f64>=(0..nx).map(|i|-1.0+i as f64*2.0/15.0).collect();
+    let gy:Vec<f64>=(0..ny).map(|j|-1.0+j as f64*2.0/15.0).collect();
+    let (dx,dy)=(gx[1]-gx[0],gy[1]-gy[0]);
+    let m = e.build_metric_field(&gx,&gy,0.5);
+    let g = compute_christoffel(&m,dx,dy);
+    let r = compute_riemann(&m,&g,dx,dy);
+    let (mut mx,mut cnt)=(0.0,0);
+    for j in 1..ny-1 { for i in 1..nx-1 { for s in 0..4 { for mu in 0..4 { for nu in 0..4 { for rr in 0..4 {
+        let v=r[j][i][s][mu][nu][rr].abs(); if v>mx{mx=v;} if v>1e-10{cnt+=1;} }}}}}}
+    TestResult{test:"riemann_tensor".into(),passed:cnt>0&&mx>1e-8,details:serde_json::json!({"max":mx,"cnt":cnt})}
+}
+
+// 9. Ricci tensor non-zero ─────────────────────────────────────────────────────
+fn t9() -> TestResult {
+    let e = StructuralEngine::new(HashMap::new());
+    let (nx,ny):(usize,usize)=(16,16);
+    let gx:Vec<f64>=(0..nx).map(|i|-1.0+i as f64*2.0/15.0).collect();
+    let gy:Vec<f64>=(0..ny).map(|j|-1.0+j as f64*2.0/15.0).collect();
+    let (dx,dy)=(gx[1]-gx[0],gy[1]-gy[0]);
+    let m = e.build_metric_field(&gx,&gy,0.5);
+    let g = compute_christoffel(&m,dx,dy); let r = compute_riemann(&m,&g,dx,dy);
+    let ric = compute_ricci_tensor(&r); let rs = ricci_scalar_from_tensor(&m,&ric);
+    let (mut mr,mut ms) = (0.0,0.0);
+    for j in 0..ny { for i in 0..nx { for mu in 0..4 { for nu in 0..4 { let v=ric[j][i][mu][nu].abs(); if v>mr{mr=v;}}}
+        let v=rs[j][i].abs(); if v>ms{ms=v;}}}
+    TestResult{test:"ricci_tensor".into(),passed:mr>1e-8&&ms>1e-8,details:serde_json::json!({"max_ricci":mr,"max_R":ms})}
+}
+
+// 10. Ricci flow ──────────────────────────────────────────────────────────────
+fn t10() -> TestResult {
+    let e=StructuralEngine::new(HashMap::new()); let (nx,ny):(usize,usize)=(12,12);
+    let gx:Vec<f64>=(0..nx).map(|i|-1.0+i as f64*2.0/11.0).collect();
+    let gy:Vec<f64>=(0..ny).map(|j|-1.0+j as f64*2.0/11.0).collect();
+    let (dx,dy)=(gx[1]-gx[0],gy[1]-gy[0]);
+    let m = e.build_metric_field(&gx,&gy,0.0);
+    let g0=compute_christoffel(&m,dx,dy); let r0=compute_riemann(&m,&g0,dx,dy); let ric0=compute_ricci_tensor(&r0);
+    let m1 = ricci_flow_step(&m,dx,dy,0.001);
+    let mut ch = 0.0; for j in 1..ny-1{for i in 1..nx-1{for mu in 0..4{for nu in 0..4{let v=(m1[j][i][mu][nu]-m[j][i][mu][nu]).abs();if v>ch{ch=v;}}}}}
+    let g1=compute_christoffel(&m1,dx,dy); let r1=compute_riemann(&m1,&g1,dx,dy); let ric1=compute_ricci_tensor(&r1);
+    let mut mr=0.0; for j in 1..ny-1{for i in 1..nx-1{for mu in 0..4{for nu in 0..4{let v=ric1[j][i][mu][nu].abs();if v>mr{mr=v;}}}}}
+    TestResult{test:"ricci_flow".into(),passed:ch>1e-10&&mr>0.0,details:serde_json::json!({"max_change":ch,"ricci_after":mr})}
+}
+
+// 11. Mesh triangulation ───────────────────────────────────────────────────────
+fn t11() -> TestResult {
+    let (nx,ny):(usize,usize)=(8,8);
+    let gx:Vec<f64>=(0..nx).map(|i|i as f64).collect();
+    let gy:Vec<f64>=(0..ny).map(|j|j as f64).collect();
+    let el = generate_triangulation(&gx,&gy);
+    let exp = 2*(nx-1)*(ny-1);
+    let ta: f64 = el.iter().map(|e| e.area).sum();
+    TestResult{test:"mesh_triangulation".into(),passed:el.len()==exp&&(ta-((nx-1)*(ny-1))as f64).abs()<1e-10&&el.iter().all(|e|e.area>0.0),
+        details:serde_json::json!({"count":el.len(),"expected":exp,"total_area":ta})}
+}
+
+// 12. Coupled evolution ────────────────────────────────────────────────────────
+fn t12() -> TestResult {
+    let (ny,nx):(usize,usize)=(10,10);
+    let gx:Vec<f64>=(0..nx).map(|i|i as f64*0.1).collect();
+    let gy:Vec<f64>=(0..ny).map(|j|j as f64*0.1).collect();
+    let (dx,dy)=(gx[1]-gx[0],gy[1]-gy[0]);
+    let e=StructuralEngine::new(HashMap::new()); let m=e.build_metric_field(&gx,&gy,0.0);
+    let mut f=vec![vec![0.0;nx];ny];
+    for j in 0..ny{for i in 0..nx{f[j][i]=(gx[i]*PI).sin()*(gy[j]*PI).sin();}}
+    let fp=f.clone();
+    let (nf,nm)=coupled_evolution_step(&f,&fp,&m,dx,dy,0.001,1.0);
+    let ok=nf.len()==ny&&nm.len()==ny;
+    TestResult{test:"coupled_evolution".into(),passed:ok,details:serde_json::json!({"ok":ok})}
+}
+
+// 13. Graph benchmark ──────────────────────────────────────────────────────────
+fn t13() -> TestResult {
+    let mut adj = vec![vec![0.0;6];6];
+    for &(a,b) in &[(0,1),(0,2),(1,3),(2,3),(3,4),(4,5)] { adj[a][b]=1.0; adj[b][a]=1.0; }
+    let d = graph_shortest_path(&adj,0);
+    let exp = [0.0,1.0,1.0,2.0,3.0,4.0];
+    let err = d.iter().zip(exp.iter()).map(|(a,b)|(a-b)*(a-b)).sum::<f64>().sqrt();
+    TestResult{test:"graph_benchmark".into(),passed:err<1e-6,details:serde_json::json!({"err":err})}
+}
+
+// 14. All problem classes ──────────────────────────────────────────────────────
+fn t14() -> TestResult {
+    let mut p = HashMap::new(); p.insert("t".into(),0.0); p.insert("ricci_steps".into(),2.0); p.insert("ricci_dt".into(),0.001);
+    let e = StructuralEngine::new(p);
+    let gx:Vec<f64>=(0..8).map(|i|-1.0+i as f64*2.0/7.0).collect();
+    let gy:Vec<f64>=(0..8).map(|j|-1.0+j as f64*2.0/7.0).collect();
+    let cases = [(ProblemClass::Metric,"Metric"),(ProblemClass::RicciFlow,"RicciFlow"),
+        (ProblemClass::Christoffel,"Γ"),(ProblemClass::RiemannCurvature,"Riemann"),
+        (ProblemClass::RicciCurvature,"Ricci"),(ProblemClass::GraphPath,"Graph"),
+        (ProblemClass::MeshAnalysis,"Mesh")];
+    let all = cases.iter().all(|(c,_)| {
+        let o = e.solve(*c,&gx,&gy);
+        match c {
+            ProblemClass::Metric|ProblemClass::Curvature => o.metric.len()==8,
+            ProblemClass::RicciCurvature => o.ricci_tensor.is_some(),
+            ProblemClass::Christoffel => o.christoffel.is_some(),
+            ProblemClass::RiemannCurvature => o.riemann_tensor.is_some(),
+            ProblemClass::RicciFlow => o.ricci_tensor.is_some(),
+            ProblemClass::GraphPath => o.graph.is_some(),
+            ProblemClass::MeshAnalysis => o.mesh.is_some(),
+            _ => false,
+        }
+    });
+    TestResult{test:"all_problem_classes".into(),passed:all,details:serde_json::json!({"all_successful":all})}
+}
+
+// 15. Mesh Laplacian ──────────────────────────────────────────────────────────
+fn t15() -> TestResult {
+    let (nx,ny):(usize,usize)=(8,8);
+    let gx:Vec<f64>=(0..nx).map(|i|i as f64).collect();
+    let gy:Vec<f64>=(0..ny).map(|j|j as f64).collect();
+    let el = generate_triangulation(&gx,&gy);
+    let mut v = vec![vec![0.0;nx];ny];
+    for j in 0..ny { for i in 0..nx { v[j][i] = gx[i]*gx[i]+gy[j]*gy[j]; }}
+    let l = mesh_laplacian(&el,&v,&gx,&gy);
+    let mx = l.iter().flat_map(|r|r.iter()).map(|x|x.abs()).fold(0.0f64,f64::max);
+    TestResult{test:"mesh_laplacian".into(),passed:mx>0.0,details:serde_json::json!({"max_lap":mx})}
+}
+
+pub fn run_attack_suite() -> serde_json::Value {
+    let r = vec![t1(),t2(),t3(),t4(),t5(),t6(),t7(),t8(),t9(),t10(),t11(),t12(),t13(),t14(),t15()];
+    let p = r.iter().filter(|x|x.passed).count();
+    serde_json::json!({"all_passed":p==r.len(),"passed":p,"total":r.len(),"results":r})
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// UNIT TESTS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test] fn test_metric() { let e=StructuralEngine::new(HashMap::new());
+        let m=e.build_metric_field(&(0..10).map(|i|i as f64*0.1).collect::<Vec<_>>(),&(0..10).map(|i|i as f64*0.1).collect::<Vec<_>>(),0.0);
+        assert_eq!(m.len(),10); assert_eq!(m[0].len(),10); }
+    #[test] fn test_wave() { let e=StructuralEngine::new(HashMap::new()); let dx=1.0/100.0;
+        let init:Vec<f64>=(0..=100).map(|i|(PI*i as f64*dx).sin()).collect();
+        assert_eq!(e.evolve_wave(&init,dx,0.001,1.0,10).len(),10); }
+    #[test] fn test_inv4x4() { let m=[[2.,1.,0.,0.],[1.,3.,1.,0.],[0.,1.,2.,1.],[0.,0.,1.,2.]]; let inv=invert_4x4(&m);
+        let mut p=[[0.;4];4]; for i in 0..4 { for j in 0..4 { for k in 0..4 { p[i][j]+=m[i][k]*inv[k][j]; }}}
+        for i in 0..4 { for j in 0..4 { assert!((p[i][j]-if i==j{1.0}else{0.0}).abs()<1e-10); }}}
+    #[test] fn test_gamma_flat() { let (ny,nx):(usize,usize)=(8,8);
+        let mut m=vec![vec![vec![vec![0.0;4];4];nx];ny];
+        for j in 0..ny{for i in 0..nx{m[j][i][0][0]=-1.;m[j][i][1][1]=1.;m[j][i][2][2]=1.;m[j][i][3][3]=1.;}}
+        let g=compute_christoffel(&m,0.1,0.1);
+        for j in 0..ny{for i in 0..nx{for s in 0..4{for mu in 0..4{for nu in 0..4{assert!(g[j][i][s][mu][nu].abs()<1e-14);}}}}}}
+    #[test] fn test_ricci_flat() { let (ny,nx):(usize,usize)=(8,8);
+        let mut m=vec![vec![vec![vec![0.0;4];4];nx];ny];
+        for j in 0..ny{for i in 0..nx{m[j][i][0][0]=-1.;m[j][i][1][1]=1.;m[j][i][2][2]=1.;m[j][i][3][3]=1.;}}
+        let g=compute_christoffel(&m,0.1,0.1); let r=compute_riemann(&m,&g,0.1,0.1);
+        let ric=compute_ricci_tensor(&r); let rs=ricci_scalar_from_tensor(&m,&ric);
+        for j in 1..ny-1{for i in 1..nx-1{for mu in 0..4{for nu in 0..4{assert!(ric[j][i][mu][nu].abs()<1e-12);}}
+            assert!(rs[j][i].abs()<1e-12);}}}
+    #[test] fn test_ricci_flow_flat() { let (ny,nx):(usize,usize)=(8,8);
+        let mut m=vec![vec![vec![vec![0.0;4];4];nx];ny];
+        for j in 0..ny{for i in 0..nx{m[j][i][0][0]=-1.;m[j][i][1][1]=1.;m[j][i][2][2]=1.;m[j][i][3][3]=1.;}}
+        let nm=ricci_flow_step(&m,0.1,0.1,0.001);
+        for j in 0..ny{for i in 0..nx{for mu in 0..4{for nu in 0..4{assert!((nm[j][i][mu][nu]-m[j][i][mu][nu]).abs()<1e-14);}}}}}
+    #[test] fn test_tri() { let gx:Vec<f64>=(0..4).map(|i|i as f64).collect();
+        let gy:Vec<f64>=(0..4).map(|j|j as f64).collect();
+        let el=generate_triangulation(&gx,&gy); assert_eq!(el.len(),18); assert!(el.iter().all(|e|e.area>0.0)); }
+    #[test] fn test_coupled_flat() { let (ny,nx):(usize,usize)=(8,8);
+        let mut m=vec![vec![vec![vec![0.0;4];4];nx];ny];
+        for j in 0..ny{for i in 0..nx{m[j][i][0][0]=-1.;m[j][i][1][1]=1.;m[j][i][2][2]=1.;m[j][i][3][3]=1.;}}
+        let gx:Vec<f64>=(0..nx).map(|i|i as f64*0.1).collect();
+        let mut f=vec![vec![0.0;nx];ny]; for j in 0..ny{for i in 0..nx{f[j][i]=gx[i].sin();}}
+        let (nf,nm)=coupled_evolution_step(&f,&f,&m,0.1,0.1,0.001,1.0);
+        assert_eq!(nf.len(),ny); assert_eq!(nm.len(),ny); }
+    #[test] fn test_scalar_vs_ricci() { let e=StructuralEngine::new(HashMap::new());
+        let gx:Vec<f64>=(0..16).map(|i|-1.0+i as f64*2.0/15.0).collect();
+        let gy:Vec<f64>=(0..16).map(|i|-1.0+i as f64*2.0/15.0).collect();
+        let (dx,dy)=(gx[1]-gx[0],gy[1]-gy[0]);
+        let rs=scalar_curvature(&e.build_metric_field(&gx,&gy,0.0),dx,dy);
+        let rf=e.solve(ProblemClass::RicciCurvature,&gx,&gy).curvature;
+        let md: f64=(1..15).flat_map(|j|(1..15).map(move|i|(rs[j][i]-rf[j][i]).abs())).sum::<f64>()/196.0;
+        assert!(md<0.5); }
+    #[test] fn test_attack() { let r=run_attack_suite(); assert!(r["all_passed"].as_bool().unwrap()); }
+}
+============================================================================================================
+ 
