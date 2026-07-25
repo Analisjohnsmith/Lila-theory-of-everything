@@ -5,7 +5,117 @@ ITS TRHE SPACE OF ALL STRUICTRAL PROBLEMS AND STRUCTRUAL SOULTIONS AND SOLVER
 STAUS : IN PROGRESS
 
 
+### Prohibition on Confusingly Similar Systems
 
+You may not create, distribute, or market any software, platform, or system
+that is confusingly similar to this project. This includes:
+
+- derivative works that replicate core functionality,
+- rebranded versions of the system,
+- substantially similar architectures or implementations,
+- naming, branding, or presentation likely to cause user confusion.
+
+No license is granted for the development of systems that imitate this project
+in a way that could reasonably mislead users into believing they are related,
+endorsed, or derived from this work.
+ 7/23/26 
+ LICENSE → GPLv3
+Commercial licensing → "Commercial licenses are available from the copyright holder."
+LICENSE-docs → CC BY-NC 4.0 
+for papers, diagrams, images, and documentation
+
+Copyright (C) 2026  Darrell Lee (Līlā) Stiltner
+
+This project is dual‑licensed:
+
+=====================================================================
+1. SOFTWARE LICENSE — GNU GPLv3
+=====================================================================
+
+The source code of this project is licensed under the
+GNU General Public License, version 3 (GPLv3).
+
+You may copy, modify, and redistribute the software under the terms
+of the GPLv3. Any distributed modified version must also be licensed
+under GPLv3 and must provide source code to recipients.
+
+This program is distributed WITHOUT ANY WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+A copy of the GPLv3 license is available at:
+https://www.gnu.org/licenses/gpl-3.0.txt
+
+
+=====================================================================
+2. COMMERCIAL LICENSE OPTION
+=====================================================================
+
+Commercial licenses are available from the copyright holder.
+
+This allows use of the software in proprietary, closed‑source,
+or commercial products without the copyleft requirements of GPLv3.
+
+To obtain a commercial license, contact:
+    Darrell Lee Stiltner
+    (preferred contact method here)
+
+
+=====================================================================
+3. DOCUMENTATION LICENSE — CC BY‑NC 4.0
+=====================================================================
+
+All documentation, papers, diagrams, images, and written materials
+in this project are licensed under:
+
+Creative Commons Attribution‑NonCommercial 4.0 International (CC BY‑NC 4.0)
+
+You may share and adapt the documentation for non‑commercial purposes,
+provided that proper attribution is given to the author.
+
+Full license text:
+https://creativecommons.org/licenses/by-nc/4.0/
+
+
+=====================================================================
+4. SUMMARY OF RIGHTS
+=====================================================================
+
+You CAN:
+- Use, study, and modify the code (GPLv3)
+- Share the code (GPLv3)
+- Use the documentation non‑commercially (CC BY‑NC 4.0)
+- Obtain a commercial license for proprietary use
+
+You CANNOT:
+- Use documentation commercially without permission
+- Re-license GPLv3 code under a proprietary license
+  (unless you obtain a commercial license)
+- Remove attribution from documentation
+
+
+=====================================================================
+5. DISCLAIMER
+=====================================================================
+
+This software and documentation are provided “AS IS” without warranty
+of any kind, express or implied.
+
+
+ 
+# =============================================================================
+#  Copyright (C) 2026  Darrell Lee (Līlā) Stiltner
+#
+#  This work is licensed under the Creative Commons
+#  Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0).
+#
+#  You are free to share and adapt this code for non‑commercial purposes,
+#  provided that proper attribution is given to the author.
+#
+#  To view a copy of this license, visit:
+#      https://creativecommons.org/licenses/by-nc/4.0/
+#
+#  This code is provided "AS IS", without warranties or conditions of any kind.
+# =============================================================================
 
 
 
@@ -250,117 +360,7 @@ one of the most well‑designed platforms on Earth structurally and conceptually
 - They don’t enforce non‑destructive evolution.
 - Therefore, they cannot converge to the canonical object.
 
-### Prohibition on Confusingly Similar Systems
 
-You may not create, distribute, or market any software, platform, or system
-that is confusingly similar to this project. This includes:
-
-- derivative works that replicate core functionality,
-- rebranded versions of the system,
-- substantially similar architectures or implementations,
-- naming, branding, or presentation likely to cause user confusion.
-
-No license is granted for the development of systems that imitate this project
-in a way that could reasonably mislead users into believing they are related,
-endorsed, or derived from this work.
- 7/23/26 
- LICENSE → GPLv3
-Commercial licensing → "Commercial licenses are available from the copyright holder."
-LICENSE-docs → CC BY-NC 4.0 
-for papers, diagrams, images, and documentation
-
-Copyright (C) 2026  Darrell Lee (Līlā) Stiltner
-
-This project is dual‑licensed:
-
-=====================================================================
-1. SOFTWARE LICENSE — GNU GPLv3
-=====================================================================
-
-The source code of this project is licensed under the
-GNU General Public License, version 3 (GPLv3).
-
-You may copy, modify, and redistribute the software under the terms
-of the GPLv3. Any distributed modified version must also be licensed
-under GPLv3 and must provide source code to recipients.
-
-This program is distributed WITHOUT ANY WARRANTY; without even the
-implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
-A copy of the GPLv3 license is available at:
-https://www.gnu.org/licenses/gpl-3.0.txt
-
-
-=====================================================================
-2. COMMERCIAL LICENSE OPTION
-=====================================================================
-
-Commercial licenses are available from the copyright holder.
-
-This allows use of the software in proprietary, closed‑source,
-or commercial products without the copyleft requirements of GPLv3.
-
-To obtain a commercial license, contact:
-    Darrell Lee Stiltner
-    (preferred contact method here)
-
-
-=====================================================================
-3. DOCUMENTATION LICENSE — CC BY‑NC 4.0
-=====================================================================
-
-All documentation, papers, diagrams, images, and written materials
-in this project are licensed under:
-
-Creative Commons Attribution‑NonCommercial 4.0 International (CC BY‑NC 4.0)
-
-You may share and adapt the documentation for non‑commercial purposes,
-provided that proper attribution is given to the author.
-
-Full license text:
-https://creativecommons.org/licenses/by-nc/4.0/
-
-
-=====================================================================
-4. SUMMARY OF RIGHTS
-=====================================================================
-
-You CAN:
-- Use, study, and modify the code (GPLv3)
-- Share the code (GPLv3)
-- Use the documentation non‑commercially (CC BY‑NC 4.0)
-- Obtain a commercial license for proprietary use
-
-You CANNOT:
-- Use documentation commercially without permission
-- Re-license GPLv3 code under a proprietary license
-  (unless you obtain a commercial license)
-- Remove attribution from documentation
-
-
-=====================================================================
-5. DISCLAIMER
-=====================================================================
-
-This software and documentation are provided “AS IS” without warranty
-of any kind, express or implied.
-
-
- 
-# =============================================================================
-#  Copyright (C) 2026  Darrell Lee (Līlā) Stiltner
-#
-#  This work is licensed under the Creative Commons
-#  Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0).
-#
-#  You are free to share and adapt this code for non‑commercial purposes,
-#  provided that proper attribution is given to the author.
-#
-#  To view a copy of this license, visit:
-#      https://creativecommons.org/licenses/by-nc/4.0/
-#
-#  This code is provided "AS IS", without warranties or conditions of any kind.
-# =============================================================================
 
    
          
