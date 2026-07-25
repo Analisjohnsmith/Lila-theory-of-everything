@@ -1,4 +1,73 @@
    this is in progress7/22/26 actively at this moment 
+
+# **📜 Dual License Notice**
+
+```markdown
+# Dual License
+
+This project uses a dual‑license structure:
+
+## 1. GPLv3 — For all source code
+All source code in this repository is licensed under the GNU General Public License v3.0 (GPLv3).
+
+You may:
+- use, study, modify, and distribute the code,
+- create derivative works under GPLv3 terms.
+
+You must:
+- release derivative code under GPLv3,
+- preserve copyright notices,
+- provide source for any distributed binaries.
+
+Full license text: https://www.gnu.org/licenses/gpl-3.0.html
+
+
+## 2. CC BY‑NC 4.0 — For documentation, diagrams, papers, and media
+All non-code content (documentation, images, diagrams, papers, notes, and other media)
+is licensed under the Creative Commons Attribution–NonCommercial 4.0 International License (CC BY‑NC 4.0).
+
+You may:
+- share and adapt the material,
+- remix and build upon it.
+
+You must:
+- provide attribution,
+- **not** use the material for commercial purposes.
+
+Full license text: https://creativecommons.org/licenses/by-nc/4.0/
+
+
+## Prohibition on Confusingly Similar Systems
+
+You may not create, distribute, or market any software, platform, or system
+that is confusingly similar to this project. This includes:
+
+- derivative works that replicate core functionality,
+- rebranded versions of the system,
+- substantially similar architectures or implementations,
+- naming, branding, or presentation likely to cause user confusion.
+
+No license is granted for the development of systems that imitate this project
+in a way that could reasonably mislead users into believing they are related,
+endorsed, or derived from this work.
+
+
+## Summary
+
+- **Code → GPLv3**
+- **Docs/Media → CC BY‑NC 4.0**
+- **No confusingly similar or derivative platforms permitted**
+
+
+
+
+
+
+
+
+
+
+
 Phase 1 — Research Program
 You are here now.
 Math, proofs, PDEs, tensors, CTCs.
