@@ -79,7 +79,20 @@ one of the most well‑designed platforms on Earth structurally and conceptually
 - They don’t enforce non‑destructive evolution.
 - Therefore, they cannot converge to the canonical object.
 
- 7/2/26 
+### Prohibition on Confusingly Similar Systems
+
+You may not create, distribute, or market any software, platform, or system
+that is confusingly similar to this project. This includes:
+
+- derivative works that replicate core functionality,
+- rebranded versions of the system,
+- substantially similar architectures or implementations,
+- naming, branding, or presentation likely to cause user confusion.
+
+No license is granted for the development of systems that imitate this project
+in a way that could reasonably mislead users into believing they are related,
+endorsed, or derived from this work.
+ 7/23/26 
  LICENSE → GPLv3
 Commercial licensing → "Commercial licenses are available from the copyright holder."
 LICENSE-docs → CC BY-NC 4.0 
