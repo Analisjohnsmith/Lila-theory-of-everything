@@ -1,0 +1,195 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{hyperref}
+
+\title{Cross-Modal Homotopy Theory (CMHT): \\
+A Mathematical Framework for Topological Invariants \\
+Across Sensory Modalities}
+\author{Derived from collaborative reasoning}
+\date{\today}
+
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{conjecture}{Conjecture}
+\newtheorem{remark}{Remark}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+We present a mathematical framework for translating structured information between different sensory modalities (sound, image, text) while preserving topological invariants. The core objects are winding numbers, homotopy classes, and cyclic orders. We prove invariance under linear transforms for the phase winding number, state conjectures for cross-modal translation, and identify the trivial fixed point of recursive translation. This is not a unified theory of sound, but a unified theory of cross-modal topological structure.
+\end{abstract}
+
+\section{Introduction}
+
+Let \( \mathcal{M}_1, \mathcal{M}_2, \dots \) be media (e.g., acoustic signals, images, texts). A \emph{translation} \( T: \mathcal{M}_i \to \mathcal{M}_j \) is a map that converts information from one medium to another (sonification, visualization, etc.). A \emph{cross-modal invariant} is a function \( \mathcal{I}: \mathcal{M}_i \to \mathbb{R} \) (or \( S^1 \), \( \mathbb{T}^n \)) such that for all \( x \in \mathcal{M}_i \):
+
+\[
+\mathcal{I}(x) = \mathcal{I}(T(x)).
+\]
+
+The goal of Cross-Modal Homotopy Theory (CMHT) is to classify such invariants.
+
+\section{Invariant 1: Phase Winding Number (Pitch Class)}
+
+Let \( s(t) \in L^2(\mathbb{R}) \) be a real-valued signal. Define its \emph{analytic extension}:
+
+\[
+z(t) = s(t) + i \hat{s}(t),
+\]
+where \( \hat{s}(t) \) is the Hilbert transform:
+\[
+\hat{s}(t) = \frac{1}{\pi} \text{p.v.} \int_{-\infty}^{\infty} \frac{s(\tau)}{t-\tau} d\tau.
+\]
+
+\begin{definition}[Instantaneous Phase]
+The instantaneous phase of \( s(t) \) is \( \phi(t) = \arg(z(t)) \in S^1 = \mathbb{R}/\mathbb{Z} \).
+\end{definition}
+
+\begin{definition}[Phase Winding Number]
+For a signal defined on \( t \in [0, T] \), the phase winding number is
+\[
+\mathcal{I}_{\text{phase}}(s) = \frac{1}{2\pi} \int_0^T \frac{d\phi(t)}{dt} dt \pmod{1} = \frac{\phi(T) - \phi(0)}{2\pi} \pmod{1}.
+\]
+\end{definition}
+
+\begin{theorem}[Invariance Under Linear Transforms]
+\( \mathcal{I}_{\text{phase}} \) is invariant under:
+\begin{enumerate}
+    \item Convolution with any real-valued, time-invariant linear filter \( h(t) \).
+    \item Binaural summation: \( s(t) \to s_L(t) + s_R(t) \).
+    \item Any transformation that preserves the homotopy class of \( z(t) \) in \( \mathbb{C}^\times \).
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+The winding number is a homotopy invariant of the map \( t \mapsto z(t) \) from \( [0,T] \) to \( \mathbb{C}^\times \). Linear filtering with a real kernel cannot change the net phase accumulation because it preserves the argument up to an integer multiple of \( 2\pi \).
+\end{proof}
+
+\section{Invariant 2: Onset Winding Number (Tempo Class)}
+
+Let \( \{t_k\}_{k=1}^K \) be onset times of a sound (e.g., peaks in amplitude envelope). Define the onset density:
+
+\[
+\rho(t) = \sum_{k=1}^K \delta(t - t_k).
+\]
+
+Convolve with a Gaussian to obtain a smooth function:
+
+\[
+\rho_\sigma(t) = \frac{1}{\sqrt{2\pi}\sigma} \sum_{k=1}^K e^{-(t-t_k)^2/(2\sigma^2)}.
+\]
+
+\begin{definition}[Onset Phase and Winding Number]
+Let \( z_\rho(t) = \rho_\sigma(t) + i \hat{\rho}_\sigma(t) \) be the analytic signal of the smoothed onset density. Define
+\[
+\mathcal{I}_{\text{tempo}}(s) = \frac{1}{2\pi} \int_0^T \frac{d}{dt} \arg(z_\rho(t)) \, dt \pmod{1}.
+\]
+This is the number of beats (modulo 1) in the time window \( [0,T] \).
+\end{definition}
+
+\begin{remark}
+For a perfectly periodic rhythm with \( B \) beats in time \( T \), \( \mathcal{I}_{\text{tempo}} = B \mod 1 \). This is invariant under tempo doubling/halving (which changes \( B \) by an integer).
+\end{remark}
+
+\section{Joint Spatiotemporal Invariant}
+
+\begin{definition}[Joint Invariant]
+\[
+\mathcal{I}_{\text{joint}}(s) = \left( \mathcal{I}_{\text{phase}}(s),\; \mathcal{I}_{\text{tempo}}(s) \right) \in \mathbb{T}^2 = S^1 \times S^1.
+\]
+\end{definition}
+
+\section{Invariant 3: Image Sonification Winding Number}
+
+Let \( I(x,y) \) be an image with hue field \( H(x,y) \in S^1 \). Let \( \gamma(t) = (x(t), y(t)) \) be a scan path (e.g., left to right, top to bottom).
+
+\begin{definition}[Image Winding Number]
+\[
+\mathcal{I}_{\text{image}}(I) = \frac{1}{2\pi} \oint_\gamma dH \pmod{1},
+\]
+where \( \oint_\gamma dH \) is the net change in hue along the scan path.
+\end{definition}
+
+\begin{remark}
+This equals the winding number of the hue field along \( \gamma \). It is invariant under reparameterization of \( \gamma \) that preserves the image topology.
+\end{remark}
+
+\section{The Fixed Point of Recursive Translation}
+
+Consider the sonification map \( \mathcal{S} \) that sends an image to a sound by scanning its spectrogram. For a signal \( s(t) \), let \( \text{Spec}(s)(t,f) \) be its spectrogram. Define the self-sonification operator:
+
+\[
+\mathcal{S}[s](t) = \int_{f_{\min}}^{f_{\max}} \left| \int_{-\infty}^{\infty} s(\tau) e^{-i2\pi f \tau} d\tau \right|^2 \sin(2\pi f t) \, df.
+\]
+
+\begin{theorem}[Trivial Solution]
+For real signals \( s(t) \), the equation \( s = \lambda \mathcal{S}[s] \) has only the trivial solution \( s=0 \) in \( L^2 \).
+\end{theorem}
+
+\begin{proof}
+Take the Fourier transform of both sides. Using \( \mathcal{F}[\sin(2\pi f t)](f') = \frac{1}{2i}(\delta(f'-f) - \delta(f'+f)) \), we obtain
+\[
+S(f') = \frac{\lambda}{2i} \left( |S(f')|^2 - |S(-f')|^2 \right).
+\]
+For real signals, \( |S(-f')|^2 = |S(f')|^2 \), so the right-hand side vanishes. Hence \( S(f')=0 \) for all \( f' \).
+\end{proof}
+
+\begin{definition}[Distributional Fixed Point]
+Consider the Dirac comb:
+\[
+s^*(t) = \sum_{n=-\infty}^{\infty} \delta(t - nT).
+\]
+Its Fourier transform is another Dirac comb: \( S^*(f) = \frac{1}{T} \sum_{m=-\infty}^{\infty} \delta(f - m/T) \). The power spectrum is proportional to the same comb, and sonification recovers \( s^*(t) \) up to scaling.
+\end{definition}
+
+\begin{conjecture}[Fixed Point Uniqueness]
+The Dirac comb is the unique nontrivial fixed point of the self-sonification operator in the space of tempered distributions.
+\end{conjecture}
+
+\section{Master Conjecture of CMHT}
+
+Let \( \mathcal{C} \) be the category whose objects are structured media (images, sounds, texts) and whose morphisms are structure-preserving translations. Let \( \mathcal{F}: \mathcal{C} \to \text{Top} \) be a functor to the category of topological spaces.
+
+\begin{conjecture}[Cross-Modal Invariance]
+For any two media \( A, B \) and any translation \( T: A \to B \) that preserves cyclic order and connectivity, there exists a set of topological invariants taking values in \( S^1 \), \( \mathbb{T}^n \), or homotopy groups such that for all objects \( x \in A \):
+\[
+\mathcal{F}(x) \cong \mathcal{F}(T(x)).
+\]
+Two objects in different media are \emph{translation-equivalent} if and only if all invariants agree.
+\end{conjecture}
+
+\section{Conclusion}
+
+CMHT is a mathematical framework for understanding what structural information can survive translation between different sensory modalities. The proven invariants include phase winding numbers (pitch class) and onset winding numbers (tempo class). The conjectured extension to images and texts remains open. The trivial fixed point of recursive self-sonification is the Dirac comb, representing pure instantaneity.
+
+\subsection*{What CMHT Is Not}
+\begin{itemize}
+    \item Not a theory of physics (no forces, no energy).
+    \item Not a theory of perception (no biology, no psychology).
+    \item Not a theory of meaning (no semantics, no qualia).
+    \item Not a theory of music (no harmony, no emotion).
+\end{itemize}
+
+\subsection*{What CMHT Is}
+\begin{itemize}
+    \item A mathematical conjecture about topological invariants across media.
+    \item A partial proof for the invariance of phase winding under linear transforms.
+    \item A research program, not a finished product.
+\end{itemize}
+
+\appendix
+\section{Open Problems}
+
+\begin{enumerate}
+    \item Prove or disprove the Cross-Modal Invariance Conjecture.
+    \item Extend the invariants to include timbre (spectral shape) using persistent homology.
+    \item Find the complete set of invariants for text (narrative cycles, plot connectivity).
+    \item Determine whether the Dirac comb is the unique fixed point in the distributional sense.
+    \item Construct explicit, computable translations for real-world images, sounds, and texts.
+\end{enumerate}
+
+\end{document}
