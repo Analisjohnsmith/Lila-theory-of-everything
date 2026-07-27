@@ -342,6 +342,81 @@ quantity under the operations tested: linear filtering, binaural
 summation, tempo scaling, and cross-domain (image$\to$sound) mapping.
 
 \end{document}
+# 1D visualization of the logic system
+# v_t+1 = v_t + F(v_t, I_t)
+# 10 variables, discrete time, stacked tracks
 
+import numpy as np
+import matplotlib.pyplot as plt
+
+# ----- PARAMETERS -----
+T = 50              # number of time steps
+N = 10              # number of state variables v0..v9
+
+# ----- STATE VECTOR -----
+v = np.zeros((T, N), dtype=int)
+
+# initial state (you can tweak these)
+v[0] = np.array([0, 0, 0, 0, 5, 0, 1, 1, 0, 0])
+
+# ----- RULES AS F(v_t, I_t) -----
+def F(v_t, I_t):
+    dv = np.zeros_like(v_t)
+
+    # I1 -> R1: v0 += 2, v1 += 1
+    if I_t == 1:
+        dv[0] += 2
+        dv[1] += 1
+
+    # I2 -> R2: v2 += 1, v3 += 1
+    elif I_t == 2:
+        dv[2] += 1
+        dv[3] += 1
+
+    # I3 -> R3: if v4 >= 5 then v5 += 2
+    elif I_t == 3:
+        if v_t[4] >= 5:
+            dv[5] += 2
+
+    # I4 -> R4: v6 -= 1
+    elif I_t == 4:
+        dv[6] -= 1
+
+    # I5 -> R5: if v7 > 0 then v8 += 1, v9 += 1
+    elif I_t == 5:
+        if v_t[7] > 0:
+            dv[8] += 1
+            dv[9] += 1
+
+    return dv
+
+# ----- INPUT SEQUENCE -----
+# simple repeating pattern of inputs 1..5
+inputs = [1, 2, 3, 4, 5] * (T // 5 + 1)
+inputs = inputs[:T]
+
+# ----- EVOLVE SYSTEM -----
+for t in range(T - 1):
+    dv = F(v[t], inputs[t])
+    v[t + 1] = v[t] + dv
+
+# ----- 1D VISUALIZATION -----
+# time axis is 1D; each variable is a colored track over time
+
+plt.figure(figsize=(10, 6))
+
+colors = plt.cm.tab10(np.linspace(0, 1, N))
+
+for i in range(N):
+    plt.plot(range(T), v[:, i], color=colors[i], label=f"v{i}")
+
+plt.xlabel("Time step t")
+plt.ylabel("Value")
+plt.title("1D Temporal Evolution of State Vector v(t)")
+plt.legend(loc="upper left", ncol=2, fontsize=8)
+plt.grid(alpha=0.3)
+
+plt.tight_layout()
+plt.show()   generate image  
 
 \end{document}
