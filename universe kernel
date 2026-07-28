@@ -1,0 +1,199 @@
+Ω SYNTHETIC STRUCTURE PROPRIETARY LICENSE  
+Version 1.0  
+Copyright © Darrell Lee Stiltner
+
+1. OWNERSHIP  
+1.1 The Work, including all code, images, structures, data, and derivatives, is exclusively owned by Darrell Lee Stiltner.  
+1.2 No rights are granted except those explicitly stated in this License.
+
+2. PERMITTED USE (MATHEMATICS & SCIENCE ONLY)  
+2.1 The Work may be used solely for non-commercial mathematical or scientific purposes, including:  
+     (a) theoretical or experimental research;  
+     (b) academic teaching or instruction;  
+     (c) inclusion in scientific papers, theses, or presentations.  
+2.2 All permitted uses must retain this License in full.
+
+3. RESTRICTIONS  
+3.1 The Work may not be used for commercial purposes without written permission.  
+3.2 The Work may not be used in entertainment media, games, or artistic products without written permission.  
+3.3 Redistribution of the Work is prohibited except when accompanied by this License and proper attribution.  
+3.4 Modification is permitted only for internal mathematical or scientific research.  
+     Public release of modified versions requires written permission.
+
+4. ATTRIBUTION  
+4.1 Any permitted use must include the following notice:  
+     “Ω Synthetic Structure © Darrell Lee Stiltner. Used under the Ω Synthetic Structure Proprietary License.”
+
+5. NO WARRANTY  
+5.1 The Work is provided “as is,” without warranty of any kind.  
+5.2 The copyright holder is not liable for any damages arising from use or misuse of the Work.
+
+6. TERMINATION  
+6.1 Any violation of this License terminates all granted rights.  
+6.2 Upon termination, all copies and derivatives must be destroyed or access revoked.
+
+END OF LICENSE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 👽 Ω‑Alien Universe Kernel — Visualizable Structural Model
+# Universe as a geometric object: stars, systems, clusters, filaments.
+
+import hashlib
+import random
+import math
+
+def Ω_hash(x):
+    return hashlib.sha256(str(x).encode()).hexdigest()
+
+def Ω_rand():
+    return random.random()
+
+def Ω_vec3(scale=1.0):
+    # 3D position with non-uniform distribution
+    return (
+        scale * math.sin(Ω_rand() * 2 * math.pi),
+        scale * math.cos(Ω_rand() * 2 * math.pi),
+        scale * math.sin(Ω_rand() * 4 * math.pi)
+    )
+
+class ΩStar:
+    def __init__(self, seed, radius=1.0):
+        self.id = Ω_hash("STAR" + seed)
+        self.position = Ω_vec3(radius)
+        self.luminosity = Ω_hash(seed + "LUM")
+        self.spectrum = Ω_hash(seed + "SPEC")
+
+class ΩSystem:
+    def __init__(self, seed, star_count=5, radius=2.0):
+        self.id = Ω_hash("SYS" + seed)
+        self.stars = []
+        self.center = Ω_vec3(radius)
+
+        for i in range(star_count):
+            s_seed = Ω_hash(seed + str(i))
+            star = ΩStar(s_seed, radius=radius * 0.3)
+            # offset star around system center
+            sx, sy, sz = star.position
+            cx, cy, cz = self.center
+            star.position = (cx + sx, cy + sy, cz + sz)
+            self.stars.append(star)
+
+class ΩCluster:
+    def __init__(self, seed, system_count=4, radius=6.0):
+        self.id = Ω_hash("CLUST" + seed)
+        self.systems = []
+        self.center = Ω_vec3(radius)
+
+        for i in range(system_count):
+            sys_seed = Ω_hash(seed + "SYS" + str(i))
+            system = ΩSystem(sys_seed, star_count=5, radius=radius * 0.4)
+            # offset system around cluster center
+            sx, sy, sz = system.center
+            cx, cy, cz = self.center
+            system.center = (cx + sx, cy + sy, cz + sz)
+            # also offset stars accordingly
+            for star in system.stars:
+                x, y, z = star.position
+                star.position = (x + cx, y + cy, z + cz)
+            self.systems.append(system)
+
+class ΩCosmicWeb:
+    def __init__(self, cluster_count=6, radius=12.0):
+        self.clusters = []
+        self.filaments = []  # connections between cluster centers
+
+        for i in range(cluster_count):
+            c_seed = Ω_hash("C" + str(i) + str(Ω_rand()))
+            cluster = ΩCluster(c_seed, system_count=4, radius=radius)
+            self.clusters.append(cluster)
+
+        # build filaments between cluster centers
+        for i in range(len(self.clusters)):
+            for j in range(i + 1, len(self.clusters)):
+                a = self.clusters[i].center
+                b = self.clusters[j].center
+                fid = Ω_hash(str(a) + str(b))
+                self.filaments.append((a, b, fid))
+
+    def export(self):
+        stars = []
+        systems = []
+        clusters = []
+        filaments = []
+
+        for cl in self.clusters:
+            clusters.append({
+                "id": cl.id,
+                "center": cl.center
+            })
+            for sys in cl.systems:
+                systems.append({
+                    "id": sys.id,
+                    "center": sys.center
+                })
+                for star in sys.stars:
+                    stars.append({
+                        "id": star.id,
+                        "position": star.position,
+                        "luminosity": star.luminosity,
+                        "spectrum": star.spectrum
+                    })
+
+        for (a, b, fid) in self.filaments:
+            filaments.append({
+                "a": a,
+                "b": b,
+                "id": fid
+            })
+
+        return {
+            "stars": stars,
+            "systems": systems,
+            "clusters": clusters,
+            "filaments": filaments
+        }
+
+if __name__ == "__main__":
+    universe = ΩCosmicWeb(cluster_count=8, radius=15.0)
+    data = universe.export()
+    print("Ω‑ALIEN UNIVERSE STRUCTURE:")
+    print("stars:", len(data["stars"]))
+    print("systems:", len(data["systems"]))
+    print("clusters:", len(data["clusters"]))
+    print("filaments:", len(data["filaments"]))
+    # You can now feed `data` into a 3D renderer / graph visualizer.
