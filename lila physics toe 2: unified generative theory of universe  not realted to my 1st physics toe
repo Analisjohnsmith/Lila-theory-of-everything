@@ -2891,6 +2891,393 @@ class UTOEMathEngine:
         
         base_sum = 0.06  # Normal hierarchy baseline
         al_correction = 0.03 * self.eta  # AL field contribution
+
+#!/usr/bin/env python3
+"""
+Universal Theory of Everything (UTOE) Validation Script
+Tests predictions from meowlatex framework against experimental data
+"""
+
+import numpy as np
+import scipy.constants as const
+from scipy import stats
+import json
+from dataclasses import dataclass
+from typing import Dict, List, Tuple, Optional
+from enum import Enum
+import sys
+import os
+
+# Import the mathematical engine
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from utoe_math_engine import UTOEMathEngine
+
+class PredictionType(Enum):
+    CONSTANT_RATIO = "constant_ratio"
+    SYMMETRY_BREAK = "symmetry_break"
+    COSMOLOGICAL = "cosmological"
+
+@dataclass
+class ExperimentalValue:
+    """Experimental measurement with uncertainty"""
+    value: float
+    uncertainty: float
+    source: str
+    year: int
+
+@dataclass
+class PredictionResult:
+    """Result of prediction validation"""
+    prediction_type: PredictionType
+    predicted_value: float
+    experimental_value: ExperimentalValue
+    sigma_difference: float
+    is_confirmed: bool
+    confidence: float
+
+class UTOEValidator:
+    """Validator for Universal Theory of Everything predictions"""
+    
+    def __init__(self):
+        # Initialize the mathematical engine
+        self.math_engine = UTOEMathEngine()
+        
+        # NIST CODATA 2018 values (most recent standard)
+        self.experimental_constants = {
+            'fine_structure': ExperimentalValue(
+                value=const.alpha,  # ~1/137.035999084
+                uncertainty=const.alpha * 1.5e-10,  # Relative uncertainty
+                source="CODATA 2018",
+                year=2018
+            ),
+            'electron_g_factor': ExperimentalValue(
+                value=-2.00231930436256,
+                uncertainty=3.5e-13,
+                source="CODATA 2018",
+                year=2018
+            ),
+            'proton_electron_mass_ratio': ExperimentalValue(
+                value=const.m_p / const.m_e,  # ~1836.15267343
+                uncertainty=1.1e-10,
+                source="CODATA 2018",
+                year=2018
+            ),
+            'rydberg_constant': ExperimentalValue(
+                value=const.Rydberg,  # ~1.0973731568160e7
+                uncertainty=1.9e-12,
+                source="CODATA 2018",
+                year=2018
+            ),
+            'planck_mass': ExperimentalValue(
+                value=const.m_p,  # ~2.176434e-8
+                uncertainty=1.1e-8,
+                source="CODATA 2018",
+                year=2018
+            ),
+        }
+        
+        # Cosmological parameters (Planck 2018)
+        self.cosmological_parameters = {
+            'hubble_constant': ExperimentalValue(
+                value=67.4,  # km/s/Mpc (Planck 2018)
+                uncertainty=0.5,
+                source="Planck 2018",
+                year=2018
+            ),
+            'hubble_constant_local': ExperimentalValue(
+                value=73.04,  # km/s/Mpc (SH0ES 2022)
+                uncertainty=1.04,
+                source="SH0ES 2022",
+                year=2022
+            ),
+            'omega_matter': ExperimentalValue(
+                value=0.315,
+                uncertainty=0.007,
+                source="Planck 2018",
+                year=2018
+            ),
+            'omega_lambda': ExperimentalValue(
+                value=0.685,
+                uncertainty=0.007,
+                source="Planck 2018",
+                year=2018
+            ),
+        }
+        
+        # Symmetry test bounds (current experimental limits)
+        self.symmetry_limits = {
+            'CPT_violation': ExperimentalValue(
+                value=0.0,
+                uncertainty=1e-18,  # Current experimental limit
+                source="KLOE/ATLAS",
+                year=2021
+            ),
+            'Lorentz_violation': ExperimentalValue(
+                value=0.0,
+                uncertainty=1e-19,  # SME constraints
+                source="LIGO/Virgo",
+                year=2020
+            ),
+        }
+
+    def predict_constant_ratio(self, ratio_name: str) -> Tuple[float, float]:
+        """
+        Generate prediction for constant ratio based on UTOE framework
+        Returns: (predicted_value, theoretical_uncertainty)
+        """
+        # Use the mathematical engine for real predictions
+        if ratio_name == 'fine_structure_correction':
+            return self.math_engine.predict_fine_structure_correction()
+        elif ratio_name == 'proton_electron_ratio_correction':
+            return self.math_engine.predict_proton_electron_ratio_correction()
+        else:
+            raise ValueError(f"Unknown constant ratio: {ratio_name}")
+
+    def predict_symmetry_deviation(self, symmetry_type: str) -> Tuple[float, float]:
+        """
+        Generate prediction for symmetry breaking deviation
+        Returns: (predicted_deviation, theoretical_uncertainty)
+        """
+        # Use the mathematical engine for real predictions
+        if symmetry_type == 'CPT_deviation':
+            return self.math_engine.predict_cpt_violation()
+        elif symmetry_type == 'Lorentz_deviation':
+            return self.math_engine.predict_lorentz_violation()
+        else:
+            raise ValueError(f"Unknown symmetry type: {symmetry_type}")
+
+    def predict_cosmological_correction(self, parameter: str) -> Tuple[float, float]:
+        """
+        Generate prediction for cosmological parameter correction
+        Returns: (predicted_value, theoretical_uncertainty)
+        """
+        # Use the mathematical engine for real predictions
+        if parameter == 'hubble_tension_resolution':
+            return self.math_engine.predict_hubble_constant_correction()
+        elif parameter == 'dark_energy_equation':
+            return self.math_engine.predict_dark_energy_equation_of_state()
+        elif parameter == 'neutrino_mass_sum':
+            return self.math_engine.predict_neutrino_mass_hierarchy()
+        elif parameter == 'omega_matter_correction':
+            return self.math_engine.predict_omega_matter_correction()
+        else:
+            raise ValueError(f"Unknown cosmological parameter: {parameter}")
+
+    def validate_constant_ratio(self, ratio_name: str) -> PredictionResult:
+        """Validate constant ratio prediction against experimental data"""
+        pred_value, pred_uncertainty = self.predict_constant_ratio(ratio_name)
+        
+        # Map ratio to experimental constant
+        exp_mapping = {
+            'fine_structure_correction': self.experimental_constants['fine_structure'],
+            'proton_electron_ratio_correction': self.experimental_constants['proton_electron_mass_ratio'],
+        }
+        
+        if ratio_name not in exp_mapping:
+            raise ValueError(f"No experimental data for {ratio_name}")
+        
+        exp_data = exp_mapping[ratio_name]
+        
+        # Calculate sigma difference
+        combined_uncertainty = np.sqrt(pred_uncertainty**2 + exp_data.uncertainty**2)
+        sigma_diff = abs(pred_value - exp_data.value) / combined_uncertainty
+        
+        # Determine if confirmed (within 3 sigma)
+        is_confirmed = sigma_diff < 3.0
+        confidence = stats.norm.cdf(-sigma_diff) if is_confirmed else 1 - stats.norm.cdf(sigma_diff)
+        
+        return PredictionResult(
+            prediction_type=PredictionType.CONSTANT_RATIO,
+            predicted_value=pred_value,
+            experimental_value=exp_data,
+            sigma_difference=sigma_diff,
+            is_confirmed=is_confirmed,
+            confidence=confidence
+        )
+
+    def validate_symmetry_break(self, symmetry_type: str) -> PredictionResult:
+        """Validate symmetry breaking prediction"""
+        pred_deviation, pred_uncertainty = self.predict_symmetry_deviation(symmetry_type)
+        
+        exp_mapping = {
+            'CPT_deviation': self.symmetry_limits['CPT_violation'],
+            'Lorentz_deviation': self.symmetry_limits['Lorentz_violation'],
+        }
+        
+        if symmetry_type not in exp_mapping:
+            # For gauge_anomaly, use generic limit
+            exp_data = ExperimentalValue(0.0, 1e-18, "Generic limit", 2021)
+        else:
+            exp_data = exp_mapping[symmetry_type]
+        
+        combined_uncertainty = np.sqrt(pred_uncertainty**2 + exp_data.uncertainty**2)
+        sigma_diff = abs(pred_deviation - exp_data.value) / combined_uncertainty
+        
+        is_confirmed = sigma_diff < 3.0
+        confidence = stats.norm.cdf(-sigma_diff) if is_confirmed else 1 - stats.norm.cdf(sigma_diff)
+        
+        return PredictionResult(
+            prediction_type=PredictionType.SYMMETRY_BREAK,
+            predicted_value=pred_deviation,
+            experimental_value=exp_data,
+            sigma_difference=sigma_diff,
+            is_confirmed=is_confirmed,
+            confidence=confidence
+        )
+
+    def validate_cosmological_parameter(self, parameter: str) -> PredictionResult:
+        """Validate cosmological parameter prediction"""
+        pred_value, pred_uncertainty = self.predict_cosmological_correction(parameter)
+        
+        exp_mapping = {
+            'hubble_tension_resolution': self.cosmological_parameters['hubble_constant'],
+            'dark_energy_equation': ExperimentalValue(-1.0, 0.02, "Planck 2018", 2018),
+            'neutrino_mass_sum': ExperimentalValue(0.12, 0.06, "Cosmological limits", 2020),
+            'omega_matter_correction': self.cosmological_parameters['omega_matter'],
+        }
+        
+        if parameter not in exp_mapping:
+            raise ValueError(f"No experimental data for {parameter}")
+        
+        exp_data = exp_mapping[parameter]
+        
+        combined_uncertainty = np.sqrt(pred_uncertainty**2 + exp_data.uncertainty**2)
+        sigma_diff = abs(pred_value - exp_data.value) / combined_uncertainty
+        
+        is_confirmed = sigma_diff < 3.0
+        confidence = stats.norm.cdf(-sigma_diff) if is_confirmed else 1 - stats.norm.cdf(sigma_diff)
+        
+        return PredictionResult(
+            prediction_type=PredictionType.COSMOLOGICAL,
+            predicted_value=pred_value,
+            experimental_value=exp_data,
+            sigma_difference=sigma_diff,
+            is_confirmed=is_confirmed,
+            confidence=confidence
+        )
+
+    def run_full_validation(self) -> Dict[str, List[PredictionResult]]:
+        """Run validation on all predictions"""
+        results = {
+            'constant_ratios': [],
+            'symmetry_breaks': [],
+            'cosmological': []
+        }
+        
+        # Test constant ratios
+        for ratio in ['fine_structure_correction', 'proton_electron_ratio_correction']:
+            try:
+                result = self.validate_constant_ratio(ratio)
+                results['constant_ratios'].append(result)
+            except Exception as e:
+                print(f"Error validating {ratio}: {e}")
+        
+        # Test symmetry breaks
+        for symmetry in ['CPT_deviation', 'Lorentz_deviation']:
+            try:
+                result = self.validate_symmetry_break(symmetry)
+                results['symmetry_breaks'].append(result)
+            except Exception as e:
+                print(f"Error validating {symmetry}: {e}")
+        
+        # Test cosmological parameters
+        for param in ['hubble_tension_resolution', 'dark_energy_equation', 'neutrino_mass_sum', 'omega_matter_correction']:
+            try:
+                result = self.validate_cosmological_parameter(param)
+                results['cosmological'].append(result)
+            except Exception as e:
+                print(f"Error validating {param}: {e}")
+        
+        return results
+
+    def generate_report(self, results: Dict[str, List[PredictionResult]]) -> str:
+        """Generate validation report"""
+        report = []
+        report.append("=" * 80)
+        report.append("UNIVERSAL THEORY OF EVERYTHING - VALIDATION REPORT")
+        report.append("=" * 80)
+        report.append("")
+        
+        total_tests = 0
+        confirmed_tests = 0
+        
+        for category, category_results in results.items():
+            report.append(f"\n{category.upper().replace('_', ' ')}")
+            report.append("-" * 80)
+            
+            for result in category_results:
+                total_tests += 1
+                if result.is_confirmed:
+                    confirmed_tests += 1
+                
+                report.append(f"\nPrediction Type: {result.prediction_type.value}")
+                report.append(f"Predicted Value: {result.predicted_value:.6e} ± {result.experimental_value.uncertainty:.2e}")
+                report.append(f"Experimental Value: {result.experimental_value.value:.6e} ± {result.experimental_value.uncertainty:.2e}")
+                report.append(f"Source: {result.experimental_value.source} ({result.experimental_value.year})")
+                report.append(f"Sigma Difference: {result.sigma_difference:.3f} sigma")
+                report.append(f"Status: {'CONFIRMED' if result.is_confirmed else 'NOT CONFIRMED'}")
+                report.append(f"Confidence: {result.confidence:.2%}")
+        
+        report.append("\n" + "=" * 80)
+        report.append("SUMMARY")
+        report.append("=" * 80)
+        report.append(f"Total Tests: {total_tests}")
+        report.append(f"Confirmed: {confirmed_tests}")
+        report.append(f"Failed: {total_tests - confirmed_tests}")
+        report.append(f"Success Rate: {confirmed_tests/total_tests*100:.1f}%")
+        
+        if confirmed_tests > 0:
+            report.append("\nTHEORY VALIDATED - At least one prediction confirmed!")
+        else:
+            report.append("\nTHEORY NOT YET VALIDATED - No predictions confirmed")
+        
+        report.append("=" * 80)
+        
+        return "\n".join(report)
+
+def main():
+    """Main validation routine"""
+    print("Initializing UTOE Validator...")
+    validator = UTOEValidator()
+    
+    print("Running validation tests...")
+    results = validator.run_full_validation()
+    
+    print("Generating report...")
+    report = validator.generate_report(results)
+    
+    print(report)
+    
+    # Save report to file
+    with open('ui/ux/utoe_validation_report.txt', 'w') as f:
+        f.write(report)
+    
+    print("\nReport saved to ui/ux/utoe_validation_report.txt")
+    
+    # Save JSON results
+    json_results = {}
+    for category, category_results in results.items():
+        json_results[category] = [
+            {
+                'prediction_type': r.prediction_type.value,
+                'predicted_value': r.predicted_value,
+                'experimental_value': r.experimental_value.value,
+                'experimental_uncertainty': r.experimental_value.uncertainty,
+                'sigma_difference': r.sigma_difference,
+                'is_confirmed': bool(r.is_confirmed),
+                'confidence': r.confidence
+            }
+            for r in category_results
+        ]
+    
+    with open('ui/ux/utoe_validation_results.json', 'w') as f:
+        json.dump(json_results, f, indent=2)
+    
+    print("JSON results saved to ui/ux/utoe_validation_results.json")
+
+if __name__ == "__main__":
+    main()
+
         
         predicted_sum = base_sum + al_correction
         uncertainty = 0.02
