@@ -1,3 +1,29 @@
+
+# HUM BLOCK EXPLANATION
+
+# 1. Build Laplacian operator
+#    - This matrix encodes how points in the toy universe connect.
+#    - Its eigenvalues are the natural vibration modes of the lattice.
+
+# 2. Compute eigenmodes
+#    - eigvals = frequencies of vibration
+#    - eigvecs = shapes of vibration
+#    - Together they form the "spectrum" of the universe.
+
+# 3. Map eigenvalues to constants
+#    - fine_structure = alpha * (1 + eigvals[1]/N)
+#    - proton_electron_ratio = beta * (1 + eigvals[2]/N)
+#    - hubble_constant = delta * (1 + eigvals[3]/N)
+#    - metabolic_scaling = eta * (1 + eigvals[4]/N)
+#    - These mappings turn raw vibrations into physical constants.
+
+# 4. The HUM
+#    - The continuous vibration is the canonical observable O(x),
+#      built from these mapped constants.
+#    - When normalized and played back as audio, this becomes
+#      the "Universal Tone" — the hum of the universe.
+
+
 import numpy as np
 from scipy.linalg import eigh
 
