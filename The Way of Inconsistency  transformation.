@@ -817,7 +817,137 @@ verse_state:
 
 
 
+bonus:
+c
+#include <stdio.h>
+#include <string.h>
 
+struct Identity {
+    char name[32];
+    char hash[64];
+};
+
+int verify(struct Identity id, const char *expected) {
+    return strcmp(id.hash, expected) == 0;
+}
+
+int main() {
+    struct Identity cosmos = {"cosmos", "sha256-of-structured-inconsistency"};
+    printf("Verification: %d\n", verify(cosmos, "sha256-of-structured-inconsistency"));
+    return 0;
+}
+☕ Java
+java
+import java.security.MessageDigest;
+
+class Identity {
+    String name;
+    String hash;
+
+    Identity(String name, String data) throws Exception {
+        this.name = name;
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        byte[] digest = md.digest(data.getBytes());
+        this.hash = javax.xml.bind.DatatypeConverter.printHexBinary(digest).toLowerCase();
+    }
+
+    boolean verify(String expected) {
+        return hash.equals(expected);
+    }
+}
+
+public class Hella {
+    public static void main(String[] args) throws Exception {
+        Identity cosmos = new Identity("cosmos", "structured inconsistency");
+        System.out.println("Verification: " + cosmos.verify(cosmos.hash));
+    }
+}
+🟩 Kotlin
+kotlin
+import java.security.MessageDigest
+
+data class Identity(val name: String, val hash: String) {
+    fun verify(expected: String) = hash == expected
+}
+
+fun sha256(data: String): String {
+    val md = MessageDigest.getInstance("SHA-256")
+    return md.digest(data.toByteArray()).joinToString("") { "%02x".format(it) }
+}
+
+fun main() {
+    val cosmos = Identity("cosmos", sha256("structured inconsistency"))
+    println("Verification: ${cosmos.verify(cosmos.hash)}")
+}
+🐚 Bash
+bash
+cosmos_hash=$(echo -n "structured inconsistency" | sha256sum | awk '{print $1}')
+expected_hash=$cosmos_hash
+
+if [ "$cosmos_hash" = "$expected_hash" ]; then
+  echo "Verification: true"
+else
+  echo "Verification: false"
+fi
+🔹 PowerShell
+powershell
+function Get-SHA256($data) {
+    $bytes = [System.Text.Encoding]::UTF8.GetBytes($data)
+    $sha = [System.Security.Cryptography.SHA256]::Create()
+    $hash = $sha.ComputeHash($bytes)
+    -join ($hash | ForEach-Object { $_.ToString("x2") })
+}
+
+$cosmos = Get-SHA256 "structured inconsistency"
+Write-Output "Verification: $($cosmos -eq $cosmos)"
+🐘 PHP
+php
+<?php
+class Identity {
+    public $name;
+    public $hash;
+
+    function __construct($name, $data) {
+        $this->name = $name;
+        $this->hash = hash('sha256', $data);
+    }
+
+    function verify($expected) {
+        return $this->hash === $expected;
+    }
+}
+
+$cosmos = new Identity("cosmos", "structured inconsistency");
+echo "Verification: " . ($cosmos->verify($cosmos->hash) ? "true" : "false");
+?>
+🟦 Lua
+lua
+local sha256 = require("sha2").sha256
+
+Identity = {}
+function Identity:new(name, data)
+    local obj = {name = name, hash = sha256(data)}
+    setmetatable(obj, self)
+    self.__index = self
+    return obj
+end
+
+function Identity:verify(expected)
+    return self.hash == expected
+end
+
+cosmos = Identity:new("cosmos", "structured inconsistency")
+print("Verification:", cosmos:verify(cosmos.hash))
+🟧 Zig
+zig
+const std = @import("std");
+
+pub fn main() !void {
+    var stdout = std.io.getStdOut().writer();
+    const cosmos_hash = "sha256-of-structured-inconsistency";
+    const expected = "sha256-of-structured-inconsistency";
+    try stdout.print("Verification: {}\n", .{cosmos_hash == expected});
+}
 
 
 
