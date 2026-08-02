@@ -1,5 +1,47 @@
 i'm working on proofs
+text
+00000001  thing
+00000010  state
+00000011  becoming
+00000100  channel
+00000101  witness
+00000110  truth
+00000111  memory
+Now the compiled VERSE kernel identity, encoded as a binary block:
 
+text
+01010110 01000101 01010010 01010011 01000101   (VERSE)
+00110001 00101110 00110000                     (1.0)
+00000001 00000010 00000011 00000100
+00000101 00000110 00000111                     (core primitives)
+Now the cosmic layer signature (VUCL‑Ω), encoded from your spec:
+
+text
+00010001 cosmos
+00010010 structure
+00010011 evolution
+00010100 information
+00010101 omega_state
+00010110 witnesses
+00010111 observer
+00011000 validation
+Now the axiom layer signature (VUAL 1.0):
+
+text
+00100001 existence
+00100010 transformation
+00100011 connection
+00100100 witness
+00100101 truth
+00100110 memory
+00100111 information
+00101000 validation
+And finally, the closure protocol signature (VUCP 1.0):
+
+text
+01000001 freeze
+01000010 execute
+01000011 validate
 
 ```python
 #!/usr/bin/env python3
