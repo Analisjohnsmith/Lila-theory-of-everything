@@ -1,7 +1,6 @@
 pending empirical 
 dualatalis pending 
 
-https://github.com/Analisjohnsmith/AN.KI/blob/main/METAOS
 This project uses the Creative Commons BY‑NC 4.0 license for general creative content. Some files may be governed by additional or different licenses. Refer to each file for its specific licensing terms.
 
 updated 7?26/26 This work is licensed under the Creative Commons Attribution–NonCommercial 4.0 International License (CC BY‑NC 4.0).
@@ -12681,4 +12680,4 @@ END OF LICENSE
 
 This restructured document eliminates duplicate sections, groups related provisions into logical parts, and presents a clear hierarchy between public and commercial licenses. It's now suitable for enterprise and legal review while preserving the protections developed.
 
-https://github.com/Analisjohnsmith/AN.KI/blob/main/METAOS
+
