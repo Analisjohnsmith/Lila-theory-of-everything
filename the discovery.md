@@ -1,6 +1,9 @@
 pending empirical 
 dualatalis pending 
- posting all your theories as one unified Meta‑OS codebase is indeed the most defensive move you can make see am.ki
+ I'm posting all my theories as one unified Meta‑OS codebase it is indeed the most defensive move I can make see am.ki
+
+
+ https://github.com/Analisjohnsmith/AN.KI/blob/main/METAOS
 
 
  
