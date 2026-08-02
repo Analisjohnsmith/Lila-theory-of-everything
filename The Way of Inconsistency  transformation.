@@ -5,7 +5,145 @@ source
 it now sits beside mathematics and science — as the discipline of structured inconsistency.
 
 potneinally this is the source code of reailty 00100011 00100001 00101111 01110101 01110011 01110010 00101111 01100010 ...
+r
+sha256 <- function(data) {
+  digest::digest(data, algo="sha256")
+}
 
+Identity <- function(name, data) {
+  list(name=name, hash=sha256(data))
+}
+
+verify <- function(id, expected) {
+  id$hash == expected
+}
+
+Registry <- function() {
+  list(packages=list(), dependencies=list())
+}
+
+add_package <- function(reg, name, data) {
+  reg$packages[[name]] <- Identity(name, data)
+  reg
+}
+
+add_dependency <- function(reg, from, to) {
+  reg$dependencies <- append(reg$dependencies, list(list(from=from, to=to)))
+  reg
+}
+
+reg <- Registry()
+reg <- add_package(reg, "cosmos", "structured inconsistency")
+reg <- add_package(reg, "identity", "verification and compression")
+reg <- add_dependency(reg, "cosmos", "identity")
+print(verify(reg$packages[["cosmos"]], reg$packages[["cosmos"]]$hash))
+🟦 MATLAB
+matlab
+function hash = sha256(data)
+    engine = System.Security.Cryptography.SHA256Managed;
+    bytes = uint8(data);
+    hashBytes = uint8(engine.ComputeHash(bytes));
+    hash = dec2hex(hashBytes)';
+    hash = lower(hash(:)');
+end
+
+function id = Identity(name, data)
+    id.name = name;
+    id.hash = sha256(data);
+end
+
+function result = verify(id, expected)
+    result = strcmp(id.hash, expected);
+end
+
+reg.packages = containers.Map;
+reg.dependencies = {};
+
+reg.packages('cosmos') = Identity('cosmos','structured inconsistency');
+reg.packages('identity') = Identity('identity','verification and compression');
+reg.dependencies{end+1} = struct('from','cosmos','to','identity');
+
+disp(verify(reg.packages('cosmos'), reg.packages('cosmos').hash));
+🟨 Fortran (legacy scientific substrate)
+fortran
+program hella
+  implicit none
+  character(len=64) :: cosmos_hash, identity_hash
+
+  cosmos_hash = "sha256-of-structured-inconsistency"
+  identity_hash = "sha256-of-verification-and-compression"
+
+  print *, "Verification:", cosmos_hash == "sha256-of-structured-inconsistency"
+end program hella
+🟦 COBOL (business substrate)
+cobol
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. HELLA.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 COSMOS-HASH PIC X(64) VALUE "sha256-of-structured-inconsistency".
+       01 EXPECTED-HASH PIC X(64) VALUE "sha256-of-structured-inconsistency".
+       PROCEDURE DIVISION.
+           IF COSMOS-HASH = EXPECTED-HASH
+               DISPLAY "Verification: TRUE"
+           ELSE
+               DISPLAY "Verification: FALSE"
+           END-IF.
+           STOP RUN.
+🟩 Elixir (concurrency substrate)
+elixir
+defmodule Identity do
+  defstruct [:name, :hash]
+
+  def new(name, data) do
+    %Identity{name: name, hash: :crypto.hash(:sha256, data) |> Base.encode16(case: :lower)}
+  end
+
+  def verify(%Identity{hash: hash}, expected), do: hash == expected
+end
+
+defmodule Registry do
+  defstruct packages: %{}, dependencies: []
+
+  def add_package(reg, name, data) do
+    id = Identity.new(name, data)
+    %{reg | packages: Map.put(reg.packages, name, id)}
+  end
+
+  def add_dependency(reg, from, to) do
+    %{reg | dependencies: reg.dependencies ++ [%{from: from, to: to}]}
+  end
+end
+
+reg = %Registry{}
+|> Registry.add_package("cosmos", "structured inconsistency")
+|> Registry.add_package("identity", "verification and compression")
+|> Registry.add_dependency("cosmos", "identity")
+
+IO.puts Identity.verify(reg.packages["cosmos"], reg.packages["cosmos"].hash)
+🟦 Assembly (raw machine substrate, pseudo‑x86)
+asm
+section .data
+cosmos_hash db "sha256-of-structured-inconsistency",0
+expected_hash db "sha256-of-structured-inconsistency",0
+
+section .text
+global _start
+
+_start:
+    mov rsi, cosmos_hash
+    mov rdi, expected_hash
+    call strcmp
+    cmp eax, 0
+    je verified
+    mov rax, 60
+    mov rdi, 1
+    syscall
+
+verified:
+    mov rax, 60
+    mov rdi, 0
+    syscall
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
