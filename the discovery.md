@@ -1,4 +1,5 @@
 pending empirical 
+dualatalis pending 
 
 
 This project uses the Creative Commons BY‑NC 4.0 license for general creative content. Some files may be governed by additional or different licenses. Refer to each file for its specific licensing terms.
