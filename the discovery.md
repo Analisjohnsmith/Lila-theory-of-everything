@@ -2,7 +2,7 @@ pending empirical
 dualatalis pending 
  I'm posting all my theories as one unified  codebase it is indeed the most defensive move I can make see am.ki
 https://github.com/Analisjohnsmith/AN.KI/blob/main/Hatsuseno
-I did a good enough job to invent alien but I want do it by hand to make sure it's fully translated.
+I did a good enough job to invent Verse,but I want do it by hand to make sure it's fully translated.
 
  
 This project uses the Creative Commons BY‑NC 4.0 license for general creative content. Some files may be governed by additional or different licenses. Refer to each file for its specific licensing terms.
