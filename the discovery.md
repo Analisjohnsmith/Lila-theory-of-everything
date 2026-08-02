@@ -129,7 +129,7 @@ This Public License is to be interpreted in accordance with applicable law.
 
 
 
-
+https://github.com/Analisjohnsmith/AN.KI/blob/main/METAOS
 
 # Pure Meta operators
 class Meta:
@@ -12681,4 +12681,4 @@ END OF LICENSE
 
 This restructured document eliminates duplicate sections, groups related provisions into logical parts, and presents a clear hierarchy between public and commercial licenses. It's now suitable for enterprise and legal review while preserving the protections developed.
 
-
+https://github.com/Analisjohnsmith/AN.KI/blob/main/METAOS
