@@ -4,6 +4,16 @@ dualatalis pending
 https://github.com/Analisjohnsmith/AN.KI/blob/main/Hatsuseno
 I did a good enough job to invent Verse,but I want do it by hand to make sure it's fully translated.
 
+
+
+
+Hatsu (初): First or beginning.Se (瀬): Fast-flowing water or current in a river (the rapids or shoals).No (野): Field or plain
+
+
+
+
+
+
  
 This project uses the Creative Commons BY‑NC 4.0 license for general creative content. Some files may be governed by additional or different licenses. Refer to each file for its specific licensing terms.
 
