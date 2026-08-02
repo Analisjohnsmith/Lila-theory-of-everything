@@ -1,3 +1,4 @@
+pending empirical 
 # Pure Meta operators
 class Meta:
     def theta(self, x):  # mirror
