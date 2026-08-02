@@ -602,6 +602,44 @@ INSERT INTO Dependencies VALUES ('cosmos', 'identity');
 -- Verification query
 SELECT CASE WHEN hash = 'sha256-of-structured-inconsistency' THEN 'true' ELSE 'false' END
 FROM Packages WHERE name = 'cosmos';
+{ pkgs ? import <nixpkgs> {} }:
+
+pkgs.stdenv.mkDerivation {
+  pname = "hella";
+  version = "1.0";
+
+  src = ./.;
+
+  buildInputs = [ pkgs.openssl ];
+
+  # Identity: package name + hash
+  outputHashAlgo = "sha256";
+  outputHashMode = "recursive";
+  outputHash = "sha256-of-structured-inconsistency";
+
+  # Dependencies: explicit derivation graph
+  propagatedBuildInputs = [
+    pkgs.python3
+    pkgs.rustc
+    pkgs.go
+    pkgs.nodejs
+    pkgs.julia
+    pkgs.ruby
+    pkgs.haskellPackages.ghc
+    pkgs.postgresql
+  ];
+
+  # Verification: conservation law check
+  checkPhase = ''
+    echo "Verifying HELLA registry..."
+    sha256sum $src
+  '';
+
+  installPhase = ''
+    mkdir -p $out/share/hella
+    cp -r * $out/share/hella
+  '';
+}
 
 
 
