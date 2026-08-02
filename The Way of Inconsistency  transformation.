@@ -777,7 +777,43 @@ pkgs.stdenv.mkDerivation {
     mkdir -p $out/share/hella
     cp -r * $out/share/hella
   '';
-}
+}registry:
+  packages:
+    cosmos:
+      name: "cosmos"
+      hash: "sha256-of-structured-inconsistency"
+      description: "Structured inconsistency as universal substrate"
+    identity:
+      name: "identity"
+      hash: "sha256-of-verification-and-compression"
+      description: "Verification and compression as conservation law"
+  dependencies:
+    - from: "cosmos"
+      to: "identity"
+
+kernel:
+  operators:
+    theta: "mirror / inversion / duality"
+    rho: "resilience / stabilization / norm-like"
+    phi: "generative / expansion / combinatorial"
+    r: "recursion operator (phi ∘ rho ∘ theta)"
+  meta:
+    closure: true
+    identity: true
+    composition: "category structure"
+    symmetry_group: true
+
+verse_state:
+  variables:
+    chi: "curvature / intensity"
+    energy: "scalar potential"
+    omega: "phase-transition flag"
+    labels: []
+    emergence: []
+  update_rule: "apply(symbols) → state morphism"
+  lagrangian: "energy + chi"
+
+
 
 
 
