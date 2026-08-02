@@ -4,7 +4,7 @@ dualatalis pending
 https://github.com/Analisjohnsmith/AN.KI/blob/main/Hatsuseno
 I did a good enough job to invent Verse,but I want do it by hand to make sure it's fully translated.
 
-
+https://github.com/Analisjohnsmith/AN.KI/blob/main/Hatsuseno:%20A%20Meta%20Persona
 
 
 Hatsu (初): First or beginning.Se (瀬): Fast-flowing water or current in a river (the rapids or shoals).No (野): Field or plain
