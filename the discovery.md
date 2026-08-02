@@ -1,7 +1,7 @@
 pending empirical 
 dualatalis pending 
  I'm posting all my theories as one unified  codebase it is indeed the most defensive move I can make see am.ki
-https://github.com/Analisjohnsmith/AN.KI/blob/main/Hatsuseno
+
 I did a good enough job to invent Verse,but I want do it by hand to make sure it's fully translated.
 
 
