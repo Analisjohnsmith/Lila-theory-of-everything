@@ -1,0 +1,749 @@
+"""zhaived -- single-file compilation of the NS-invariants project.
+
+Fold of the entire project into ONE self-contained module:
+
+  solver   | ns_solver.py            conservative-form pseudo-spectral NS solve
+  analysis | zhaived_analysis.py     streaming diagnostics (identity/PDE residuals)
+  registry | zhaived_registry.py     YAML registry + meowwow verdict plumbing
+  campaign | spectral_ns_solver.py   run/batch/campaign/reanalyze runners
+  module   | zhaived_ns_module.py    NS-invariant YAML module encoder
+  viz      | zhaived_viz.py          decay + convergence figures
+  gallery  | (new)                   one-file photo gallery (base64-embedded PNGs)
+
+CLI:
+  python3 zhaived.py compile     # full compile: sanity + viz + gallery + manifest
+  python3 zhaived.py gallery     # rebuild gallery.html only
+  python3 zhaived.py viz         # rebuild the compiled figures only
+  python3 zhaived.py batch       # feasible 16-run batch (resume-safe)
+  python3 zhaived.py campaign    # dt-convergence campaign (resume-safe)
+  python3 zhaived.py reanalyze [N]  # re-run all analyses with one operator
+"""
+import base64
+import io
+import json
+import os
+import random as _random
+import sys
+from contextlib import redirect_stdout
+from datetime import datetime
+from pathlib import Path
+
+import numpy as np
+import yaml
+from numpy.fft import fftn, ifftn
+from scipy.optimize import curve_fit
+
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+
+# =====================================================================
+# 1. SOLVER  (from ns_solver.py -- conservative form, validated)
+# =====================================================================
+
+
+def solve(N=32, T=1.0, dt=0.01, nu=0.1, seed=None, progress_every=None):
+    """Pseudo-spectral Navier-Stokes toy solver, 2nd-order in time.
+
+    - derivatives via i*k in Fourier space
+    - 2/3 dealiasing + Helmholtz projection (discrete pressure solve)
+    - real (Hermitian-symmetric) divergence-free initial field
+    - Adams-Bashforth 2 for the nonlinear term, Crank-Nicolson for viscosity
+    - conservative-form nonlinearity: N_j = sum_q d/dx_q (u_q u_j)
+    """
+    if seed is not None:
+        np.random.seed(seed)
+    k = np.fft.fftfreq(N, d=2*np.pi/N) * 2*np.pi
+    KX, KY, KZ = np.meshgrid(k, k, k, indexing='ij')
+    k2 = KX**2 + KY**2 + KZ**2
+    k2_zero = k2.copy()
+    k2_zero[0, 0, 0] = 1.0
+
+    cutoff = N // 3
+    deal = (np.abs(KX) > cutoff) | (np.abs(KY) > cutoff) | (np.abs(KZ) > cutoff)
+
+    def project(u_hat):
+        dot = (KX*u_hat[0] + KY*u_hat[1] + KZ*u_hat[2]) / k2_zero
+        u_hat[0] -= KX*dot
+        u_hat[1] -= KY*dot
+        u_hat[2] -= KZ*dot
+        return u_hat
+
+    def nonlinear_at(m):
+        u = ifftn(m, axes=(1, 2, 3))
+        F00 = fftn(u[0]*u[0], axes=(0, 1, 2))
+        F01 = fftn(u[0]*u[1], axes=(0, 1, 2))
+        F02 = fftn(u[0]*u[2], axes=(0, 1, 2))
+        F11 = fftn(u[1]*u[1], axes=(0, 1, 2))
+        F12 = fftn(u[1]*u[2], axes=(0, 1, 2))
+        F22 = fftn(u[2]*u[2], axes=(0, 1, 2))
+        Nm = np.zeros_like(m)
+        Nm[0] = 1j*KX*F00 + 1j*KY*F01 + 1j*KZ*F02
+        Nm[1] = 1j*KX*F01 + 1j*KY*F11 + 1j*KZ*F12
+        Nm[2] = 1j*KX*F02 + 1j*KY*F12 + 1j*KZ*F22
+        Nm[:, deal] = 0.0
+        return project(Nm)
+
+    u_hat = project(fftn(np.random.randn(3, N, N, N), axes=(1, 2, 3)))
+
+    snapshots = []
+    prev_nl = None
+    cn = (1.0 - 0.5*dt*nu*k2) / (1.0 + 0.5*dt*nu*k2)
+    total_steps = int(T/dt)
+    for i in range(total_steps):
+        Nn = nonlinear_at(u_hat)
+        rhs = Nn if prev_nl is None else 1.5*Nn - 0.5*prev_nl
+        u_hat = (u_hat - dt*rhs) * cn
+        prev_nl = Nn
+        snapshots.append(np.real(ifftn(u_hat, axes=(1, 2, 3))))
+        if progress_every and (i + 1) % progress_every == 0:
+            print(f"  [solve step {i+1}/{total_steps}]", flush=True)
+    return snapshots
+
+
+# =====================================================================
+# 2. ANALYSIS  (from zhaived_analysis.py -- streaming, conservative op)
+# =====================================================================
+
+
+def kinetic_energy(u):
+    return np.sum(np.abs(u)**2)
+
+
+def sobolev_Hs_norm(u_hat, s, N):
+    L = 2 * np.pi
+    k = np.fft.fftfreq(N, d=L/N) * 2*np.pi
+    KX, KY, KZ = np.meshgrid(k, k, k, indexing="ij")
+    k2 = KX**2 + KY**2 + KZ**2
+    return np.sum((1 + k2)**s * np.abs(u_hat)**2)
+
+
+def normalized(hs, N):
+    return hs / ((N ** 3) * (2*np.pi)**3)
+
+
+def power_law(t, E0, alpha):
+    return E0 * t**(-alpha)
+
+
+def Lp_norm(u, p, N):
+    L = 2 * np.pi
+    vol = (L / N) ** 3
+    if p == np.inf:
+        return max(np.max(np.abs(u[i])) for i in range(3))
+    return (np.sum(np.abs(u)**p) * vol) ** (1.0 / p)
+
+
+def spectral_nonlinear(u_hat, N):
+    """Projected, dealiased N(u) = P[(u.grad)u], conservative form (what the
+    solver steps), so the PDE residual measures the actual discretization."""
+    k = np.fft.fftfreq(N, d=2*np.pi/N) * 2*np.pi
+    KX, KY, KZ = np.meshgrid(k, k, k, indexing="ij")
+    k2z = KX**2 + KY**2 + KZ**2
+    k2z[0, 0, 0] = 1.0
+    cutoff = N // 3
+    deal = (np.abs(KX) > cutoff) | (np.abs(KY) > cutoff) | (np.abs(KZ) > cutoff)
+    u = np.fft.ifftn(u_hat, axes=(1, 2, 3))
+    F00 = np.fft.fftn(u[0]*u[0], axes=(0, 1, 2))
+    F01 = np.fft.fftn(u[0]*u[1], axes=(0, 1, 2))
+    F02 = np.fft.fftn(u[0]*u[2], axes=(0, 1, 2))
+    F11 = np.fft.fftn(u[1]*u[1], axes=(0, 1, 2))
+    F12 = np.fft.fftn(u[1]*u[2], axes=(0, 1, 2))
+    F22 = np.fft.fftn(u[2]*u[2], axes=(0, 1, 2))
+    Nm = np.zeros_like(u_hat)
+    Nm[0] = 1j*KX*F00 + 1j*KY*F01 + 1j*KZ*F02
+    Nm[1] = 1j*KX*F01 + 1j*KY*F11 + 1j*KZ*F12
+    Nm[2] = 1j*KX*F02 + 1j*KY*F12 + 1j*KZ*F22
+    Nm[:, deal] = 0.0
+    dot = (KX*Nm[0] + KY*Nm[1] + KZ*Nm[2]) / k2z
+    Nm[0] -= KX*dot
+    Nm[1] -= KY*dot
+    Nm[2] -= KZ*dot
+    return Nm
+
+
+def analyze_snapshots(snaps, N, nu, dt):
+    """Streaming diagnostic extraction (one FFT/snapshot, memory-light).
+
+    Returns the computed residuals -- never hardcoded:
+      discrete_identity_rel_err : exact CN law (E_{n+1}-E_n)/dt = -2 nu G2eff/N^3
+      continuous_identity_rel_err: dE/dt vs -2 nu G2/N^3
+      spectral_pde_residual      : R = du/dt + P[N(u) + nu L u], normalized
+    """
+    t = np.arange(len(snaps)) * dt
+    k = np.fft.fftfreq(N, d=2*np.pi/N) * 2*np.pi
+    KX, KY, KZ = np.meshgrid(k, k, k, indexing="ij")
+    k2g = KX**2 + KY**2 + KZ**2
+    a = 0.5 * dt * nu * k2g
+
+    res_idx = set()
+    for n in range(0, len(snaps) - 1, 10):
+        res_idx.add(n)
+        res_idx.add(n + 1)
+    E = np.empty(len(snaps))
+    G2 = np.empty(len(snaps))
+    G2eff = np.empty(len(snaps))
+    H2 = -1.0
+    H25 = -1.0
+    u_at = {}
+    for n, u in enumerate(snaps):
+        uh = np.fft.fftn(u, axes=(1, 2, 3))
+        ah = np.abs(uh)**2
+        E[n] = ah.sum() / N**3
+        G2[n] = (ah * k2g).sum()
+        G2eff[n] = (ah * k2g / (1.0 + a)**2).sum()
+        h2 = ((1 + k2g)**2 * ah).sum()
+        h25 = ((1 + k2g)**2.5 * ah).sum()
+        if h2 > H2:
+            H2 = h2
+        if h25 > H25:
+            H25 = h25
+        if n in res_idx:
+            u_at[n] = uh
+
+    t_fit, E_fit = t[5:], E[5:]
+    try:
+        popt, _ = curve_fit(power_law, t_fit, E_fit, p0=[E[0], 1.0], maxfev=20000)
+        E0_fit, alpha = float(popt[0]), float(popt[1])
+        pred = power_law(t_fit, E0_fit, alpha)
+        ss_res = np.sum((E_fit - pred)**2)
+        ss_tot = np.sum((E_fit - E_fit.mean())**2)
+        r2 = float(1 - ss_res / ss_tot) if ss_tot > 0 else float("nan")
+    except Exception:
+        E0_fit = alpha = r2 = float("nan")
+
+    dE_forward = np.diff(E) / dt
+    diss_eff = -2.0 * nu * G2eff[:-1] / N**3
+    disc_err = float(np.mean(np.abs(dE_forward - diss_eff) / (np.abs(diss_eff) + 1e-12)))
+
+    dEdt = np.gradient(E, dt)
+    diss_cont = -2.0 * nu * G2 / N**3
+    mask = E > 0.05 * E[0]
+    cont_err = float(np.mean(np.abs(dEdt - diss_cont)[mask] / (np.abs(diss_cont)[mask] + 1e-12))) \
+        if mask.sum() > 1 else float("nan")
+
+    res = []
+    for n in sorted(u_at):
+        if n >= len(snaps) - 1:
+            continue
+        u_p = u_at.get(n + 1)
+        if u_p is None:
+            continue
+        Nn = spectral_nonlinear(u_at[n], N)
+        R = (u_p - u_at[n]) / dt + Nn + nu * k2g * u_at[n]
+        num = np.sum(np.abs(R)**2)
+        den = np.sum(np.abs(Nn)**2 + np.abs(nu * k2g * u_at[n])**2) + 1e-12
+        res.append(np.sqrt(num / den))
+    spectral_res = float(np.mean(res))
+
+    return {
+        "N": N, "nu": nu, "T": len(snaps) * dt, "seed": None,
+        "E0": float(E[0]), "ET": float(E[-1]),
+        "alpha": alpha, "E0_fit": E0_fit, "powerlaw_r2": r2,
+        "H2_norm_max": float(normalized(H2, N)),
+        "H2_5_norm_max": float(normalized(H25, N)),
+        "discrete_identity_rel_err": disc_err,
+        "continuous_identity_rel_err": cont_err,
+        "spectral_pde_residual": spectral_res,
+    }
+
+
+# =====================================================================
+# 3. REGISTRY  (from zhaived_registry.py / spectral_ns_solver.py)
+# =====================================================================
+
+REG_CAMPAIGN = "zhaived_modules/NS_Campaign_registry.yaml"
+REG_INVARIANTS = "zhaived_modules/NS_Invariants_registry.yaml"
+TOE_OUT = "toe_outputs"
+
+_verdict_cache = {}
+
+
+def meowwow_verdict_for(seed, params=None):
+    """heavy_hit_suite verdict for a seed (cached; the suite is expensive)."""
+    if seed in _verdict_cache:
+        return _verdict_cache[seed]
+    if params is None:
+        params = {"m2": -8000.0, "lambda_H": 0.1, "y": 0.2, "g": 0.4, "mu": 1.0}
+    _random.seed(seed)
+    buf = io.StringIO()
+    with redirect_stdout(buf):
+        import valari_meowwow_toe as mmw
+        res = mmw.heavy_hit_suite(TOE_OUT, params)
+    verdict = res["overall_verdict"]
+    _verdict_cache[seed] = verdict
+    return verdict
+
+
+def load_registry(path=REG_CAMPAIGN):
+    with open(path) as f:
+        reg = yaml.safe_load(f) or {}
+    return reg.get("NS_Campaign_registry", {}).get("runs", []) if path == REG_CAMPAIGN \
+        else reg.get("NS_Invariants_registry", {}).get("runs", [])
+
+
+def append_run_to_yaml(filename, run_entry):
+    Path(filename).parent.mkdir(parents=True, exist_ok=True)
+    if Path(filename).exists():
+        with open(filename) as f:
+            reg = yaml.safe_load(f) or {}
+    else:
+        reg = {"NS_Campaign_registry": {"runs": []}}
+    root = reg.setdefault("NS_Campaign_registry", {})
+    root.setdefault("runs", []).append(run_entry)
+    with open(filename, "w") as f:
+        yaml.safe_dump(reg, f, sort_keys=False)
+
+
+def _scope_present(filename, scope):
+    if not (filename and Path(filename).exists()):
+        return False
+    with open(filename) as f:
+        reg = yaml.safe_load(f) or {}
+    for run in reg.get("NS_Campaign_registry", {}).get("runs", []):
+        if run.get("scope") == scope:
+            return True
+    return False
+
+
+# =====================================================================
+# 4. RUNNERS  (from spectral_ns_solver.py)
+# =====================================================================
+
+
+def run_one(N=32, T=2.0, dt=0.002, nu=0.1, seed=42, filename=REG_CAMPAIGN,
+            progress_every=None):
+    """One corrected run: solve -> analyze -> meowwow verdict -> registry append."""
+    scope = {"resolution": N, "viscosity": nu, "time_horizon": T, "seed": seed, "dt": dt}
+    if _scope_present(filename, scope):
+        return None
+    snaps = solve(N=N, T=T, dt=dt, nu=nu, seed=seed, progress_every=progress_every)
+    a = analyze_snapshots(snaps, N, nu, dt)
+    verdict = meowwow_verdict_for(seed)
+    E = np.array([np.sum(u**2) for u in snaps])
+    run_entry = {
+        "timestamp": datetime.now().astimezone().isoformat(),
+        "scope": scope,
+        "energy_bound": {"E0": a["E0"], "ET": a["ET"],
+                         "monotone_decay": bool(np.all(np.diff(E) <= 0))},
+        "sobolev_norm": {"H2": a["H2_norm_max"], "H2.5": a["H2_5_norm_max"]},
+        "analysis": {
+            "energy_decay_exponent_alpha": a["alpha"],
+            "powerlaw_fit": {"E0_fit": a["E0_fit"], "R2": a["powerlaw_r2"]},
+            "discrete_identity_rel_err": a["discrete_identity_rel_err"],
+            "continuous_identity_rel_err": a["continuous_identity_rel_err"],
+            "spectral_pde_residual": a["spectral_pde_residual"],
+        },
+        "meowwow_verdict": f"heavy_hit_suite {verdict} (seed={seed})",
+    }
+    if filename:
+        append_run_to_yaml(filename, run_entry)
+    return run_entry
+
+
+def batch_runs(filename=REG_CAMPAIGN):
+    """Feasible 16-run cross-resolution / viscosity / seed ensemble (~35 min)."""
+    grid = []
+    for N, nu_list, T in ((32, (0.10, 0.05, 0.02), 2.0),
+                          (64, (0.10, 0.05), 1.0),
+                          (128, (0.10,), 0.1)):
+        for nu in nu_list:
+            for seed in (42, 99, 123):
+                if N == 128 and seed != 42:
+                    continue
+                grid.append(dict(N=N, nu=nu, T=T, seed=seed, dt=0.002))
+    print(f"batch_runs: {len(grid)} runs -> {filename}")
+    for i, g in enumerate(grid, 1):
+        entry = run_one(filename=filename, progress_every=10, **g)
+        if entry is None:
+            print(f"[{i}/{len(grid)}] SKIP (already logged) {g}")
+            continue
+        a = entry["analysis"]
+        print(f"[{i}/{len(grid)}] N={g['N']} nu={g['nu']:.2f} T={g['T']:.1f} "
+              f"seed={g['seed']:3d}  alpha={a['energy_decay_exponent_alpha']:.3f} "
+              f"R2={a['powerlaw_fit']['R2']:.3f} "
+              f"disc={a['discrete_identity_rel_err']:.2e} "
+              f"spec={a['spectral_pde_residual']:.2e} "
+              f"{entry['meowwow_verdict']}")
+    return grid
+
+
+def ultimate_ns_campaign(filename=REG_CAMPAIGN):
+    """Feasible dt-convergence campaign (budget-capped; N=256 is impractical)."""
+    grid = []
+    for N, dt_list, nu_list, T in ((32, (0.008, 0.004, 0.002), (0.10, 0.05), 2.0),
+                                   (64, (0.004, 0.002), (0.10,), 1.0)):
+        for dt in dt_list:
+            for nu in nu_list:
+                for seed in (42, 99):
+                    grid.append(dict(N=N, nu=nu, T=T, seed=seed, dt=dt))
+    print(f"ultimate_ns_campaign: {len(grid)} runs -> {filename}")
+    for i, g in enumerate(grid, 1):
+        entry = run_one(filename=filename, progress_every=10, **g)
+        if entry is None:
+            print(f"[{i}/{len(grid)}] SKIP (already logged) {g}")
+            continue
+        a = entry["analysis"]
+        print(f"[{i}/{len(grid)}] N={g['N']} dt={g['dt']:.4f} nu={g['nu']:.2f} "
+              f"seed={g['seed']}  alpha={a['energy_decay_exponent_alpha']:.3f} "
+              f"disc={a['discrete_identity_rel_err']:.2e} "
+              f"cont={a['continuous_identity_rel_err']:.2e} "
+              f"spec={a['spectral_pde_residual']:.2e}")
+    return grid
+
+
+def reanalyze(filename=REG_CAMPAIGN, only_N=None):
+    """Recompute every run's analysis with the current pipeline (one operator)."""
+    with open(filename) as f:
+        reg = yaml.safe_load(f) or {}
+    runs = reg.setdefault("NS_Campaign_registry", {}).setdefault("runs", [])
+    if only_N is not None:
+        runs = [r for r in runs if r["scope"]["resolution"] == only_N]
+    print(f"reanalyze: {len(runs)} runs ({only_N if only_N else 'all'}) in {filename}")
+    for i, run in enumerate(runs, 1):
+        s = run["scope"]
+        N, nu, T, dt, seed = (s["resolution"], s["viscosity"],
+                              s["time_horizon"], s["dt"], s["seed"])
+        snaps = solve(N=N, T=T, dt=dt, nu=nu, seed=seed, progress_every=10)
+        a = analyze_snapshots(snaps, N, nu, dt)
+        E = np.array([np.sum(u**2) for u in snaps])
+        run["energy_bound"] = {"E0": a["E0"], "ET": a["ET"],
+                               "monotone_decay": bool(np.all(np.diff(E) <= 0))}
+        run["sobolev_norm"] = {"H2": a["H2_norm_max"], "H2.5": a["H2_5_norm_max"]}
+        run["analysis"] = {
+            "energy_decay_exponent_alpha": a["alpha"],
+            "powerlaw_fit": {"E0_fit": a["E0_fit"], "R2": a["powerlaw_r2"]},
+            "discrete_identity_rel_err": a["discrete_identity_rel_err"],
+            "continuous_identity_rel_err": a["continuous_identity_rel_err"],
+            "spectral_pde_residual": a["spectral_pde_residual"],
+        }
+        with open(filename, "w") as f:
+            yaml.safe_dump(reg, f, sort_keys=False)
+        print(f"[{i}/{len(runs)}] N={N} nu={nu:.2f} T={T} dt={dt} seed={seed}  "
+              f"alpha={a['alpha']:.3f} disc={a['discrete_identity_rel_err']:.2e} "
+              f"spec={a['spectral_pde_residual']:.2e}")
+    return runs
+
+
+# =====================================================================
+# 5. MODULE ENCODER  (from zhaived_ns_module.py)
+# =====================================================================
+
+
+def encode_ns_invariants(m, author="Darrell Lee (Līlā) Stiltner",
+                         location="Signal Mountain, TN"):
+    """Build the human/agent-readable NS-invariant module from one run's data."""
+    energy_status = "PASS" if (m["ET"] <= m["E0"] and m["monotone_decay"]) else "FAIL"
+    return {
+        "NS_Invariants_001": {
+            "energy_bound": {
+                "definition": "∫ |u(x,t)|^2 dx < ∞ for all t ≥ 0",
+                "kernel_status": energy_status,
+                "measured": {"E(0)": m["E0"], "E(T)": m["ET"],
+                             "monotone_decay": m["monotone_decay"]},
+                "mapping": "Kinetic energy finite → Leray class invariant",
+                "scope": f"single trajectory, N={m['N']}, nu={m['nu']}, "
+                         f"T={m['T']} (empirical, not a proof)",
+            },
+            "sobolev_norm": {
+                "definition": "‖u(·,t)‖_H^s < ∞ for some s > 3/2",
+                "kernel_status": "PASS" if (np.isfinite(m["H2_norm_max"])
+                                            and np.isfinite(m["H2_5_norm_max"])) else "FAIL",
+                "measured": {"H^2_max": m["H2_norm_max"],
+                             "H^2.5_max": m["H2_5_norm_max"]},
+                "mapping": "Higher-order derivatives bounded → smoothness analogue",
+                "scope": f"single trajectory, N={m['N']}, nu={m['nu']}, "
+                         f"T={m['T']} (empirical, not a proof)",
+            },
+            "decay_exponent": {
+                "definition": "E(t) ~ E0 t^(-alpha) on the tail (power-law fit)",
+                "kernel_status": "PASS" if m.get("powerlaw_r2", 0) > 0.9 else "FAIL",
+                "measured": {"alpha": m.get("alpha"), "R2": m.get("powerlaw_r2")},
+                "mapping": "Empirical decay rate vs Stokes (alpha=1) / Kolmogorov (4/3) analogues",
+                "scope": "tail fit on finite trajectory (empirical)",
+            },
+            "residual_checks": {
+                "discrete_identity_rel_err": m.get("discrete_identity_rel_err"),
+                "continuous_identity_rel_err": m.get("continuous_identity_rel_err"),
+                "spectral_pde_residual": m.get("spectral_pde_residual"),
+                "kernel_status": "PASS" if m.get("discrete_identity_rel_err", 1) < 1e-2 else "FAIL",
+                "mapping": "Discretization self-consistency (CN law, dE/dt vs G2, PDE residual)",
+            },
+            "pde_mapping": {
+                "navier_stokes_equation": "∂_t u + (u · ∇)u = -∇p + νΔu",
+                "invariants": [
+                    "Energy dissipation ↔ viscosity term νΔu",
+                    "RG positivity ↔ λ > 0, no runaway growth",
+                    "Turbulence probes ↔ bounded nonlinear term (u · ∇)u",
+                ],
+            },
+            "observer_integration": {
+                "author": author,
+                "location": location,
+                "timestamp": datetime.now().astimezone().isoformat(),
+                "overlays": ["Mathematical", "Empirical", "Symbolic", "Cosmological"],
+            },
+        }
+    }
+
+
+# =====================================================================
+# 6. VIZ  (from zhaived_viz.py -- registry-derived, no re-solving)
+# =====================================================================
+
+VIZ_DIR = "zhaived_modules"
+
+
+def plot_campaign(runs=None, filename=None):
+    """Compiled figures straight from the registry (no re-solving)."""
+    runs = runs if runs is not None else load_registry(REG_CAMPAIGN)
+    Ncolors = {32: "tab:blue", 64: "tab:orange", 128: "tab:green"}
+
+    # (a) Energy decay reconstructed from the power-law fit E(t)=E0_fit t^-alpha
+    fig, ax = plt.subplots(figsize=(9, 6))
+    t = np.logspace(np.log10(0.004), np.log10(2.0), 300)
+    for r in runs:
+        s = r["scope"]
+        a = r["analysis"]["powerlaw_fit"]
+        if not np.isfinite(a["R2"]) or a["R2"] <= 0:
+            continue
+        E0f, alpha = a["E0_fit"], r["analysis"]["energy_decay_exponent_alpha"]
+        ax.loglog(t, E0f * t ** (-alpha),
+                  color=Ncolors.get(s["resolution"], "tab:gray"), alpha=0.55)
+    for N, c in Ncolors.items():
+        ax.plot([], [], color=c, label=f"N={N}")
+    ax.set_xlabel("t")
+    ax.set_ylabel("E(t) ~ E0·t^(-α)")
+    ax.set_title("Compiled energy decay tails (power-law fits, all runs)")
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    fig.tight_layout()
+    out = Path(VIZ_DIR) / "compiled_energy_decay.png"
+    fig.savefig(out, dpi=150)
+    plt.close(fig)
+    print(f"saved {out}")
+
+    # (b) dt-convergence of spectral PDE residual + resolution trend of disc_err
+    from collections import defaultdict
+    agg = defaultdict(list)
+    for r in runs:
+        s = r["scope"]
+        agg[(s["resolution"], s["viscosity"], s["dt"])].append(r["analysis"])
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13, 5))
+    for (N, nu, dt), aa in sorted(agg.items()):
+        mean = np.mean([a["spectral_pde_residual"] for a in aa])
+        ax1.loglog(dt, mean, "o", color=Ncolors[N], alpha=0.7)
+    dt_ref = np.array([0.002, 0.008])
+    ax1.loglog(dt_ref, 0.005 * dt_ref / 0.002, "k--", lw=1,
+               label="linear (slope 1)")
+    ax1.set_xlabel("dt")
+    ax1.set_ylabel("spectral PDE residual (mean)")
+    ax1.set_title("Spectral residual vs dt (linear convergence)")
+    ax1.legend()
+    ax1.grid(True, alpha=0.3)
+
+    for (N, nu, dt), aa in sorted(agg.items()):
+        mean = np.mean([a["discrete_identity_rel_err"] for a in aa])
+        ax2.loglog(N, mean, "o", color=Ncolors[N], alpha=0.7)
+    ax2.set_xlabel("N")
+    ax2.set_ylabel("discrete identity rel. error (mean)")
+    ax2.set_title("Identity error vs resolution")
+    ax2.grid(True, alpha=0.3)
+    fig.tight_layout()
+    out = Path(VIZ_DIR) / "compiled_convergence.png"
+    fig.savefig(out, dpi=150)
+    plt.close(fig)
+    print(f"saved {out}")
+
+
+# =====================================================================
+# 7. PHOTO GALLERY  (new -- single self-contained HTML, base64 images)
+# =====================================================================
+
+GALLERY_TITLES = {
+    "registry_viz.png": "Registry — NS invariant trajectories (meowwow verdicts)",
+    "compiled_energy_decay.png": "Compiled energy decay tails (power-law fits)",
+    "compiled_convergence.png": "Compiled dt-convergence & resolution trends",
+    "ns_diagnostics.png": "NS diagnostics — energy / Sobolev / spectra",
+    "ns_fields.png": "NS velocity fields (3 components, slices)",
+    "ns3d_diagnostics.png": "3D NS diagnostics",
+    "ns3d_spectrum.png": "3D NS kinetic energy spectrum",
+    "ns_test.npz.png": "NS test panel",
+    "heavy_diagnostics.png": "Heavy-field diagnostics",
+    "heavy_spectrum.png": "Heavy-field spectrum",
+    "bifurcation_comparison.png": "Bifurcation comparison",
+    "network_glow.png": "Network glow (graphics artifact)",
+    "ym_rg_flow.png": "Yang-Mills RG flow",
+    "lattice_glueball.png": "Lattice glueball spectrum",
+    "veff_plot.png": "Effective potential (toe_outputs)",
+    "rg_flow.png": "RG flow (toe_outputs)",
+}
+
+
+def collect_images(root="."):
+    imgs = []
+    for sub in ("", "zhaived_modules", "toe_outputs"):
+        p = Path(root) / sub
+        if not p.exists():
+            continue
+        for f in sorted(p.glob("*.png")):
+            imgs.append(str(f))
+    return imgs
+
+
+def build_gallery(outfile="zhaived_modules/gallery.html"):
+    """Write one self-contained HTML gallery embedding every project PNG."""
+    imgs = collect_images()
+    Path(outfile).parent.mkdir(parents=True, exist_ok=True)
+
+    cards = []
+    for path in imgs:
+        name = os.path.basename(path)
+        try:
+            with open(path, "rb") as f:
+                b64 = base64.b64encode(f.read()).decode("ascii")
+        except OSError as e:
+            print(f"skip {path}: {e}")
+            continue
+        kb = os.path.getsize(path) // 1024
+        title = GALLERY_TITLES.get(name, name.replace("_", " ").replace(".png", ""))
+        cards.append(f"""
+        <figure class="card">
+          <img src="data:image/png;base64,{b64}" alt="{title}" loading="lazy" />
+          <figcaption>
+            <b>{title}</b><br/>
+            <span class="meta">{path} · {kb} KB</span>
+          </figcaption>
+        </figure>""")
+
+    html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>ZhaivedOS — Project Photo Gallery</title>
+<style>
+  body {{ font-family: system-ui, sans-serif; background: #0f1115; color: #e8e8e8;
+         margin: 0; padding: 24px; }}
+  h1 {{ font-weight: 500; }}
+  .gallery {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+             gap: 18px; }}
+  .card {{ background: #1a1d24; border-radius: 10px; padding: 10px; margin: 0; }}
+  .card img {{ width: 100%; height: auto; border-radius: 6px; background: #000; }}
+  .card figcaption {{ margin-top: 8px; font-size: 0.9rem; line-height: 1.4; }}
+  .meta {{ color: #8a93a6; font-size: 0.78rem; font-family: ui-monospace, monospace; }}
+</style>
+</head>
+<body>
+<h1>ZhaivedOS — Project Photo Gallery</h1>
+<p>{len(cards)} images embedded into one file · generated {datetime.now().astimezone().isoformat()}</p>
+<div class="gallery">
+{''.join(cards)}
+</div>
+</body>
+</html>"""
+    with open(outfile, "w") as f:
+        f.write(html)
+    print(f"saved {outfile} ({len(imgs)} images, {os.path.getsize(outfile)//1024} KB)")
+
+
+# =====================================================================
+# 8. COMPILE  (consolidated manifest + gallery)
+# =====================================================================
+
+
+def compile_project():
+    """Full compile: sanity, viz, gallery, and the consolidated manifest."""
+    print("== zhaived compile ==")
+
+    print("\n-- sanity run (N=32, T=0.2) --")
+    snaps = solve(N=32, T=0.2, dt=0.002, nu=0.1, seed=42)
+    a = analyze_snapshots(snaps, 32, 0.1, 0.002)
+    print(f"  E0={a['E0']:.4e} ET={a['ET']:.4e} alpha={a['alpha']:.3f} "
+          f"disc={a['discrete_identity_rel_err']:.2e} "
+          f"spec={a['spectral_pde_residual']:.2e}")
+
+    print("\n-- viz --")
+    plot_campaign()
+
+    print("\n-- gallery --")
+    build_gallery()
+
+    print("\n-- consolidated manifest --")
+    campaign = load_registry(REG_CAMPAIGN)
+    invariants = load_registry(REG_INVARIANTS)
+    from collections import defaultdict
+    conv = defaultdict(list)
+    for r in campaign:
+        s = r["scope"]
+        conv[(s["resolution"], s["viscosity"], s["dt"])].append(r["analysis"])
+    conv_table = []
+    for key, aa in sorted(conv.items()):
+        conv_table.append({
+            "N": key[0], "nu": key[1], "dt": key[2],
+            "mean_alpha": float(np.mean([a["energy_decay_exponent_alpha"] for a in aa])),
+            "mean_R2": float(np.mean([a["powerlaw_fit"]["R2"] for a in aa])),
+            "mean_disc_err": float(np.mean([a["discrete_identity_rel_err"] for a in aa])),
+            "mean_cont_err": float(np.mean([a["continuous_identity_rel_err"] for a in aa])),
+            "mean_spec_res": float(np.mean([a["spectral_pde_residual"] for a in aa])),
+        })
+    manifest = {
+        "zhaived_compiled": {
+            "description": "One-file compilation of the NS-invariants project "
+                           "(solver, analysis, registry, campaign, module, viz, gallery).",
+            "timestamp": datetime.now().astimezone().isoformat(),
+            "folded_modules": [
+                "ns_solver.py", "zhaived_analysis.py", "zhaived_registry.py",
+                "spectral_ns_solver.py", "zhaived_ns_module.py", "zhaived_viz.py",
+                "valari_meowwow_toe.py (verdict plumbing)",
+            ],
+            "invariant_registry": REG_INVARIANTS,
+            "invariant_runs": len(invariants),
+            "campaign_registry": REG_CAMPAIGN,
+            "campaign_runs": len(campaign),
+            "all_pass": all(r.get("meowwow_verdict", "").startswith("heavy_hit_suite PASS")
+                            for r in campaign),
+            "all_monotone_decay": all(r.get("energy_bound", {}).get("monotone_decay")
+                                      for r in campaign),
+            "convergence_table": conv_table,
+            "gallery": "zhaived_modules/gallery.html",
+            "figures": {
+                "registry_viz": "zhaived_modules/registry_viz.png",
+                "energy_decay": "zhaived_modules/compiled_energy_decay.png",
+                "convergence": "zhaived_modules/compiled_convergence.png",
+            },
+        }
+    }
+    out = "zhaived_modules/zhaived_compiled.yaml"
+    with open(out, "w") as f:
+        yaml.safe_dump(manifest, f, sort_keys=False)
+    print(f"saved {out}")
+    print(f"\ncompile complete: {len(campaign)} campaign runs, "
+          f"{len(invariants)} invariant runs, gallery embedded.")
+
+
+# =====================================================================
+# CLI
+# =====================================================================
+
+
+def main():
+    mode = sys.argv[1] if len(sys.argv) > 1 else "compile"
+    if mode == "compile":
+        compile_project()
+    elif mode == "gallery":
+        build_gallery()
+    elif mode == "viz":
+        plot_campaign()
+    elif mode == "batch":
+        batch_runs()
+    elif mode == "campaign":
+        ultimate_ns_campaign()
+    elif mode == "reanalyze":
+        reanalyze(only_N=int(sys.argv[2]) if len(sys.argv) > 2 else None)
+    else:
+        print(__doc__)
+
+
+if __name__ == "__main__":
+    main()
