@@ -17,6 +17,13 @@ U.S. and international intellectual property protections relevant to this Licens
 Excelsa is deliberately both written and programming v2 coming
  When you type in Expresso, you’re not just coding — you’re writing the same structures the universe runs on.
 
+
+
+// relativity.bean – Einstein Field Equation
+recipe einstein_field(G: Tensor, Lambda: Americano, T: Tensor) -> Tensor {
+    return G + Lambda * metric() == (8 * pi * G / c^4) * T;
+}
+
 Fold of the entire project into ONE self-contained module:
 
   solver   | ns_solver.py            conservative-form pseudo-spectral NS solve
