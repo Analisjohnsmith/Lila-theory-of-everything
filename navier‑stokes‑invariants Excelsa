@@ -24,6 +24,17 @@ recipe einstein_field(G: Tensor, Lambda: Americano, T: Tensor) -> Tensor {
     return G + Lambda * metric() == (8 * pi * G / c^4) * T;
 }
 
+
+// cosmology.bean – Friedmann Equation
+recipe friedmann(a: Function, rho: Function, k: Espresso, Lambda: Americano) -> Function {
+    return (d_dt(a) / a)^2 == (8 * pi * G / 3) * rho 
+           - k * c^2 / a^2 
+           + Lambda * c^2 / 3;
+}
+
+
+i think isee whats going on here
+
 Fold of the entire project into ONE self-contained module:
 
   solver   | ns_solver.py            conservative-form pseudo-spectral NS solve
