@@ -25,36 +25,7 @@ Excelsa is deliberately both written and programming v2 coming
 
 When you type in Expresso, you’re not just coding — you’re writing the same structures the universe runs on.
 
-// cats.bean – playful mutation of the language
 
-// Instead of coffee metaphors, we swap to cats.
-// The substrate still compiles and runs — only the symbols change.
-
-roast KERNEL_NAME = "kernel.cats"
-roast COMPILER_NAME = "compiler.cats"
-roast SHELL_NAME = "barista.cats"
-roast GUI_NAME = "glyphcats.cats"
-
-// Example recipe: physics with cats
-recipe schrodinger_cat(psi: Function, V: Function, m: Americano) -> Function {
-    return i * hbar * d_dt(psi) == -hbar^2/(2*m) * laplacian(psi) + V * psi;
-}
-
-// Operator mutations
-operator CatNap(x: Sound) -> Motif { return resonance(x); }
-operator CatPounce(x: Sound) -> Motif { return emergence(x); }
-operator CatVoid(x: Sound) -> Motif { return dissolution(x); }
-
-// Universe rewritten with cats
-recipe universe_cats(depth: Integer) -> Symphony {
-    if depth == 0 {
-        return CatVoid(boltzmann_noise(W));
-    } else {
-        return CatNap(schrodinger_cat(psi, V, m))
-             + CatPounce(einstein_chord(G, T, Lambda))
-             + universe_cats(depth - 1);
-    }
-}
 
 
 // relativity.bean – Einstein Field Equation
