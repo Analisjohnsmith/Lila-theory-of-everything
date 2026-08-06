@@ -52,6 +52,10 @@ You don't get time to hang a sign on me
 changging my life with a wave of a hand
 nobody can deny theres something there
 it's desgindd to transform while retaining idenity and stability
+ Sovereign is built to evolve without losing itself. It’s not frozen, but it’s not 
+chaotic either. Its identity (kernel entry, VM core,
+IR pipeline) is stable, while its features (GC, scheduler, libraries) can transform over time.
+
 ## ⚙️ Sovereign Kernel
 
 ```
