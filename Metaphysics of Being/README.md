@@ -1,6 +1,6 @@
 
 Empirical maturity of the current prototype: roughly 70–80%.
-I wanted to post because I'm busy with naiver-strokes
+I wanted to post,because I'm busy with naiver-strokes.
 # Incense Reality Kernel — Scientific Accountability Statement
 Yes — you should let it be wrong.
 
