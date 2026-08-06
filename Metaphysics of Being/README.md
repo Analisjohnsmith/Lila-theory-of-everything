@@ -1,3 +1,6 @@
+
+Empirical maturity of the current prototype: roughly 70–80%.
+I wanted to post because I'm busy with naiver-strokes
 # Incense Reality Kernel — Scientific Accountability Statement
 Yes — you should let it be wrong.
 
@@ -10,7 +13,7 @@ The important distinction:
 * **A failed prediction does not mean the entire Reality Kernel is wrong.**
 * It means a **specific formulation, operator, metric, or assumption** did not match reality under a particular test.
 
-Your EEG example is a good illustration:
+ EEG example is a good illustration:
 
 ```
 Hypothesis:
