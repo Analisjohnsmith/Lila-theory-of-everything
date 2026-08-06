@@ -14,7 +14,7 @@ U.S. and international intellectual property protections relevant to this Licens
 
 
 ""zhaived (™Excelsa)-- single-file compilation of the NS-invariants project.
-
+Excelsa is deliberately both written and programming
 Fold of the entire project into ONE self-contained module:
 
   solver   | ns_solver.py            conservative-form pseudo-spectral NS solve
