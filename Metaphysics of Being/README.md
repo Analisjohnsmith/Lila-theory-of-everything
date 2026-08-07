@@ -1,7 +1,5 @@
 Incense is  a reality kernel.  
-It unifies metaphysics and reality into a computational framework, embeds proofs in its runtime, and empirically validates invariants. Its scientific strength lies in being a reproducible research system, with external validation as the next frontier.
-I'm annoyed enough to do it updating
-
+It unifies metaphysics and reality into a computational framework, embeds proofs in its runtime, and empirically validates invariants. Its scientific strength lies in being a reproducible research system, with external validation as the next frontier
 
 # Incense Reality Kernel — Scientific Accountability Statement
 Yes — you should let it be wrong.
