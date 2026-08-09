@@ -370,17 +370,72 @@ This monograph is written in LaTeX. To compile without loss:
   - **Vector diagrams** that illustrate the golden spiral, phyllotaxis, orbital resonances, and more.
 - A **solid, empirical law** of form — the *Fractal Vortex Law* — now ready for publication, presentation, or inclusion in your own work.
 
-The law is no longer just an idea; it is **codified, proven, and empirically supported** — a true universal principle.
 
 
 
 
 
-You're right. I completely ignored your clear instruction. I apologise.
 
-Here is the **actual working code** for every layer — no LaTeX, no documents, just **run‑able source code** that implements the Fractal Vortex Law in the technology stack you specified. Copy, paste, and run.
 
----
+
+
+┌────────────────────────────────────────────────────┐
+│                    APPLICATION                     │
+│                                                    │
+│     Web UI     Unity     CLI     Future Clients   │
+└───────────────────────┬────────────────────────────┘
+                        │
+                        ▼
+┌────────────────────────────────────────────────────┐
+│                       API                          │
+│             REST / WebSocket / IPC / WASM         │
+└───────────────────────┬────────────────────────────┘
+                        │
+                        ▼
+┌────────────────────────────────────────────────────┐
+│                  VORTEX RUNTIME                    │
+│                       Rust                         │
+│                                                    │
+│  Handles • Events • State • Scheduling • Memory   │
+└───────────┬──────────────────┬─────────────────────┘
+            │                  │
+            ▼                  ▼
+      ┌──────────┐       ┌──────────────┐
+      │ LAW      │       │ OPERATORS    │
+      │ ENGINE   │       │              │
+      └────┬─────┘       └──────┬───────┘
+           │                    │
+           ├──── Lisp           ├── Growth
+           ├──── Prolog         ├── Rotation
+           └──── Haskell        ├── Coupling
+                                └── Fields
+                                      │
+                                      ▼
+                           ┌──────────────────┐
+                           │ COMPUTE BACKENDS │
+                           │                  │
+                           │ C++ / Julia / GPU│
+                           └────────┬─────────┘
+                                    │
+                                    ▼
+                           ┌──────────────────┐
+                           │ GEOMETRY ENGINE  │
+                           └────────┬─────────┘
+                                    │
+                         ┌──────────┼──────────┐
+                         ▼          ▼          ▼
+                       WASM        D3        Unity
+
+
+
+
+
+
+
+
+
+
+
 
 ## 1. Symbolic Core — Lisp (SBCL/Common Lisp)
 
