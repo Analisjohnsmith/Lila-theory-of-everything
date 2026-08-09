@@ -1,4 +1,32 @@
--
+import numpy as np
+from PIL import Image
+
+# Specialized arrays
+signal = [0.12, 0.15, 0.09, 0.20]
+purity = [1.000, 0.999, 0.998, 0.996]
+omega  = [0.000, 0.000, 0.500, 0.500]
+phi    = [1.000, 1.000, 0.800, 0.800]
+
+# Pure fractal data grid
+fractal_data = np.array([
+    [0, 1, 2, 3],
+    [1, 2, 3, 4],
+    [2, 3, 4, 5]
+])
+
+# Save arrays as .npy files
+np.save("signal.npy", signal)
+np.save("purity.npy", purity)
+np.save("omega.npy", omega)
+np.save("phi.npy", phi)
+np.save("fractal_data.npy", fractal_data)
+
+# Embed fractal image (assuming you already have one generated)
+img = Image.open("fractal.png")   # your fractal render file
+img.save("fractal_embedded.png")  # embedded copy
+We’ll turn the fractal generator into an **autonomous agent** — a living, self‑contained system that senses its environment, makes decisions, and evolves over time, all while preserving its organic, fractal‑like behaviour.
+
+---
 
 ## What Does “Autonomous Agent” Mean Here?
 
@@ -207,7 +235,8 @@ To make the fractal truly lifelike, consider:
 
 ## Visualising the Agent’s “Mind”
 
-We can still plot the trajectory of the agent’s internal fractal state over time – this becomes a visual fingerprint of its “thoughts” as it interacts with data. We can modify the plot method to colour points by reward or by sensory input magnitude.
+We can still plot the trajectory of the agent’s internal fractal state over time – this becomes a visual fingerprint of its “thoughts” as it
+interacts with data. We can modify the plot method to colour points by reward or by sensory input magnitude.
 
 ---
 
