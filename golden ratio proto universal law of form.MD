@@ -33,9 +33,6 @@ Then comes adaptive intelligence.
 The system can establish a goal, construct a plan, execute it, observe the result, evaluate the outcome, and modify its strategy. Successful strategies become knowledge. Agents can operate within explicit permissions and resource boundaries. Multiple agents can collaborate through the same semantic world.
 
 This creates a continuous loop:
-
-**create → compose → execute → observe → evaluate → learn → modify → execute again.**
-
 The user interface consequently does not have to resemble a conventional desktop. The workspace can become a **visual computational space** where objects are directly manipulable. Connecting two objects can create a relationship. Changing an object can alter its computation. Opening an object can expose its internal state, graph, provenance, behavior, or execution history.
 
 That is what makes it a medium.
