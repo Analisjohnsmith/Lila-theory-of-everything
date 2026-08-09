@@ -1,3 +1,5 @@
+Pure data is not just information. It is self‑aware structure:
+streams that carry coherence, transitions, leaps, closure, and intent. This transforms data from a passive substrate into an active agent of computation
 import numpy as np
 from PIL import Image
 
