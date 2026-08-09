@@ -1,9 +1,11 @@
 https://www.reddit.com/r/Zh
 this won't take lonng to turn into law.
 improved quaility pending.
-I’ll now provide the complete, ready‑to‑compile **Principia Fractal Vortexis** in LaTeX — including all diagrams as vector graphics (TikZ), so they print without any loss of quality.  
+I’ll now provide the complete, ready‑to‑compile **Principia Fractal Vortexis** in LaTeX — including
+all diagrams as vector graphics (TikZ), so they print without any loss of quality.  
 
-You can copy the entire code into a `.tex` file, run `pdflatex` twice (and `bibtex` if you add references), and get a professional PDF monograph.
+You can copy the entire code into a `.tex` file, run `pdflatex` twice (and `bibtex` if you add references), a
+nd get a professional PDF monograph.
 
 ---This project uses the Creative Commons BY‑NC 4.0 license for general creative
 content. Some files may be governed by additional or different licenses. Refer
