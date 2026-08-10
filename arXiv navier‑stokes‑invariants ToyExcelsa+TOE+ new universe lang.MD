@@ -11,7 +11,7 @@ Characters: 1,146,327
 Lines: 2,765
 This document lists the official governing texts that define and enforce
 U.S. and international intellectual property protections relevant to this License.
-
+see bottom for physical toe
 Excelsa handles scientific universality: physics, math, cosmology, simulation.
 Macambo handles enterprise universality: clusters, orchestration, resilience, symbolic AI.
 
