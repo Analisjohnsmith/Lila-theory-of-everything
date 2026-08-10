@@ -1,0 +1,42 @@
+import numpy as np
+
+def transformation_law_kernel(x, m, alpha, depth=1):
+    """
+    Monolithic kernel of the Law of Form as Transformation.
+    Encapsulates summation, scaling, normalization, recursion, and ratio.
+    
+    Parameters:
+    x : array-like contributions
+    m : array-like multipliers
+    alpha : scaling exponent
+    depth : recursion depth
+    
+    Returns:
+    omega : aggregated operator value
+    index : normalized ratio (0–1)
+    """
+    n = len(x)
+    
+    # Base operator: summation with scaling
+    omega = np.sum([(x[i] * m[i]) / ((i + 1) ** alpha) for i in range(n)])
+    
+    # Normalization boundary
+    omega_max = np.max(x) * np.max(m)
+    index = omega / omega_max if omega_max != 0 else 0
+    
+    # Recursive folding
+    if depth > 1:
+        for _ in range(depth - 1):
+            omega = (omega / ((n + 1) ** alpha)) + index
+            index = omega / omega_max if omega_max != 0 else 0
+    
+    return omega, index
+
+# Example usage
+x = np.array([1.0, 0.9, 0.8, 0.7, 0.6])
+m = np.array([1.0, 0.95, 0.9, 0.85, 0.8])
+alpha = 1.5
+
+omega, index = transformation_law_kernel(x, m, alpha, depth=5)
+print(f"Ω = {omega:.4f}")
+print(f"Normalized Index = {index:.4f}")
