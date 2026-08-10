@@ -1,5 +1,10 @@
-https://www.reddit.com/r/Zh
-this won't take lonng to turn into law.
+
+
+
+
+
+
+
 improved quaility pending.
 I’ll now provide the complete, ready‑to‑compile **Principia Fractal Vortexis** in LaTeX — including
 all diagrams as vector graphics (TikZ), so they print without any loss of quality.  
