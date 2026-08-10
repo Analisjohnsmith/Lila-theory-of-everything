@@ -1,7 +1,6 @@
-
+https://github.com/Analisjohnsmith/AN.KI/blob/main/toe%20physical%20AN.KI.MD
 there my physical toe  i wanted to share because I'm happy about it.
 
-https://github.com/Analisjohnsmith/AN.KI/blob/main/AN.KI
 
 ya'll need to fix chatgpt your're going to give some a stroke arguing with it.
 
