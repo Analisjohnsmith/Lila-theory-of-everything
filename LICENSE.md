@@ -143,7 +143,7 @@ Section 8 – Interpretation.
 This Public License is to be interpreted in accordance with applicable law.
 
 
-
+version 2.2 coming.
 GreatScott!™🄯  ENTERPRISE LICENSE v2.1
 Open for Study • Closed for Commercial Use
 AN.KI™ • Hatsuseno™ • M.E.O.W.W.O.W!™ • 
