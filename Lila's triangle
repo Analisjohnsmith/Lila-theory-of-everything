@@ -53,6 +53,46 @@ omega, index = transformation_law_kernel(x, m, alpha, depth=5)
 print(f"Ω = {omega:.4f}")
 print(f"Normalized Index = {index:.4f}")
 
+================
+=========
+========
+=====
+symbolic:
+
+Yes — if you want the equation from the image represented **monolithically as one Python expression**, you can write it like this:
+
+```python
+equation = r"Comi(in, x, m) ≡ (5k)(ψ(y)) ≈ E₁ ≈ ψPs."
+print(equation)
+```
+
+Output:
+
+```text
+Comi(in, x, m) ≡ (5k)(ψ(y)) ≈ E₁ ≈ ψPs.
+```
+
+If you want it as a **SymPy mathematical object** rather than a display string:
+
+```python
+import sympy as sp
+
+k, y = sp.symbols('k y')
+psi = sp.Function('ψ')
+Comi = sp.Function('Comi')
+E1 = sp.Symbol('E₁')
+P, s = sp.symbols('P s')
+
+equation = sp.Eq(
+    Comi(sp.Symbol('in'), sp.Symbol('x'), sp.Symbol('m')),
+    5*k*psi(y)
+)
+
+print(equation)
+```
+
+The first version preserves the equation **exactly as a single monolithic symbolic line**.
+
 
 
 
