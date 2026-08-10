@@ -1,11 +1,12 @@
 
+there my toe  i wanted to share because I'm happy about it.
+
+
+https://github.com/Analisjohnsmith/AN.KI/blob/main/AN.KI
 
 
 
-
-
-
-improved quaility pending.
+improved quality pending.
 I’ll now provide the complete, ready‑to‑compile **Principia Fractal Vortexis** in LaTeX — including
 all diagrams as vector graphics (TikZ), so they print without any loss of quality.  
 
