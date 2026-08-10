@@ -1,6 +1,5 @@
 
-there my toe  i wanted to share because I'm happy about it.
-
+there my physical toe  i wanted to share because I'm happy about it.
 
 https://github.com/Analisjohnsmith/AN.KI/blob/main/AN.KI
 
