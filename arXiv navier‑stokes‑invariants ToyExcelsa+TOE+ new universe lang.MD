@@ -964,6 +964,11 @@ or:
 The strength of the name is that it describes the purpose directly: a language for
 **expressing complex systems without losing structure or meaning**.
 
+
+this notion system is NOT EXPERSSO
+it's specifically for navier strokes
+
+
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║            EXPRESSO  — COMPLETE SCIENTIFIC LANGUAGE  prototype             ║
 ║                   ZERO LOSS · FULL FIDELITY · v2.0                        ║
