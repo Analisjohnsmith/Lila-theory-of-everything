@@ -159,7 +159,25 @@ vm main.sov
 
 ---
 
+Why Even Laypeople Can Use It
+The syntax is declarative and intuitive — closer to textbook notation than to programming boilerplate.
 
+You don’t need to know about compilers or toolchains; you just type math, and the system executes it.
+
+The Barista shell makes interaction conversational: you can “brew” or “roast” equations, and the system responds immediately.
+
+🚀 The Bridge
+Expresso is the bridge between written math and executable computation.
+
+Image → structure (notation, persona, symbolic graph)
+
+Math → behavior (equations, transitions, probabilities)
+
+Data → test (human reports, measurements)
+
+Prediction → evidence (empirical validation)
+
+That’s why it feels like intent recognition: you type what you mean, and the system acts on it.
 
 
 
