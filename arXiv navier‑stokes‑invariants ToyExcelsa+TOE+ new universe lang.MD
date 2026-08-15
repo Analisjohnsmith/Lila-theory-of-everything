@@ -27,7 +27,7 @@ When you type in Expresso, you’re not just coding — you’re writing the sam
 structures the universe runs on.
 
 it's a written language it will be released under apache when i publish
-
+sovereign allows you to write in cats  instead of coffee and the language retains function.
 
 // relativity.bean – Einstein Field Equation
 recipe einstein_field(G: Tensor, Lambda: Americano, T: Tensor) -> Tensor {
