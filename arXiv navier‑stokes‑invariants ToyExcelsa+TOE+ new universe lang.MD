@@ -26,7 +26,7 @@ Excelsa is deliberately both written and programming v2 coming
 When you type in Expresso, you’re not just coding — you’re writing the same
 structures the universe runs on.
 
-it's a written language it will be released under apahce when i publish
+it's a written language it will be released under apache when i publish
 
 
 // relativity.bean – Einstein Field Equation
