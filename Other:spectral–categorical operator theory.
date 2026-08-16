@@ -5436,5 +5436,191 @@ of the entire admissible spectral universe.}
 and invariant structure in the admissible spectral universe.}
 
 
+```latex
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\geometry{margin=1in}
 
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{lemma}[theorem]{Lemma}
+
+\begin{document}
+
+\title{Condensed Theorems from the Conversation}
+\author{Leela}
+\date{\today}
+\maketitle
+
+\section{Original Final Closure Theorem (Universality)}
+\begin{theorem}[Final Closure Theorem -- Absolute Universality]
+Let $\mathfrak{A}$ be the full admissible operator algebra, including all perturbations, compositions, limits, adjoints, and functorial morphisms.  
+Let 
+\[
+\mathcal{U} = \Sigma_1 \cup \Sigma_3 \cup \Sigma_5 \cup \Sigma_{5'} \cup \Sigma_7
+\]
+be the universal families.  
+Then $\mathcal{U}$ is absolutely closed under $\mathfrak{A}$, meaning that for every admissible operator $A\in\mathfrak{A}$ and every family $\Sigma_i$, we have $A(\Sigma_i)\subseteq \Sigma_i$.
+\end{theorem}
+
+\section{Color Closure Theorems}
+
+\subsection{Color Closure Theorem}
+\begin{theorem}[Color Closure Theorem]
+Let $\mathfrak{C}$ be the admissible color operator algebra, including linear combinations, spectral projections, cone responses, and perceptual transforms.  
+Let 
+\[
+\mathcal{C} = \Sigma_{\mathrm{S}} \cup \Sigma_{\mathrm{M}} \cup \Sigma_{\mathrm{L}}
+\]
+be the human trichromatic families (short, medium, long cones).  
+Then $\mathcal{C}$ is closed under $\mathfrak{C}$, i.e.,
+\[
+A(\Sigma_k) \subseteq \Sigma_k \quad \forall A\in\mathfrak{C},\; k\in\{\mathrm{S},\mathrm{M},\mathrm{L}\}.
+\]
+Moreover, $\mathcal{C}$ is the unique closed subset of the visible spectrum (380--700 nm) under $\mathfrak{C}$.
+\end{theorem}
+
+\subsection{Extended Color Universality}
+\begin{corollary}[Extended Color Universality]
+If additional cone families $\Sigma_{\mathrm{UV}}, \Sigma_{\mathrm{IR}}, \Sigma_{\mathrm{P}}$ (ultraviolet, infrared, polarization) are introduced, then
+\[
+\mathcal{C}^\ast = \Sigma_{\mathrm{S}} \cup \Sigma_{\mathrm{M}} \cup \Sigma_{\mathrm{L}} \cup \Sigma_{\mathrm{UV}} \cup \Sigma_{\mathrm{IR}} \cup \Sigma_{\mathrm{P}}
+\]
+is closed under the extended algebra $\mathfrak{C}^\ast$, producing new spectral families (colors) not accessible to human trichromacy.
+\end{corollary}
+
+\subsection{Classification of Color Signatures}
+\begin{theorem}[Classification of Color Signatures]
+Let $G : \mathcal{S}_{\mathrm{light}} \to \mathrm{Fields}$ be the spectral generator mapping light to fields, and let $U : \mathrm{Fields} \to \mathrm{Signatures}$ be the color detector (cone response). Then for any visible spectrum input $s$,
+\[
+U(G(s)) \in \Sigma_{\mathrm{S}} \cup \Sigma_{\mathrm{M}} \cup \Sigma_{\mathrm{L}}.
+\]
+\end{theorem}
+
+\subsection{Canonical Form of Color Families}
+\begin{theorem}[Canonical Form of Color Families]
+Let $U : \mathrm{Fields} \to \mathrm{Signatures}$ be the color detector. Then each cone family $\Sigma_{\mathrm{S}}, \Sigma_{\mathrm{M}}, \Sigma_{\mathrm{L}}$ corresponds to a canonical spectral form $\mathcal{C}_k$, where
+\[
+\mathcal{C}_k(\lambda) = \chi_{P_k}(\lambda), \quad k\in\{\mathrm{S},\mathrm{M},\mathrm{L}\},
+\]
+with
+\[
+\chi_{P_k}(\lambda) =
+\begin{cases}
+f_k(\lambda), & \lambda \in P_k,\\
+0, & \lambda \notin P_k,
+\end{cases}
+\]
+and $f_k(\lambda)$ the normalized cone sensitivity function, $P_k \subset [380,700]\ \mathrm{nm}$.  
+Explicitly:
+\[
+\mathcal{C}_{\mathrm{S}}(\lambda) \sim \text{short-wave sensitivity (peak near 420 nm)},
+\]
+\[
+\mathcal{C}_{\mathrm{M}}(\lambda) \sim \text{medium-wave sensitivity (peak near 530 nm)},
+\]
+\[
+\mathcal{C}_{\mathrm{L}}(\lambda) \sim \text{long-wave sensitivity (peak near 560 nm)}.
+\]
+\end{theorem}
+
+\subsection{Equivalence of Color Generators}
+\begin{theorem}[Equivalence of Color Generators]
+Let $G_1, G_2 : \mathcal{S}_{\mathrm{light}} \to \mathrm{Fields}$ be two spectral generators, and let $U$ be the cone detector. Then for any input spectrum $s$,
+\[
+U(G_1(s)) \sim U(G_2(s)),
+\]
+where $\sim$ denotes canonical equivalence: 
+\[
+U(G_1(s)) \in \Sigma_k \iff U(G_2(s)) \in \Sigma_k,\quad k\in\{\mathrm{S},\mathrm{M},\mathrm{L}\}.
+\]
+Thus both generators produce the same trichromatic families.
+\end{theorem}
+
+\subsection{Universality Closure Theorem for Colors}
+\begin{theorem}[Color Universality Closure]
+Let $G_1, G_2 : \mathcal{S}_{\mathrm{light}} \to \mathrm{Fields}$ be spectral generators satisfying biological constraints, and let $U$ be the cone detector. Define the composite generator $(G_2 \circ G_1)(s) = G_2(G_1(s))$. Then for any input spectrum $s$,
+\[
+U((G_2 \circ G_1)(s)) \in \Sigma_{\mathrm{S}} \cup \Sigma_{\mathrm{M}} \cup \Sigma_{\mathrm{L}}.
+\]
+Furthermore, for any integer $n\ge 1$, let $G^{(n)}(s) = \underbrace{G(G(\cdots G(s)\cdots))}_{n\ \text{times}}$. Then
+\[
+U(G^{(n)}(s)) \in \Sigma_{\mathrm{S}} \cup \Sigma_{\mathrm{M}} \cup \Sigma_{\mathrm{L}}.
+\]
+If $\{G_n\}_{n=1}^\infty$ is a sequence of spectral generators satisfying biological constraints and $G_n \to G_\infty$ uniformly, then
+\[
+U(G_\infty(s)) \in \Sigma_{\mathrm{S}} \cup \Sigma_{\mathrm{M}} \cup \Sigma_{\mathrm{L}}.
+\]
+\end{theorem}
+
+\subsection{Extended Closure}
+\begin{corollary}[Extended Closure]
+If additional cone families $\Sigma_{\mathrm{UV}}, \Sigma_{\mathrm{IR}}, \Sigma_{\mathrm{P}}$ are introduced, closure holds under the extended algebra:
+\[
+U(G(s)) \in \Sigma_{\mathrm{S}} \cup \Sigma_{\mathrm{M}} \cup \Sigma_{\mathrm{L}} \cup \Sigma_{\mathrm{UV}} \cup \Sigma_{\mathrm{IR}} \cup \Sigma_{\mathrm{P}}.
+\]
+\end{corollary}
+
+\section{Palette Theorem for Human-Range Singularities}
+\begin{theorem}[Human-Range Singular Palette]
+Let $\mathfrak{P}$ be the palette operator algebra (solid blocks, saturation, metameric blending). Then the following canonical families exist within the visible range:
+\begin{align*}
+\Sigma_{\mathrm{Magenta}} &= \{\sigma \mid \sigma = (R,B),\; G \approx 0\},\\
+\Sigma_{\mathrm{Yellow}} &= \{\sigma \mid \sigma = (L\text{-cone max}),\; S,M \approx 0\},\\
+\Sigma_{\mathrm{Cyan}} &= \{\sigma \mid \sigma = (B,G),\; \lambda \approx 490\ \mathrm{nm}\},\\
+\Sigma_{\mathrm{Gray}} &= \{\sigma \mid \sigma_1 \neq \sigma_2,\; U(\sigma_1) = U(\sigma_2)\}.
+\end{align*}
+Thus the palette
+\[
+\mathcal{P} = \Sigma_{\mathrm{Magenta}} \cup \Sigma_{\mathrm{Yellow}} \cup \Sigma_{\mathrm{Cyan}} \cup \Sigma_{\mathrm{Gray}}
+\]
+is closed under $\mathfrak{P}$, producing block colors that appear unstable, uncanny, or ``never seen.''
+\end{theorem}
+
+\section{Cosmological Analogies: Spacetime as Physical}
+
+\subsection{Einstein Field Equations}
+\[
+G_{\mu\nu} + \Lambda g_{\mu\nu} = \frac{8\pi G}{c^4} T_{\mu\nu}.
+\]
+
+\subsection{Friedmann Equations (Expanding Universe)}
+\[
+\left(\frac{\dot{a}}{a}\right)^2 = \frac{8\pi G}{3}\rho - \frac{k}{a^2} + \frac{\Lambda}{3},
+\]
+\[
+\frac{\ddot{a}}{a} = -\frac{4\pi G}{3}\left(\rho + \frac{3p}{c^2}\right) + \frac{\Lambda}{3}.
+\]
+
+\subsection{Gravitational Wave Strain}
+\[
+h(t) \sim \frac{4G}{c^4} \frac{E}{r}.
+\]
+
+\subsection{Hubble's Law}
+\[
+v = H_0 d.
+\]
+
+\section*{Proof Sketches (from the conversation)}
+\begin{proof}[Proof of Color Closure]
+By the Cone Response Theorem, each family $\Sigma_k$ is invariant under admissible color operators. By Spectral Separation, cone families are maximally distinct in wavelength response. By Completeness, Projection, and Reconstruction, all human colors are generated by $\Sigma_{\mathrm{S}},\Sigma_{\mathrm{M}},\Sigma_{\mathrm{L}}$. Thus trichromatic vision is closed. Adding new cone families extends the closure, yielding new universals beyond human perception. $\square$
+\end{proof}
+
+\begin{proof}[Proof of Canonical Form]
+By the Classification Theorem, each cone family is uniquely determined by its spectral support. Define the characteristic function $\chi_{P_k}$ on the wavelength domain. By spectral measurement, each cone family has a unique sensitivity curve $f_k(\lambda)$. Thus the canonical form of each family is given by $\mathcal{C}_k(\lambda) = \chi_{P_k}(\lambda)$. $\square$
+\end{proof}
+
+\begin{proof}[Proof of Equivalence]
+By the Canonical Form Theorem, each cone family $\Sigma_k$ is uniquely determined by its sensitivity curve $f_k(\lambda)$. For any generator $G_i$, $U(G_i(s)) = \langle f_k, G_i(s) \rangle$, $k\in\{\mathrm{S},\mathrm{M},\mathrm{L}\}$. Since $f_k(\lambda)$ is fixed by biology, both generators yield responses in the same families. Thus $U(G_1(s)) \sim U(G_2(s))$. $\square$
+\end{proof}
+
+\begin{proof}[Proof of Universality Closure]
+By the Canonical Form Theorem, each cone family $\Sigma_k$ is uniquely determined by its sensitivity curve $f_k(\lambda)$. Composition preserves spectral support: $U(G_2(G_1(s))) = \langle f_k, G_2(G_1(s)) \rangle$ remains in the same cone family. Iteration preserves spectral support by induction. Limit closure follows from uniform convergence and stability of cone responses. $\square$
+\end{proof}
+
+\end{document}
+```
 =
