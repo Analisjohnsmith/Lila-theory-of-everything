@@ -9,3 +9,4 @@ Paramahansa Yogananda
 
 Where to begin...
 I  suppose i need a table of content with status and description.
+i'm getting a head ache trying to fix the main issue.
