@@ -1,7 +1,5 @@
 So in computational terms, the Pokéball is a black-box quantum supercomputer that solves problems at the edge of known complexity classes. It compresses biology into tractable data, applies error correction, and simulates quantum states — all in real time.
-
-Would you like me to write this up as a LaTeX section (
- 
+ creative technical project — a mix of math, physics, and Rust systems design.
  with pdflatex.
 latex
 
