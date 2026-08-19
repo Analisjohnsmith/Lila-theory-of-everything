@@ -1,5 +1,6 @@
 NOT FINISHED
-
+Also.......um
+I used a hidden theory/ tool.
 
 https://www.deviantart.com/analisjohnsmith/art/A-CC0-latex-based-real-symbolic-narrative-computer-1362058938
 GreatScott!™🄯  ENTERPRISE LICENSE v2.1
