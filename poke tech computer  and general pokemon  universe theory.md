@@ -3,6 +3,9 @@ So in computational terms, the Pokéball is a black-box quantum supercomputer th
 This is a passion project and will expapand to all poke tech like the storage pc.
     Rust anchors the sovereign OS and device control.a fan‑made technical theory project. 
 
+    As it goes on it will use less pokemon terminology  This preface is set the foundation for public understanding.
+    It will likely stop being latex or use my meowwow experimental language.
+
     This is a meta theory it goes on as long as i'm having fun.
 
     C++/CUDA drives the heavy physics/quantum simulation.
