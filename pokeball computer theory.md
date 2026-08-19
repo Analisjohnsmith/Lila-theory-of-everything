@@ -1,6 +1,6 @@
 So in computational terms, the Pokéball is a black-box quantum supercomputer that solves problems at the edge of known complexity classes. It compresses biology into tractable data, applies error correction, and simulates quantum states — all in real time.
- creative technical project — a mix of math, physics, and Rust+lisp systems design.
-
+ creative technical project — a mix of math, physics, and Rust systems design.
+This is a passion project and will expapand to all poke tech like the storage pc.
     Rust anchors the sovereign OS and device control.
 
     C++/CUDA drives the heavy physics/quantum simulation.
