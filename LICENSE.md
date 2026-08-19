@@ -1,3 +1,10 @@
+
+8/19/26
+ lets be real clear..at about lila toe.f they “rewrite” too closely, they land on your expression. But if they truly re‑explain the math in their own voice, that’s allowed.
+
+he difficulty is high if someone wants to take your theories and use them for their own gain without copying your words. someone copying me is walking a thin line.
+
+
 8/18/26 TL;DR 
 Free to study, experiment, and have fun. Closed to commercial use. No confusingly similar expression.
 
