@@ -1,3 +1,6 @@
+NOT FINISHED
+
+
 https://www.deviantart.com/analisjohnsmith/art/A-CC0-latex-based-real-symbolic-narrative-computer-1362058938
 GreatScott!™🄯  ENTERPRISE LICENSE v2.1
 Open for Study • Closed for Commercial Use
