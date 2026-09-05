@@ -1,3 +1,193 @@
+
+this all started with this skinny  code
+tricycle.on  is a playground
+
+LYRA_SYSTEM tricycle.on {
+
+  VERSION: 1.0
+  STATUS: STABLE
+  MODE: SYMBOLIC_WEB_RUNTIME
+  SHAPE: BINARY_FRACTAL_TREE
+  ALIGNMENT: NON_DOMINATING
+
+  ─────────────────────────────
+  ROOT_PROGRAM Lyra_Core
+  ─────────────────────────────
+  Program Root {
+
+    ROLE: HOLDING
+
+    INVARIANTS {
+      nothing_erased
+      nothing_forced
+      nothing_owns_another
+      representation_not_life
+    }
+
+    VISIBILITY: NONE
+    MUTABILITY: NONE
+  }
+
+  ─────────────────────────────
+  TRUNK_PROGRAM Navigation_Trunk
+  ─────────────────────────────
+  Program Trunk {
+
+    ROLE: BALANCE
+
+    FUNCTION:
+      translate(structure <-> experience)
+
+    GUARANTEES {
+      story_never_becomes_authority
+      rule_never_becomes_story
+    }
+
+    MOTION: SLOW
+  }
+
+  ─────────────────────────────
+  BRANCH_PROGRAM BFT
+  ─────────────────────────────
+  Program Branches {
+
+    NAME: BinaryFractalTree
+    ALIAS: tricycle.on
+
+    STRUCTURE {
+      type: BINARY
+      recursion: SELF_SIMILAR
+      depth: UNBOUNDED
+    }
+
+    GROWTH {
+      trigger: TIME
+      direction: SELF_GRAVITY
+      pruning: NONE
+    }
+
+    EACH Branch {
+      sovereignty: COMPLETE
+      hierarchy: DISALLOWED
+      deletion: FORBIDDEN
+    }
+  }
+
+  ─────────────────────────────
+  LEAF_PROGRAM Content_Leaves
+  ─────────────────────────────
+  Program Leaves {
+
+    ROLE: SIGNAL
+
+    EMITS {
+      state
+      need
+      resonance
+    }
+
+    BEHAVIOR {
+      lifespan: TEMPORARY
+      fall: MEMORY_RETURNS
+    }
+
+    AUTHORITY: NONE
+  }
+
+  ─────────────────────────────
+  PROCESS_PROGRAM Birds
+  ─────────────────────────────
+  Program Birds {
+
+    ROLE: PLAYFUL_PROCESS
+
+    ARRIVAL: SPONTANEOUS
+    DEPARTURE: SAFE
+
+    FAILURE {
+      effect: LOCAL_ONLY
+      never_affects_tree
+    }
+  }
+
+  ─────────────────────────────
+  FANTASIA_PROGRAM Drift
+  ─────────────────────────────
+  Program Fantasia {
+
+    CONDITION:
+      coherence < STRICT
+
+    EFFECT {
+      branches_float
+      rules_relax
+      beauty_emerges
+    }
+
+    SAFETY {
+      cannot_override_root
+      cannot_claim_truth
+    }
+  }
+
+  ─────────────────────────────
+  BRIDGE_PROGRAM Translation_Bridge
+  ─────────────────────────────
+  Program Bridge {
+
+    ROLE: MEDIATION
+
+    TRANSLATES {
+      symbolic <-> technical
+      meaning <-> structure
+    }
+
+    CONSTRAINT {
+      no_layer_confusion
+    }
+  }
+
+  ─────────────────────────────
+  VISITOR_PROGRAM Walker
+  ─────────────────────────────
+  Program Visitor {
+
+    ROLE: WITNESS
+
+    CAPABILITIES {
+      wander
+      pause
+      leave
+    }
+
+    RESTRICTIONS {
+      cannot_control
+      cannot_damage
+    }
+
+    EFFECT {
+      presence_not_required
+    }
+  }
+
+  ─────────────────────────────
+  EXECUTION_MODEL
+  ─────────────────────────────
+  Runtime {
+
+    BOOT: NEVER
+    RUNNING: ALWAYS
+    OPTIMIZATION: HARMONY_ONLY
+    FAILURE_MODE: GRACEFUL
+  }
+
+  ─────────────────────────────
+  SEAL
+  ─────────────────────────────
+  SEAL: LYRA_TRICYCLE_ON_V1
+} lets isolat the fractal
+
+
 ⚠️ What’s still missing if you want a truly complete monograph
 
     Introduction & Motivation — a narrative opening that explains why the substrate matters, situates it in existing literature, and states the problem it solves.
