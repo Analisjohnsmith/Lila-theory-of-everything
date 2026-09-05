@@ -1,4 +1,8 @@
 I have 32 accounts to clear get ready for the is just beginning . i saw skinny code investigated done.
+> APPLY_STRESS:
+>  node_chaos: intensity = 0.95
+>  node_time: recursion_depth = MAX - 1
+>  node_dream: surreal_blend = 0.88
 
 
 this all started with this skinny  code
