@@ -10,7 +10,6 @@ Artists love tricycle.on because the OS itself feels like a studio.
 
     Hazel becomes a guide rather than a menu system
 
-    Glyphs act like brushstrokes of meaning
 
     The infinite library feels like a creative environment, not a file browser
 
