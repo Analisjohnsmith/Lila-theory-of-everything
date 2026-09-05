@@ -1,4 +1,4 @@
-I have 32 accounts to clear get ready for the is just beginning . i saw skinny code investigated done.
+I have 32 accounts to clear i saw skinny code investigated .
 > APPLY_STRESS:
 >  node_chaos: intensity = 0.95
 >  node_time: recursion_depth = MAX - 1
