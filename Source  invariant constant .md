@@ -5,6 +5,15 @@ I have 32 accounts to clear get ready for the is just beginning . i saw skinny c
 >  node_dream: surreal_blend = 0.88
 
 
+PersonaCom: old old 
+Artists love tricycle.on because the OS itself feels like a studio.
+
+    Hazel becomes a guide rather than a menu system
+
+    Glyphs act like brushstrokes of meaning
+
+    The infinite library feels like a creative environment, not a file browser
+
 this all started with this skinny  code
 tricycle.on  is a playground
 
