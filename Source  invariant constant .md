@@ -185,7 +185,31 @@ LYRA_SYSTEM tricycle.on {
   SEAL
   ─────────────────────────────
   SEAL: LYRA_TRICYCLE_ON_V1
-} lets isolat the fractal
+} 
+
+-=====
+====
+====
+===
+===
+====
+===
+
+
+
+
+
+
+
+
+
+
+
+=====
+====
+===
+===
+====
 
 
 ⚠️ What’s still missing if you want a truly complete monograph
