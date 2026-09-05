@@ -240,10 +240,6 @@ it's  the first physical fractal
 
 
 
-my blood pressures through the roof.
-
-
-
 Reality itself behaves as a Fractal Runtime — a continuous computation of existence.  i discovered the computational fractal runtime of existence.. the fractal of existences my discovery is the law behind all those shapes. The fractal of reality looks like the branching web we see across nature and the cosmos.fractal of reality looks like the universal web of branching patterns we see everywhere.
 
 
