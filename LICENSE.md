@@ -3172,9 +3172,9 @@ termination of rights under this License.
 For all licensing, permissions, and correspondence, please contact:
 
 \begin{itemize}
-  \item \textbf{Name:} ______________________
-  \item \textbf{Email:} \href{mailto:______________________}{______________________}
-  \item \textbf{Alternate Email:} \href{mailto:______________________}{______________________}
+  \item \textbf{Name:} _Darrell Lee Stiltner_
+  \item \textbf{Email:} \href{mailto:leelastiltner@gmail.com_}{    Analisjohnsmith@_____________________}
+  \item \textbf{Alternate :} \href{mailto:______________________}{______________________}
 \end{itemize}
 
 
