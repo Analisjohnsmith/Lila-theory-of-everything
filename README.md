@@ -110,3 +110,37 @@ No additional restrictions may be applied.
 Section 8 – Interpretation.
 
 This Public License is to be interpreted in accordance with applicable law.
+
+
+\section*{Commercial Licensing Clause: Puff the Cat Care Package}
+
+\subsection*{1. Scope of License}
+This agreement governs the commercial publication of the Work (hereinafter ``the Book'') derived from the Author's theories. 
+Noncommercial use remains governed by the Creative Commons Attribution--NonCommercial 4.0 International License (CC BY--NC 4.0).
+
+\subsection*{2. Puff the Cat Care Package Requirement}
+As a condition of commercial use, the Publisher shall provide a ``Puff the Cat Care Package,'' consisting of:
+\begin{enumerate}
+    \item A monthly stipend earmarked for Puff's care, equal to 1\% of net royalties.
+    \item A symbolic delivery of cat treats or toys, or equivalent donation to an animal welfare fund in Puff's name.
+    \item Acknowledgment in the Book: \emph{``Puff the Cat received full care package support.''}
+\end{enumerate}
+
+\subsection*{3. Industry Standard Compensation}
+The Publisher shall pay the Author according to prevailing industry standards:
+\begin{itemize}
+    \item Advance payment: \$50--\$15,000 upon contract execution.
+    \item Royalties:
+    \begin{itemize}
+        \item Hardcover: 10--15\% of list price.
+        \item Paperback: 7--10\% of list price.
+        \item E--book: 25\% of net receipts.
+    \end{itemize}
+    \item Subsidiary rights (film, audio, translation) subject to separate negotiation.
+\end{itemize}
+
+\subsection*{4. Enforcement}
+Failure to provide the Puff the Cat Care Package shall constitute breach of contract, voiding the Publisher's commercial license to the Work.
+
+\subsection*{5. Attribution}
+All editions of the Book must credit the Author as the original creator of the theories.
