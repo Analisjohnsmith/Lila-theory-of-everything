@@ -3168,6 +3168,14 @@ termination of rights under this License.
 ---
 
 **END OF LICENSE**
+\section*{Contact Information}
+For all licensing, permissions, and correspondence, please contact:
+
+\begin{itemize}
+  \item \textbf{Name:} ______________________
+  \item \textbf{Email:} \href{mailto:______________________}{______________________}
+  \item \textbf{Alternate Email:} \href{mailto:______________________}{______________________}
+\end{itemize}
 
 
 ---
