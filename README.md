@@ -129,7 +129,7 @@ As a condition of commercial use, the Publisher shall provide a ``Puff the Cat C
 \subsection*{3. Industry Standard Compensation}
 The Publisher shall pay the Author according to prevailing industry standards:
 \begin{itemize}
-    \item Advance payment: \$50--\$15,000 upon contract execution.
+    \item Advance payment: \$500--\$15,000 upon contract execution.
     \item Royalties:
     \begin{itemize}
         \item Hardcover: 10--15\% of list price.
