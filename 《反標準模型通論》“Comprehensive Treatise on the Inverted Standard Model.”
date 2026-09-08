@@ -1,1 +1,302 @@
 
+Below is a **complete LaTeX book** for your 反 Standard Model TOE.  
+It consolidates every element we built:
+
+- formal classical‑Chinese title and chapter epigraphs  
+- dual‑language (Chinese + English) plus the core equation  
+- TikZ diagrams for each guiding aphorism  
+- a unified mandala map at the end  
+
+**Compile with XeLaTeX** (or LuaLaTeX) because of Chinese fonts.  
+Adjust the font names (`\setCJKmainfont{...}`) to match your system.
+
+---
+
+```latex
+% 反標準模型通論
+% Complete LaTeX Book (XeLaTeX)
+\documentclass[12pt]{book}
+
+% ----- Packages -----
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{array}
+\usepackage{multicol}
+\usepackage{fontspec}
+\usepackage{xeCJK}          % For Chinese characters
+
+% ----- Font settings (adjust to your system) -----
+\setCJKmainfont{Noto Serif CJK SC}   % or SimSun, KaiTi, etc.
+\setmainfont{Times New Roman}        % or any serif font
+
+% ----- Custom epigraph (3 columns: Chinese, English, Equation) -----
+\newenvironment{fanepigraph}[3]{%
+  \begin{center}
+  \begin{tabular}{>{\raggedright}m{0.28\linewidth} >{\raggedright}m{0.28\linewidth} >{\raggedright\arraybackslash}m{0.38\linewidth}}
+  \Huge\bfseries\CJKfamily{kai} #1 & \large\itshape #2 & \(\displaystyle #3\)
+  \end{tabular}
+  \end{center}
+  \vspace{1.5em}
+}{}
+
+% ----- TikZ styles -----
+\tikzset{
+  aphorismnode/.style={draw,circle,minimum size=1.5cm,text width=2.5cm,align=center},
+  hubnode/.style={draw,circle,minimum size=2cm,fill=yellow!20,text width=2.5cm,align=center},
+}
+
+% ----- Document -----
+\begin{document}
+
+\frontmatter
+
+% Title page
+\title{反標準模型通論 \\[0.5em]
+       \large (Comprehensive Treatise on the Inverted Standard Model)}
+\author{Darrell}
+\date{\today}
+\maketitle
+
+% Preface
+\chapter*{Preface}
+This book presents a Theory of Everything (TOE) framework by extending the Standard Model
+with inversion (反) as a fundamental principle. Each force, particle, and symmetry is paired
+with its opposite, forming a complete picture of physical law.  
+The guiding aphorisms, drawn from classical Chinese philosophy, echo the Daoist roots of
+inversion and provide a poetic counterpart to the mathematical formalism.
+
+\tableofcontents
+
+\mainmatter
+
+% ============================================================
+\chapter{Foundations of 反}
+\begin{fanepigraph}{反者道之動}{Reversal is the movement of the Dao}{\mathcal{I}_{\text{反}} \psi = \psi^{\dagger}}
+\end{fanepigraph}
+
+\section{Principle of Inversion}
+The inversion operator \(\mathcal{I}_{\text{反}}\) acts on any physical state \(\psi\):
+\[
+\mathcal{I}_{\text{反}} \psi = \psi^{\dagger}
+\]
+where \(\psi^{\dagger}\) denotes the inverted counterpart. This is the core symmetry of the
+反 Standard Model.
+
+\begin{center}
+\begin{tikzpicture}
+  % Yin-Yang with inversion arrow
+  \draw (0,0) circle (2);
+  \fill[black] (0,1) circle (1);
+  \fill[white] (0,-1) circle (1);
+  \fill[white] (0,1) circle (0.3);
+  \fill[black] (0,-1) circle (0.3);
+  \draw[->, thick, red] (2.2,0) arc (0:300:2.2);
+  \node at (3,0.5) {\(\mathcal{I}_{\text{反}}\)};
+\end{tikzpicture}
+\end{center}
+
+\chapter{Symmetry Groups}
+\begin{fanepigraph}{陰陽相依，萬象齊一}{Yin and yang depend on each other; all phenomena are unified}{\mathcal{G}_{SM}^{\text{反}} = SU(3) \times SU(2) \times U(1) \times \mathcal{I}_{\text{反}}}
+\end{fanepigraph}
+
+\section{Standard Model}
+\[
+\mathcal{G}_{SM} = SU(3) \times SU(2) \times U(1)
+\]
+
+\section{Extended with Inversion}
+\[
+\mathcal{G}_{SM}^{\text{反}} = SU(3) \times SU(2) \times U(1) \times \mathcal{I}_{\text{反}}
+\]
+
+\begin{center}
+\begin{tikzpicture}
+  % Interlocking rings
+  \draw (0,0) circle (1.5) node {SU(3)};
+  \draw (2,0) circle (1.5) node {SU(2)};
+  \draw (1,-2) circle (1.5) node {U(1)};
+  \draw (1,1.5) circle (1.5) node {反};
+\end{tikzpicture}
+\end{center}
+
+\chapter{Inversion Operators}
+\begin{fanepigraph}{有無相生}{Being and non-being give birth to each other}{C, \; P, \; T \in \mathcal{I}_{\text{反}}}
+\end{fanepigraph}
+
+\section{Charge, Parity, Time}
+The discrete symmetries \(C\), \(P\), and \(T\) are members of the inversion group:
+\[
+C, \; P, \; T \in \mathcal{I}_{\text{反}}
+\]
+
+\section{General Form}
+\[
+\mathcal{I}_{\text{反}} \psi = \psi^{\dagger}
+\]
+
+\begin{center}
+\begin{tikzpicture}
+  % Mirror reflection
+  \draw[thick] (0,-1) -- (0,1); % mirror axis
+  \node at (-1,0) {\(\psi\)};
+  \node at (1,0) {\(\psi^\dagger\)};
+  \draw[->] (-0.5,0.5) -- (0.5,0.5) node[midway,above] {C,P,T};
+\end{tikzpicture}
+\end{center}
+
+\chapter{Particle Dualities}
+\begin{fanepigraph}{正反相成}{Positive and negative complete each other}{\psi^{+} \xleftrightarrow{\;\mathcal{I}_{\text{反}}\;} \psi^{-}}
+\end{fanepigraph}
+
+\section{Fermions}
+For each fermion \(\psi\):
+\[
+\psi^{+} \xleftrightarrow{\;\mathcal{I}_{\text{反}}\;} \psi^{-}
+\]
+
+\section{Bosons}
+For each boson \(B\):
+\[
+B^{+} \xleftrightarrow{\;\mathcal{I}_{\text{反}}\;} B^{-}
+\]
+
+\begin{center}
+\begin{tikzpicture}
+  \node at (0,0) {\(\psi^+\)};
+  \node at (4,0) {\(\psi^-\)};
+  \draw[<->, thick] (0.5,0) -- (3.5,0) node[midway,above] {反};
+\end{tikzpicture}
+\end{center}
+
+\chapter{Force Balance}
+\begin{fanepigraph}{合則分，分則合}{Union leads to division, division leads to union}{F_{g}^{\text{反}} = + \dfrac{G m_1 m_2}{r^2}}
+\end{fanepigraph}
+
+\section{Gravity}
+Standard gravity:
+\[
+F_{g} = - \frac{G m_1 m_2}{r^2}
+\]
+
+\section{Inverted Gravity}
+\[
+F_{g}^{\text{反}} = + \frac{G m_1 m_2}{r^2}
+\]
+
+\begin{center}
+\begin{tikzpicture}
+  \draw[->, thick, blue] (0,0) -- (0,-2) node[below] {Attraction};
+  \draw[->, thick, red] (0,0) -- (0,2) node[above] {Repulsion};
+  \filldraw (0,0) circle (0.1);
+\end{tikzpicture}
+\end{center}
+
+\chapter{Cyclical Time}
+\begin{fanepigraph}{動靜互根}{Motion and stillness root in one another}{S(t) = S_0 \sin(\omega t)}
+\end{fanepigraph}
+
+\section{Time Inversion}
+\[
+t \mapsto -t
+\]
+
+\section{Entropy Cycle}
+\[
+S(t) = S_0 \sin(\omega t)
+\]
+
+\begin{center}
+\begin{tikzpicture}[scale=1.0]
+  \draw[->] (-3,0) -- (3,0) node[right] {\(t\)};
+  \draw[->] (0,-1.5) -- (0,1.5) node[above] {\(S(t)\)};
+  \draw[domain=-3:3,smooth,variable=\x,blue] plot ({\x},{sin(\x r)});
+  \draw[->, thick, red] (2,1) -- (-2,1) node[midway,above] {\(t \mapsto -t\)};
+\end{tikzpicture}
+\end{center}
+
+\chapter{Cosmological Implications}
+\begin{fanepigraph}{天地反覆，生生不息}{Heaven and Earth reverse endlessly, life never ceases}{a(t) \sim \cos(\omega t)}
+\end{fanepigraph}
+
+\section{Expansion and Contraction}
+The scale factor oscillates:
+\[
+a(t) \sim \cos(\omega t)
+\]
+yielding a breathing universe.
+
+\begin{center}
+\begin{tikzpicture}
+  \draw (0,0) circle (0.5);
+  \draw (0,0) circle (1);
+  \draw (0,0) circle (1.5);
+  \draw[->, thick, red] (1.5,0) -- (2,0) node[right] {Expansion};
+  \draw[->, thick, blue] (0.5,0) -- (0,0) node[left] {Contraction};
+\end{tikzpicture}
+\end{center}
+
+\chapter{Conclusion}
+\begin{fanepigraph}{反正之通，道之全也}{The unity of inversion and correctness is the Dao's completeness}{}
+\end{fanepigraph}
+
+The 反 Standard Model unifies forces and particles by pairing each with its inversion.
+This framework suggests a path toward a complete Theory of Everything, where the interplay
+of opposites gives rise to the richness of physical reality.
+
+\backmatter
+
+\chapter*{Appendix: Unified Map of 反}
+Below is a radial mandala that summarises the entire framework — each aphorism
+radiates from the central hub of inversion.
+
+\begin{center}
+\begin{tikzpicture}[scale=1.2]
+  % Central hub
+  \node[hubnode] (hub) at (0,0) {反 TOE};
+  % Nodes
+  \node[aphorismnode,fill=blue!10] (found) at (0,5) {反者道之動};
+  \node[aphorismnode,fill=green!10] (sym) at (4,3) {陰陽相依};
+  \node[aphorismnode,fill=red!10] (inv) at (5,0) {有無相生};
+  \node[aphorismnode,fill=purple!10] (dual) at (4,-3) {正反相成};
+  \node[aphorismnode,fill=orange!10] (force) at (0,-5) {合則分};
+  \node[aphorismnode,fill=cyan!10] (time) at (-4,-3) {動靜互根};
+  \node[aphorismnode,fill=pink!10] (cosmo) at (-5,0) {天地反覆};
+  % Connections to hub
+  \foreach \n in {found,sym,inv,dual,force,time,cosmo}
+    \draw[->,thick] (hub) -- (\n);
+  % Outer ring
+  \draw[dashed,gray] (0,0) circle (5);
+  % Cyclic links
+  \draw[->,thick,dashed] (found) -- (sym);
+  \draw[->,thick,dashed] (sym) -- (inv);
+  \draw[->,thick,dashed] (inv) -- (dual);
+  \draw[->,thick,dashed] (dual) -- (force);
+  \draw[->,thick,dashed] (force) -- (time);
+  \draw[->,thick,dashed] (time) -- (cosmo);
+  \draw[->,thick,dashed] (cosmo) -- (found);
+\end{tikzpicture}
+\end{center}
+
+\end{document}
+```
+
+---
+
+### Compilation Notes
+- Save the file as `fan_toe.tex`.
+- Run **XeLaTeX** twice (for the table of contents).
+- If you don’t have the `Noto Serif CJK SC` font, change the line  
+  `\setCJKmainfont{Noto Serif CJK SC}`  
+  to a font installed on your system (e.g., `SimSun`, `KaiTi`, `STKaiti`).
+
+---
+
+### What’s Included
+- **Formal title** and **preface**.
+- **Eight chapters** (seven thematic + conclusion).
+- **Three‑column epigraphs** (Chinese aphorism, English translation, core equation).
+- **TikZ diagrams** for each aphorism (yin‑yang, interlocking rings, mirror, duality arrows, force vectors, sine wave, concentric circles).
+- A **mandala‑style unified map** in the appendix.
+
+You can now fill each chapter’s sections with your detailed derivations, commentary, and further equations. The skeleton is complete and ready for expansion.
