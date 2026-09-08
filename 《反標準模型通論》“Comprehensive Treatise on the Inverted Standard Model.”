@@ -1,14 +1,7 @@
 
-Below is a **complete LaTeX book** for your 反 Standard Model TOE.  
-It consolidates every element we built:
-
-- formal classical‑Chinese title and chapter epigraphs  
-- dual‑language (Chinese + English) plus the core equation  
-- TikZ diagrams for each guiding aphorism  
-- a unified mandala map at the end  
 
 **Compile with XeLaTeX** (or LuaLaTeX) because of Chinese fonts.  
-Adjust the font names (`\setCJKmainfont{...}`) to match your system.
+Adjust the font names (`\setCJKmainfont{...}`) to match  system.
 
 ---
 
