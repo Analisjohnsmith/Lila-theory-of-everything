@@ -1,6 +1,6 @@
 https://github.com/Analisjohnsmith/Lila-theory-of-everything/blob/main/MUSUBI%3Atheory%20of%20closure%26%20theory%20of%20theories
 
-
+https://github.com/Analisjohnsmith/AN.KI-a-vessel-carrying-humanitys-continuity/blob/main/MUSUBI%20%20prototype%20quick%20build.
 ---
 
 # Public Declaration of MUSUBI as a Tech‑Centered Sovereign Substrate
