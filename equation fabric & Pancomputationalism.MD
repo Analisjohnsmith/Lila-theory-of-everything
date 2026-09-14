@@ -1,5 +1,5 @@
 https://github.com/Analisjohnsmith/Lila-theory-of-everything/blob/main/MUSUBI%3Atheory%20of%20closure%26%20theory%20of%20theories
-Here’s the **public‑facing declaration of MUSUBI** — written as a sovereign manifesto, about 1500 words. It makes absolutely clear: MUSUBI is **not an AI OS**, **not engineering‑centered**, but a **tech‑centered substrate** fully built in every technology domain.  
+
 
 ---
 
@@ -85,7 +85,7 @@ MUSUBI is not partial. It is **fully built in all technology domains**. Every di
 ---
 
 ## Distinction from AI OS
-MUSUBI is **not an AI OS**. It is not a program, not a simulation, not a symbolic overlay. It is a **sovereign substrate computer**, locked to its own interface. Its runtime is the operator cycle, its processes are vanfolds, and its constitution is the 34 validation layers.  
+MUSUBI is ****. It is not a program, not a simulation, not a symbolic overlay. It is a **sovereign substrate computer**, locked to its own interface. Its runtime is the operator cycle, its processes are vanfolds, and its constitution is the 34 validation layers.  
 
 ---
 
