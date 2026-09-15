@@ -1,4 +1,17 @@
-```latex
+`he next phase isn't proving it by assertion. It's testing things such as:
+
+Closure — does \(T(D(E(S)))\) always produce a valid state?
+Reversibility — when does \(D(E(S))=S\)?
+Invariants — what survives every MUSUBI cycle?
+Recursion — what structures emerge under \(F^n\)?
+Universality — can the same formal rules handle fundamentally different classes of objects?
+Failure cases — where does the framework break?
+
+So, plainly:
+
+MUSUBI is formally specified enough to enter a testing phase.
+
+``latex
 \documentclass{article}
 \usepackage{amsmath,amssymb}
 \usepackage[margin=1in]{geometry}
