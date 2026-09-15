@@ -1278,3 +1278,114 @@ and the fractal is one possible \textbf{visual expression} of that recursive str
 
 \end{document}
 ```
+Your original file ends at §36, so there is no next section to convert.  
+
+The next useful step is to formalize the idea. Here is a LaTeX section you can append before `\end{document}`:
+
+```latex
+\section{A Minimal Formal Core}
+
+\subsection{Spaces and operations}
+
+Let \(\mathcal{S}\) be a state space and \(\mathcal{R}\) a representation space.
+Define
+\[
+E:\mathcal{S}\to\mathcal{R},
+\qquad
+D:\mathcal{R}\to\mathcal{S},
+\qquad
+T:\mathcal{S}\to\mathcal{S}.
+\]
+The composite transformation is
+\[
+F=T\circ D\circ E:\mathcal{S}\to\mathcal{S}.
+\]
+The recursive system is then
+\[
+S_{n+1}=F(S_n),
+\qquad
+S_n=F^n(S_0).
+\]
+
+\subsection{Basic properties}
+
+\paragraph{Reversible encoding.}
+An encoding is reversible on a domain if
+\[
+D(E(S))=S.
+\]
+
+\paragraph{Lossy encoding.}
+If
+\[
+D(E(S))\neq S,
+\]
+then information has been discarded, compressed, or made inaccessible in the representation.
+
+\paragraph{Invariant.}
+A quantity \(I:\mathcal{S}\to V\) is invariant under \(F\) if
+\[
+I(F(S))=I(S).
+\]
+
+\paragraph{Fixed point.}
+A state \(S^*\) is fixed if
+\[
+F(S^*)=S^*.
+\]
+In the framework this means
+\[
+T(D(E(S^*)))=S^*.
+\]
+
+\paragraph{Cycle.}
+A state \(S\) lies on a cycle of period \(p\) if
+\[
+F^p(S)=S
+\]
+for some \(p\ge 1\).
+
+\subsection{Minimal grammar}
+
+A minimal expression language for the framework can be written as
+\[
+\begin{aligned}
+\langle expr\rangle ::= {} & x
+\mid E(\langle expr\rangle)
+\mid D(\langle expr\rangle)
+\mid T(\langle expr\rangle)\\
+& \mid \langle expr\rangle \circ \langle expr\rangle
+\mid F^n(\langle expr\rangle).
+\end{aligned}
+\]
+Here \(x\) is an atomic state or representation, \(\circ\) is composition, and \(F^n\) is recursive iteration.
+
+\subsection{Example: quadratic iteration}
+
+To see how \(E,D,T\) can decompose a familiar recursion, take
+\[
+\mathcal{S}=\mathbb{C},
+\qquad
+\mathcal{R}=\mathbb{C}\times\mathbb{C}.
+\]
+Define
+\[
+E(z)=(z,1),
+\qquad
+D(z,1)=z,
+\qquad
+T(z,c)=z^2+c.
+\]
+Then
+\[
+F(z)=T(D(E(z)))=z^2+c.
+\]
+Thus the Mandelbrot iteration
+\[
+z_{n+1}=z_n^2+c
+\]
+is a special case of
+\[
+S_{n+1}=T(D(E(S_n))).
+\]
+```\
