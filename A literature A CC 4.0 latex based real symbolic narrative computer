@@ -1564,9 +1564,6 @@ if name == "__main__":
 
 
 
-
-Here is the combined CC0 code with both Machine A and Machine B kept separate as distinct engines:
-
 AnkhMorpork metaverse
 
 ```python
@@ -1576,18 +1573,6 @@ AnkhMorpork metaverse
 # -*- coding: utf-8 -*-
 
 """
-
-CC0 1.0 Universal (Public Domain Dedication)
-
-To the extent possible under law, the creator has waived all copyright
-
-and related or neighboring rights to this work. This work is published
-
-from the United States.
-
-You can copy, modify, distribute, and perform the work, even for
-
-commercial purposes, all without asking permission.
 
 =============================================================================
 
@@ -1612,28 +1597,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 # =============================================================================
-
-# CC0 PUBLIC DOMAIN DEDICATION
-
-# =============================================================================
-
-CC0_DEDICATION = """
-
-CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
-
-The person who associated a work with this deed has dedicated the work to
-
-the public domain by waiving all of his or her rights to the work worldwide
-
-under copyright law, including all related and neighboring rights, to the
-
-extent allowed by law.
-
-You can copy, modify, distribute and perform the work, even for commercial
-
-purposes, all without asking permission.
-
-For more information: https://creativecommons.org/publicdomain/zero/1.0/
 
 """
 
@@ -2709,7 +2672,7 @@ The engine is fully deterministic - every run with the same seed produces identi
 
 
 
-FREE MP3 TO EXPERIMENT WITH IT'S THE GOLDEN PATH THEORY
+ MP3 TO EXPERIMENT WITH IT'S THE GOLDEN PATH THEORY
 
  :
 
