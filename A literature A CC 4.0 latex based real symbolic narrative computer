@@ -33,7 +33,38 @@ It asks you to remain.
 Remain in the breath.
 
 Remain in the knot.
+=======
 
+
+The Narrative Universe Machine, including its documented architecture, specifications, 
+narrative-generation principles, and other copyrightable materials expressly identified as
+licensed under CC BY 4.0, is made available under the Creative Commons Attribution 4.0 International License.
+
+Users may copy, modify, distribute, perform, display, and commercially use the licensed material,
+subject to the terms of CC BY 4.0 and appropriate attribution.
+
+Output Boundary: The license applies to the machine and material expressly designated as Licensed Material
+It does not automatically claim ownership of every narrative, image, audiovisual work, dataset, or othe
+output produced through use of the machine. Rights in outputs depend on the applicable copyright and other
+laws and on any third-party material incorporated into those outputs.
+
+No implied ownership of outputs: Operation of the Narrative Universe Machine does not by itself transfer
+ownership of independently created output to the creator of the machine.
+
+Attribution: Where attribution is required, users should identify the Narrative Universe Machine and provide the applicable CC BY 4.0 license notice. CC BY 4.0 also requires indicating modifications when distributing modified licensed material.
+
+Those are specifications of the machine, not extra CC BY 4.0 license restrictions.
+
+For example:
+
+Output Limits: A conforming implementation of the Narrative Universe Machine may impose finite computational limits on individual executions, including output length, recursion depth, runtime, memory consumption, resolution, and number of concurrently generated narrative entities. Such computational limits do not restrict the copyright permissions granted by CC BY 4.0.
+
+That's probably the dis
+
+
+=======
+====
+===
 Remain in the unfinished.
 ## `universe_machine.hson`
 
