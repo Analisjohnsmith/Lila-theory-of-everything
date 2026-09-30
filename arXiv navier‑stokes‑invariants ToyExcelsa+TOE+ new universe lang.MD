@@ -22,8 +22,7 @@ Macambo handles enterprise universality: clusters, orchestration, resilience, sy
 Combined, they are capable in anything in tech: from running
 distributed enterprise systems to simulating quantum fields, from orchestrating workflows to 
 verifying cosmological constants.
-""zhaived (™Excelsa)-- single-file compilation of the NS-invariants project.
-Excelsa is deliberately both written and programming v2 coming
+
 
 
 
