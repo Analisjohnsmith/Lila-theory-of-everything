@@ -16,7 +16,11 @@ while commercial use requires a license. It also contains an explicit “Prohibi
 So for the intention you just stated, I would revise my score upward to about 88/100 for clarity of the intended policy, but the document itself still needs consolidation because it currently contains several different licensing formulations.
 
 The core could literally be reduced to:
-
+License: CC BY‑NC 4.0 for theory documents.
+Commercial use: Contact owner.
+Confusingly similar systems: Prohibited.
+AI training: Not permitted.
+Owner: © 2026 Darrell Lee Stiltner.
 Study: Free
 Research: Free
 Personal/educational use: Free
