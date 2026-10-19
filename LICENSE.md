@@ -10,49 +10,24 @@ Free to study, experiment, and have fun. Closed to commercial use. No confusingl
 
 That is a much clearer licensing philosophy than the full draft currently communicates.
 
-The draft already says essentially this in places: the public/community may use the work for fun or research,
-while commercial use requires a license. It also contains an explicit “Prohibition on Confusingly Similar Systems” section.
 
-So for the intention you just stated, I would revise my score upward to about 88/100 for clarity of the intended policy, but the document itself still needs consolidation because it currently contains several different licensing formulations.
+# Terms of Use & Licensing Summary
 
-The core could literally be reduced to:
-License: CC BY‑NC 4.0 for theory documents.
-Commercial use: Contact owner.
-Confusingly similar systems: Prohibited.
-AI training: Not permitted.
-Owner: © 2026 Darrell Lee Stiltner.
-Study: Free
-Research: Free
-Personal/educational use: Free
-Fun/experimentation: Free
-Commercial use: Closed unless licensed
-Confusingly similar expression: Prohibited
-Ownership: Retained by © 2026 Analisjohnsmith(Darrell Lee Stiltner)                       
+**Owner & Copyright:** © 2026 Darrell Lee Stiltner (Analisjohnsmith). All rights reserved.
+**License Model:** Custom Source-Available Noncommercial License (GreatScott™ RC3)
 
+### Permitted (Free):
+* **Personal & Educational Use:** Free
+* **Study & Research:** Free
+* **Fun & Experimentation:** Free
+* **Independent Re-explanation:** You are free to re-explain the underlying math/ideas in your own voice.
 
-This project uses the Creative Commons BY‑NC 4.0 license for general creative
-content. Some files may be governed by additional or different licenses. Refer
-to each file for its specific licensing terms.
+### Strictly Prohibited (Without Separate License):
+* **Commercial Use:** Closed unless explicitly licensed. Contact owner.
+* **AI & Model Training:** Not permitted (no training, fine-tuning, distillation, or dataset generation).
+* **Confusingly Similar Expression:** Prohibited from copying proprietary phrasing, voice, or structure.
 
-updated  7?26/26
-This work is licensed under the Creative Commons Attribution–NonCommercial 4.0 
-International License (CC BY‑NC 4.0).
-
-You are free to:
-- Share — copy and redistribute the material in any medium or format
-- Adapt — remix, transform, and build upon the material
-
-Under the following terms:
-- Attribution — You must give appropriate credit, provide a link to the license, 
-  and indicate if changes were made.
-- NonCommercial — You may not use the material for commercial purposes.
-- No additional restrictions — You may not apply legal terms or technological 
-  measures that legally restrict others from doing anything the license permits.
-
-To view the full license, visit:
-https://creativecommons.org/licenses/by-nc/4.0/
-
-
+*For full governing terms, see the main [LICENSE.md](./LICENSE.md) file.*
 
 # GREATSCOTT™ ECOSYSTEM PUBLIC NONCOMMERCIAL LICENSE
 ## Version 3.0 — Release Candidate 2 (RC2)
